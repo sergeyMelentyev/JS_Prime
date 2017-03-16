@@ -1,4 +1,9 @@
 "use strict";
+            /* DATA TYPES */
+// string, number, boolean, null, undefined = primitive values
+// String(), Number(), Boolean(), Array(), Object(), Function(), RegExp(), Data(), Error() = natives
+
+
 
             /* NAMESPACE */
 var libOne = {
@@ -44,6 +49,7 @@ iterator.next();
 });     // the same but inverted
 
 var x = (function () { return 10; })();     // the same as lambda expression
+x.length;       // will return number ob arguments
 
 // closure: func is able to access its lexical scope even when that func is executing outside its scope
 function outerOne() {
@@ -170,16 +176,80 @@ var objThree = {
     }
 };      // property setters and getters
 
-
-
-
-            /* PROTOTYPES */
-var a = {
-    name: "first",
-    last: "last"
+function Foo(name) {
+    this.name = name;
+}   // adds property onto each object
+Foo.prototype.getName = function () {
+    return this.name;
 };
-var b = Object.create(a);   // create prototype link, now 'b' has all properties from 'a'
-b.name = "new";     // 'b' can change properties in 'a' obj, but not in reverse
+var a = new Foo("name");
+
+
+
+            /* PROTOTYPES & DELEGATION PATTERN */
+var Task = {
+    setID: function (ID) {
+        this.id = ID;
+    },
+    outputID: function () {
+        console.log(this.id);
+    }
+};
+var XYZ = Object.create(Task);
+
+XYZ.prepareTask = function (ID, Label) {
+    this.setID(ID);
+    this.label = Label;
+};
+XYZ.outputTaskDetails = function () {
+    this.outputID();
+    console.log(this.label);
+};
+
+XYZ.prepareTask(1, "NAME");
+XYZ.outputTaskDetails();
+
+
+
+            /* ARRAYS */
+function makeArray() {
+    return Array.prototype.slice.call(arguments);
+}
+
+funcName(arrName);      // passing array by reverence
+funcName(arrName.slice());      // passing array by value
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            /* TRICKS */
+if (typeof varName !== "undefined") {}  // use global var only if it exists
+
+if (!Number.EPSILON) Number.EPSILON = Math.pow(2, -52); // compare floating point numbers
+function closeToEqual(n1, n2) {
+    return Math.abs(n1 - n2) < Number.EPSILON;
+}
+
+function doSomething() {
+    if (!APP.ready)
+        return void setTimeout(doSomething, 100);   // try again later
+    var result;     // do some stuff
+    return result;
+}       // wait until something is done
+if (doSomething()) {
+    // handle next task
+}
 
 
 
