@@ -1,7 +1,9 @@
 "use strict";
+var bar, baz;
+
             /* DATA TYPES */
 // string, number, boolean, null, undefined = primitive values
-// String(), Number(), Boolean(), Array(), Object(), Function(), RegExp(), Data(), Error() = natives
+// String, Number, Boolean, Array, Object, Function, RegExp, Data, Error = natives
 
 
 
@@ -29,15 +31,6 @@ function funcOne(bigData){}     // engine will remove block-scoping after execut
 
 
 
-            /* LOOPS AND ITERATIONS */
-var array = [1, 2, 3, 4];
-for (var v of array) {}
-
-var iterator = array[Symbol.iterator]();    // { value: 1, done: false }
-iterator.next();
-
-
-
             /* FUNCTIONS & CLOSURE */
 (function (global) {
     // logic here
@@ -49,9 +42,10 @@ iterator.next();
 });     // the same but inverted
 
 var x = (function () { return 10; })();     // the same as lambda expression
-x.length;       // will return number ob arguments
+x.length;       // will return number of arguments
 
-// closure: func is able to access its lexical scope even when that func is executing outside its scope
+// closure: func is able to access its lexical scope even when that func
+// is executing outside its scope
 function outerOne() {
     var a = 2;
     function innerOne() {
@@ -88,8 +82,7 @@ function ModOne() {
         doSecond: doSecond
     }
 }
-var module = funcOne(); module.doFirst(); module.doSecond();  // create new instance each time it called
-
+var module = ModOne(); module.doFirst();  // create new instance each time it called
 var singleton = (function Singleton () {
     // logic here the same as in Module()
 })();   // create one instance
@@ -160,29 +153,66 @@ foo.call(obj);
 
 
 
-            /* OBJECTS */
+            /* OBJECT */
 var objOne = { key: "value" };      // literal syntax
-var objTwo = new Object(); objTwo.key = "value";    // constructed syntax
+
+var objTwo = new Object(); objTwo.name = ""; objTwo.last = "";    // constructed syntax
+Object.defineProperty(objTwo, "fullname", {
+    get: function () {
+        return this.name + " " + this.last;
+    },
+    set: function (value) {
+        var temp = value.split(" ");
+        this.name = temp[0]; this.last = temp[1];
+    }
+});
 
 var bool = ("prop" in objOne);     // check if property is exist also included prototype link
 objOne.hasOwnProperty("prop");      // check if property is exist only in that object
 
-var objThree = {
-    get a() {
-        return this._a_;
-    },
-    set a(val) {
-        this._a_ = val * 2;
-    }
-};      // property setters and getters
+// constructor function
+function Foo() { this.name = "name"; }
+bar = Foo();        // return undefined and set this.name to global window object
+bar = new Foo();    // return new obj and set this.name refer to it, Foo { name: "name" }
 
-function Foo(name) {
+// iteration
+for (var key in objOne) {
+    // 'key' will show all keys, 'objOne[key]' all values
+}
+Object.keys(objOne);        // get array of keys
+
+// utils
+Object.defineProperty();
+delete objOne.key;
+
+
+
+            /* PROTOTYPES */
+// prototype is an object, when function created, a prototype obj is created
+// and attached to the function. If func is used an an constructor with new keyword
+// created object has __proto__ property that pointing to the same prototype obj in func
+
+// prototype of func is an obj instance that will become the prototype for all
+// objects created using this func as a constructor
+var myFunc = function () {};        // myFunc.prototype
+
+// prototype of obj is the obj instance from which he obj is inherited
+var myObj = {};     // myObj.__proto__
+
+function Animal(voice) {
+    this.voice = voice || "default";
+}
+Animal.prototype.teeth = "10";      // add property to prototype, will be inherited
+Animal.prototype.speak = function () {
+    console.log(this.voice);
+};  // add function to prototype, wll be inherited
+
+function Cat(name) {
+    Animal.call(this, "not default");   // call 'Animal' constructor with args
     this.name = name;
-}   // adds property onto each object
-Foo.prototype.getName = function () {
-    return this.name;
-};
-var a = new Foo("name");
+}       // will inherit 'teeth' prop and 'speak' func
+Cat.prototype = Object.create(Animal.prototype);    // assign 'Animal' as a prototype for 'Cat'
+Cat.prototype.constructor = Cat;
 
 
 
@@ -212,28 +242,50 @@ XYZ.outputTaskDetails();
 
 
             /* ARRAYS */
+var array = [1, 2, 3, 4];
 function makeArray() {
     return Array.prototype.slice.call(arguments);
 }
 
-funcName(arrName);      // passing array by reverence
-funcName(arrName.slice());      // passing array by value
+funcName(array);      // passing array by reverence
+funcName(array.slice());      // passing array by value
+
+function predicateMap(v) {
+    return v + v;
+}       // call predicate func on each value in an array
+[1,2,3,4].map(predicateMap);
+
+function predicateFilter(v) {
+    return v % 2 == 1;
+}       // filer values, predicate must return boolean
+[1,2,3,4].filter(predicateFilter);
+
+function predicateCompose(x, y) {
+    return x * y;
+}   // reduction example
+function compose(arr, predicate, init) {
+    var temp = init;
+    for (var i = 0; i < arr.length; i++)
+        temp = predicate(temp, arr[i]);
+    return temp;
+}
+compose([1,2,3,4], predicateCompose, 1);
+
+function predicateForEach(eachValue) {
+    // logic here
+}       // call predicate func on each value
+[1,2,3,4].forEach(predicateForEach);
+
+// iteration over array
+for (var i in array) {}     // will iterate over array index, not values
+for (var j of array) {}     // will iterate over array values
+
+var iterator = array[Symbol.iterator]();    // { value: 1, done: false }
+iterator.next();
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-            /* TRICKS */
+            /* UTILS */
 if (typeof varName !== "undefined") {}  // use global var only if it exists
 
 if (!Number.EPSILON) Number.EPSILON = Math.pow(2, -52); // compare floating point numbers
@@ -250,57 +302,3 @@ function doSomething() {
 if (doSomething()) {
     // handle next task
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* page 200
- var MyModules = (function Manager() {
- var modules = {};
- function define(name, deps, impl) {
- for(var i = 0; i < deps.length; i++) {
- deps[i] = modules[deps[i]];
- }
- modules[name] = impl.apply(impl,deps);
- }
- function get(name) {
- return modules[name];
- }
- return {
- define: define,
- get: get
- };
- })();
- MyModules.define("bar", [], function () {
- function hello(who) {
- return "My name is " + who;
- }
- return {
- hello: hello
- };
- });
- MyModules.define("foo", ["bar"], function (bar) {
- var name = "Sergey";
- function awesome() {
- console.log(bar.hello(name).toUpperCase());
- }
- return {
- awesome: awesome
- };
- });
-
- var bar = MyModules.get("bar");
- var fee = MyModules.get("foo");
- fee.awesome();
- */
