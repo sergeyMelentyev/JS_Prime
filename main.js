@@ -70,7 +70,7 @@ function outerThree(arg) {
 
             /* MODULES */
 function ModOne() {
-    var privatDataVars;
+    var privateData;
     function doFirst() {
         // logic here
     }
@@ -97,7 +97,7 @@ var singleton = (function Singleton () {
 
 function foo() {
     console.log("Call from foo function: " + this.a);
-}   // implicit binding (default)
+}       // implicit binding
 var bar = {
     a: "bar object",
     b: foo
@@ -105,8 +105,8 @@ var bar = {
 bar.b();
 
 function foo() {
-    console.log("Call from foo function: " + this.a);
-}   // explicit and strong binding (hard binding)
+    console.log(this.a);
+}       // explicit binding with 'call' function
 var bar = {
     a: "bar object"
 };
@@ -116,9 +116,9 @@ var baz = function () {
 baz(); setTimeout(baz, 100);
 
 function foo(something) {
-    console.log("Call from foo function " + this.a + " " + something);
+    console.log(this.a + " " + something);
     return this.a + something;
-}
+}   // explicit binding with 'apply' function
 var bar = {
     a: "bar object"
 };
@@ -127,13 +127,19 @@ var baz = function () {
 };
 baz("args");
 
-function foo(something) {
-    console.log("Call from foo: " + this.a + " "+ something);
-}   // explicit and strong binding with bind() helper func
-var obj = {
-    a: "object"
-};
-var baz = foo.bind(obj); baz("args");
+function foo() {
+    console.log(this.bar);
+}       // explicit hard binding, 'this' reference cannot be changed
+var objOne = { bar: "barOne" };
+var orig = foo;
+foo = function () { orig.call(objOne); };   // if 'foo' is called 'barOne' will be returned
+
+function foo(baz, bam) {
+    console.log(this.bar + " " + baz + " " + bam);
+}       // explicit hard binding with 'bind' function
+var obj = { bar: "bar" };
+foo = foo.bind(obj, "baz");
+foo("bam");     // bar baz bam
 
 function foo(a) {
     this.a = a;
@@ -170,10 +176,11 @@ Object.defineProperty(objTwo, "fullname", {
 var bool = ("prop" in objOne);     // check if property is exist also included prototype link
 objOne.hasOwnProperty("prop");      // check if property is exist only in that object
 
-// constructor function
+// function with constructor call
 function Foo() { this.name = "name"; }
-bar = Foo();        // return undefined and set this.name to global window object
-bar = new Foo();    // return new obj and set this.name refer to it, Foo { name: "name" }
+bar = new Foo();    // constructor call, return new obj and set this.name refer to it
+bar = Foo();        // regular func call, return undefined and set this.name to global window obj
+
 
 // iteration
 for (var key in objOne) {
@@ -189,7 +196,7 @@ delete objOne.key;
 
             /* PROTOTYPES */
 // prototype is an object, when function created, a prototype obj is created
-// and attached to the function. If func is used an an constructor with new keyword
+// and attached to the function. If func is used as a constructor with new keyword
 // created object has __proto__ property that pointing to the same prototype obj in func
 
 // prototype of func is an obj instance that will become the prototype for all
@@ -213,31 +220,6 @@ function Cat(name) {
 }       // will inherit 'teeth' prop and 'speak' func
 Cat.prototype = Object.create(Animal.prototype);    // assign 'Animal' as a prototype for 'Cat'
 Cat.prototype.constructor = Cat;
-
-
-
-            /* PROTOTYPES & DELEGATION PATTERN */
-var Task = {
-    setID: function (ID) {
-        this.id = ID;
-    },
-    outputID: function () {
-        console.log(this.id);
-    }
-};
-var XYZ = Object.create(Task);
-
-XYZ.prepareTask = function (ID, Label) {
-    this.setID(ID);
-    this.label = Label;
-};
-XYZ.outputTaskDetails = function () {
-    this.outputID();
-    console.log(this.label);
-};
-
-XYZ.prepareTask(1, "NAME");
-XYZ.outputTaskDetails();
 
 
 
@@ -286,7 +268,7 @@ iterator.next();
 
 
             /* UTILS */
-if (typeof varName !== "undefined") {}  // use global var only if it exists
+if (typeof varName !== "undefined") {}  // use global var only if it exist
 
 if (!Number.EPSILON) Number.EPSILON = Math.pow(2, -52); // compare floating point numbers
 function closeToEqual(n1, n2) {
