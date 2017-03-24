@@ -1,19 +1,8 @@
 "use strict";
-var bar, baz;
-
             /* DATA TYPES */
+// typeof operator
 // string, number, boolean, null, undefined = primitive values
 // String, Number, Boolean, Array, Object, Function, RegExp, Data, Error = natives
-
-
-
-            /* NAMESPACE */
-var libOne = {
-    a: "stuff",
-    b: function (arg) {
-        // logic here
-    }
-};  // single var declaration, used as namespace
 
 
 
@@ -90,11 +79,10 @@ var singleton = (function Singleton () {
 
 
             /* THIS POINTER */
-// if func called with 'new' (new binding), this = newly constructed object
-// if func called with 'call' or 'apply' (explicit binding), this = explicitly specified object
+// if func called with "new" (new binding), this = newly constructed object
+// if func called with "call" or "apply" (explicit binding), this = explicitly specified object
 // if func called with a context (implicit binding), this = context object
 // otherwise default binding to undefined in strict mode or global object
-
 function foo() {
     console.log("Call from foo function: " + this.a);
 }       // implicit binding
@@ -106,7 +94,7 @@ bar.b();
 
 function foo() {
     console.log(this.a);
-}       // explicit binding with 'call' function
+}       // explicit binding with "call" function
 var bar = {
     a: "bar object"
 };
@@ -118,7 +106,7 @@ baz(); setTimeout(baz, 100);
 function foo(something) {
     console.log(this.a + " " + something);
     return this.a + something;
-}   // explicit binding with 'apply' function
+}   // explicit binding with "apply" function
 var bar = {
     a: "bar object"
 };
@@ -129,14 +117,14 @@ baz("args");
 
 function foo() {
     console.log(this.bar);
-}       // explicit hard binding, 'this' reference cannot be changed
+}       // explicit hard binding, "this" reference cannot be changed
 var objOne = { bar: "barOne" };
 var orig = foo;
-foo = function () { orig.call(objOne); };   // if 'foo' is called 'barOne' will be returned
+foo = function () { orig.call(objOne); };   // if "foo" is called "barOne" will be returned
 
 function foo(baz, bam) {
     console.log(this.bar + " " + baz + " " + bam);
-}       // explicit hard binding with 'bind' function
+}       // explicit hard binding with "bind" function
 var obj = { bar: "bar" };
 foo = foo.bind(obj, "baz");
 foo("bam");     // bar baz bam
@@ -181,10 +169,9 @@ function Foo() { this.name = "name"; }
 bar = new Foo();    // constructor call, return new obj and set this.name refer to it
 bar = Foo();        // regular func call, return undefined and set this.name to global window obj
 
-
 // iteration
 for (var key in objOne) {
-    // 'key' will show all keys, 'objOne[key]' all values
+    // "key" will show all keys, "objOne[key]" all values
 }
 Object.keys(objOne);        // get array of keys
 
@@ -195,16 +182,33 @@ delete objOne.key;
 
 
             /* PROTOTYPES */
-// prototype is an object, when function created, a prototype obj is created
-// and attached to the function. If func is used as a constructor with new keyword
-// created object has __proto__ property that pointing to the same prototype obj in func
+function Human(arg) {
+    // func will create arbitrary labeled "object"
+    // "Foo.prototype" will point (link) to that "object"
+    // "object.constructor" will point (link) back to "Foo"
+    this.name = arg;
+}
+Human.prototype.propName = "";      // put property directly on arbitrary labeled "object"
+    // will be referenced by all objects
 
-// prototype of func is an obj instance that will become the prototype for all
-// objects created using this func as a constructor
-var myFunc = function () {};        // myFunc.prototype
+var men = new Human("S");
+var female = new Human("O");
+// a. new obj is created
+// b. that obj get linked via [[Prototype]] to the arbitrary labeled "object"
+    // the same that "Human.prototype" points to
+// c. context get set to that new obj, "Human this.name" will be pointing to that obj
+// d. obj is being returned and assign to variable "men"
+men.propValue = "";     // put property directly on that "men" object
 
-// prototype of obj is the obj instance from which he obj is inherited
-var myObj = {};     // myObj.__proto__
+men.constructor === Human;      // true, "men" does not have that prop, will walk up the
+    // prototype chain via private [[Prototype]] link to the arbitrary labeled "object"
+    // that has ".constructor" property pointing to the "Human" function
+men.constructor === female.constructor;     // true, both points to the "Human" function
+men.__proto__ === Human.prototype;      // true, "men" does not have that function,
+    // will walk up the prototype chain via private [[Prototype]] link to the the arbitrary
+    // labeled "object" that also does not have that function, will walk up to the system
+    // arbitrary labeled "object" and call that func. It will return internal prototype
+    // linkage [[Prototype]] of called obj, in this case "men"
 
 function Animal(voice) {
     this.voice = voice || "default";
@@ -215,11 +219,30 @@ Animal.prototype.speak = function () {
 };  // add function to prototype, wll be inherited
 
 function Cat(name) {
-    Animal.call(this, "not default");   // call 'Animal' constructor with args
+    Animal.call(this, "not default");   // call "Animal" constructor with args
     this.name = name;
-}       // will inherit 'teeth' prop and 'speak' func
-Cat.prototype = Object.create(Animal.prototype);    // assign 'Animal' as a prototype for 'Cat'
+}       // will inherit "teeth" prop and "speak" func
+Cat.prototype = Object.create(Animal.prototype);    // assign "Animal" as a prototype for "Cat"
 Cat.prototype.constructor = Cat;
+
+
+
+            /* BEHAVIOR DELEGATION */
+var Foo = {
+    init: function(who) {
+        this.me = who;
+    },
+    identify: function() {
+        return "I am " + this.me;
+    }
+};
+var Bar = Object.create(Foo);
+Bar.speak = function () {
+    console.log("Hello, " + this.identify() + ".");
+};
+var bam = Object.create(Bar);
+bam.init("S");
+bam.speak();
 
 
 
@@ -229,7 +252,6 @@ function makeArray() {
     return Array.prototype.slice.call(arguments);
 }
 
-funcName(array);      // passing array by reverence
 funcName(array.slice());      // passing array by value
 
 function predicateMap(v) {
