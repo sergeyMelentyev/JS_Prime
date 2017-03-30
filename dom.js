@@ -19,7 +19,7 @@
 })();
 
 
-/* GET NODE ELEMENTS */
+/* GET NODE ELEMENT */
 (function () {
     "use strict";
     var elem = document.getElementById('id');
@@ -32,7 +32,7 @@
 })();
 
 
-/* GET AND SET ATTRIBUTES */
+/* GET AND SET ATTRIBUTE */
 (function () {
     "use strict";
     var atr = document.getElementById('one').getAttribute("data-role");
@@ -40,7 +40,7 @@
 })();
 
 
-/* FRAGMENTS, NODE ELEMENT, TEXT NODE */
+/* FRAGMENT, NODE ELEMENT, TEXT NODE */
 (function () {
     "use strict";
     var fragment = document.createDocumentFragment();       // fragments for adding elems
@@ -197,3 +197,21 @@
     xhr.open("GET", "page.html", true);     // method, url, asynchronous
     xhr.send("");
 })();
+
+/* JQUERY */
+(function (global) {
+    "use strict";
+    var $ = global.jQuery;
+
+    var windowHeight = $(window).height();
+    $('selector').on('click', function () {
+        $('body').scrollTop(windowHeight);
+    });
+
+    $(window).scroll(function () {
+        var div = $('div').height();
+        if ($(window).scrollTop() > (div / 4))
+            $('selector').animate({top: div + 100}, 1000);
+    });
+
+})(window);
