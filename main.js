@@ -177,12 +177,20 @@
 /* ARRAY */
 (function () {
     "use strict";
-    var array = [1, 2, 3, 4];
+    var arr = [1, 2, 3, 4];
     function makeArray() {
         return Array.prototype.slice.call(arguments);
     }
 
-    funcName(array.slice());      // passing array by value
+    arr.push(5);      // add to the end, return value will show new length
+    arr.unshift(5);   // add to the front
+    arr.pop();        // remove the last one element
+    arr.shift();      // remove the fist one element
+
+    arr.splice(arr.indexOf(3), 1);  // remove exact value '3' by index position
+
+    func(array);                // passing array by reference
+    func(array.slice());        // passing array by value
 
     function predicateMap(v) {
         return v + v;
@@ -205,9 +213,9 @@
     }
     compose([1,2,3,4], predicateCompose, 1);
 
-    function predicateForEach(eachValue) {
+    function predicateForEach(item, index, array) {
         // logic here
-    }       // call predicate func on each value
+    }   // call predicate func on each value
     [1,2,3,4].forEach(predicateForEach);
 
 // iteration over array
@@ -429,4 +437,63 @@
     if (doSomething()) {
         // handle next task
     }
+})();
+
+/* CONCURRENCY */
+(function (callbackPattern) {
+    "use strict";
+    function fakeAjax(url, cb) {
+        var fake_responses = {
+            "file1": "The first response",
+            "file2": "The second response",
+            "file3": "The third response"
+        };
+        var randomDelay = (Math.round(Math.random() * 1E4) % 8000) + 10;
+        console.log("Requesting: " + url);
+
+        setTimeout(function () {
+            cb(fake_responses[url]);
+        }, randomDelay);
+    }
+    function getFile(file) {
+        fakeAjax(file, function (text) {
+            handleResponse(file, text);
+        });
+    }
+
+    var responses = {};
+    function handleResponse(filename, contents) {
+        if (!(filename in responses))
+            responses[filename] = contents;
+        var renderOrder = ["file1", "file2", "file3"];
+        for (var i = 0; i < renderOrder.length; i++) {
+            if (renderOrder[i] in responses) {
+                if (typeof responses[renderOrder[i]] == "string") {
+                    render(responses[renderOrder[i]]);
+                    responses[renderOrder[i]] = false;
+                }
+            }
+            else return;
+        }
+    }
+    function render(contents) {
+        console.log("Rendering: " + contents + ".");
+    }
+
+    getFile("file1");
+    getFile("file2");
+    getFile("file3");
+})(window);
+(function (thunkPattern) {
+    "use strict";
+
+})(window);
+
+/* ES6 */
+(function () {
+    "use strict";
+    var name = (x) => ++x;      // arrow function
+    function foo (x = 42) {}        // default value of argument
+    function bar(x = foo()) {}      // default function argument
+
 })();
