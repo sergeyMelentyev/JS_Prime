@@ -6,7 +6,6 @@
     var elem = document.querySelector("[data-role='p']");
 })();
 
-
 /* COLLECTIONS SELECTOR */
 (function () {
     "use strict";
@@ -17,7 +16,6 @@
     var elem = document.querySelectorAll('*[class="name"]');    // any elems with same class name
     var array = [].slice.call(elem);        // get array from NodeList object
 })();
-
 
 /* GET NODE ELEMENT */
 (function () {
@@ -31,14 +29,12 @@
     }
 })();
 
-
 /* GET AND SET ATTRIBUTE */
 (function () {
     "use strict";
     var atr = document.getElementById('one').getAttribute("data-role");
     atr.setAttribute("data-role", atr);
 })();
-
 
 /* FRAGMENT, NODE ELEMENT, TEXT NODE */
 (function () {
@@ -67,7 +63,6 @@
     var p = document.createElement('p').appendChild(text);
 })();
 
-
 /* DELETE NODE ELEMENT */
 (function () {
     "use strict";
@@ -76,7 +71,6 @@
     one.removeChild(set[0]);
 })();
 
-
 /* ADD ID, CLASS IDENTIFIER */
 (function () {
     "use strict";
@@ -84,7 +78,6 @@
     elem.setAttribute('class', 'class-name');
     elem.classList.add('class-name');       // .remove
 })();
-
 
 /* ADD CALLBACKS TO ARRAY OF ELEMS */
 (function () {
@@ -102,14 +95,12 @@
     }
 })();
 
-
 /* STYLES */
 (function () {
     "use strict";
     elem.style.backgroundColor = 'red';
     elem.setAttribute('style', 'background-color: red; color: white;');
 })();
-
 
 /* POPUP OVERLAY */
 (function (global) {
@@ -126,7 +117,6 @@
         displayPopup();
     };
 })(window);
-
 
 /* EVENTS */
 (function () {
@@ -167,7 +157,6 @@
     }
 })();
 
-
 /* BACKGROUND THREAD */
 (function () {
     "use strict";
@@ -182,7 +171,6 @@
     // logic here
     postMessage("post event before end");
 })();       // ww.js file
-
 
 /* MAKE REQUEST TO THE SERVER */
 (function () {
