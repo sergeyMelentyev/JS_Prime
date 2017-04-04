@@ -32,25 +32,25 @@
 })();
 
 /* SCOPE */
-(function () {
+(function (window) {
     "use strict";
-    window.a = 0;   // global vars are props of the global scope
-    var varA;       // will stick only to function scope
-    let varB;       // will stick to any block scope
-    const varC = 0;     // constant value will stick to any block scope
+    window.a = 0;       // global vars are props of the global scope
+    var one;        // will stick only to function scope
+    let two;        // will stick to any block scope
+    const three = 0;    // constant value will stick to any block scope
 
     function funcOne(bigData){}     // engine will remove block-scoping after executing
     {
         let bigData = {};
         funcOne(bigData);
     }
-})();
+})(window);
 
 /* FUNCTION & CLOSURE */
 (function () {
     "use strict";
     var x = (function () { return 10; })();     // the same as lambda expression
-    x.length;       // will return number of arguments
+    var size = x.length;        // will return number of arguments
 
     // closure: func is able to access its lexical scope even when that func
     // is executing outside its scope
@@ -162,9 +162,9 @@
         }
     });
 
-    var bool = ("prop" in obj);     // check if property is exist also included prototype link
-    obj.hasOwnProperty("prop");      // check if property is exist only in that object
-    delete obj.key;         // delete value by key from obj
+    var bool = ("key" in obj);      // check if property is exist also included prototype link
+    obj.hasOwnProperty("key");      // check if property is exist only in that object
+    delete obj.key;         // delete 'value' by targeting its 'key' from obj
 
     // iterate over object
     for (var key in obj) {
@@ -218,11 +218,11 @@
     }   // call predicate func on each value
     [1,2,3,4].forEach(predicateForEach);
 
-// iteration over array
-    for (var i in array) {}     // will iterate over array index, not values
-    for (var j of array) {}     // will iterate over array values
+    // iteration over array
+    for (var i in arr) {}     // will iterate over array index, not values
+    for (var j of arr) {}     // will iterate over array values
 
-    var iterator = array[Symbol.iterator]();    // { value: 1, done: false }
+    var iterator = arr[Symbol.iterator]();    // { value: 1, done: false }
     iterator.next();
 })();
 
@@ -240,11 +240,11 @@
 
     var men = new Human("S");
     var female = new Human("O");
-// a. new obj is created
-// b. that obj get linked via [[Prototype]] to the arbitrary labeled "object"
-    // the same that "Human.prototype" points to
-// c. context get set to that new obj, "Human this.name" will be pointing to that obj
-// d. obj is being returned and assign to variable "men"
+    // new obj is created;
+    // that obj get linked via [[Prototype]] to the arbitrary labeled "object"
+    //  the same that "Human.prototype" points to;
+    // context get set to that new obj, "Human this.name" will be pointing to that obj;
+    // obj is being returned and assign to variable "men";
     men.propValue = "";     // put property directly on that "men" object
 
     men.constructor === Human;      // true, "men" does not have that prop, will walk up the
