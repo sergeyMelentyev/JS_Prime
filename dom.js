@@ -157,6 +157,34 @@
     }
 })();
 
+/* PERSISTENCE */
+(function () {
+    "use strict";
+    // Web Storage API sessionStorage and localStorage, key-value pairs, value in string format,
+    // indexed array like object
+
+    if (window.sessionStorage && window.localStorage) { /* check if API is supported */ }
+
+    var item = { id: "5456098", name: "Samsung S8", dateView: new Date() };
+    localStorage.setItem (item.id, JSON.stringify(item));
+    var key, value;
+    for (var i = 0; i < localStorage.length; i++) {
+        key = localStorage.key(i); value = JSON.parse(localStorage.getItem(key));
+        if (Date.parse(value.dateView) < (new Date() - 1000*60*60*24*30))
+            localStorage.removeItem(key);
+    }
+
+    // IndexedDB API, NOSQL storage,
+    window.indexedDB = window.indexedDB || window.mozIndexedDB  // check if API is supported
+            || window.webkitIndexedDB || window.msIndexedDB;
+
+    var db;
+    var request = window.indexedDB.open("name", 1); // open 'name' database, ver 1.0
+    request.onerror = function(event) { /* error logic */ };
+    request.onsuccess = function(event) { db = event.target.result; };
+
+})();
+
 /* BACKGROUND THREAD */
 (function () {
     "use strict";
