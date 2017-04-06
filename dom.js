@@ -200,9 +200,13 @@
     postMessage("post event before end");
 })();       // ww.js file
 
-/* MAKE REQUEST TO THE SERVER */
+/* SEND REQUEST TO THE SERVER */
 (function () {
     "use strict";
+
+    // XMLHttpRequest + $.ajax
+    jQuery.ajax();
+
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function () {      // provide a callback to the event
         if ((xhr.readyState === 4) && (xhr.status === 200)) {
@@ -212,6 +216,14 @@
     };
     xhr.open("GET", "page.html", true);     // method, url, asynchronous
     xhr.send("");
+
+    // WebSocket
+    // browser send GET request, if server response success, TCP connection stay open
+    // Each side can send data without headers and metadata
+    var ws = new WebSocket("ws://site.com/demo");
+    ws.onopen = function() { /* success callback, connection established */ };
+    ws.onclose = function() { /* closing callback, connection ended */ };
+    ws.onmessage = function(data) { /* receiving data callback */ };
 })();
 
 /* JQUERY */
@@ -231,3 +243,9 @@
     });
 
 })(window);
+
+/* UNIT TESTING */
+(function () {
+    "use strict";
+    // QUnit модульные тесты для каждой функции
+})();
