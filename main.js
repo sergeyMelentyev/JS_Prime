@@ -195,7 +195,7 @@
     function predicateMap(v) {
         return v + v;
     }       // call predicate func on each value in an array
-    [1,2,3,4].map(predicateMap);
+    [1,2,3,4].map(predicateMap);        // no side effect, will return new array
 
     function predicateFilter(v) {
         return v % 2 == 1;
@@ -216,7 +216,7 @@
     function predicateForEach(item, index, array) {
         // logic here
     }   // call predicate func on each value
-    [1,2,3,4].forEach(predicateForEach);
+    [1,2,3,4].forEach(predicateForEach);        // with side effect, will change initial array
 
     // iteration over array
     for (var i in arr) {}     // will iterate over array index, not values
@@ -242,7 +242,7 @@
     var female = new Human("O");
     // new obj is created;
     // that obj get linked via [[Prototype]] to the arbitrary labeled "object"
-    //  the same that "Human.prototype" points to;
+        // the same that "Human.prototype" points to;
     // context get set to that new obj, "Human this.name" will be pointing to that obj;
     // obj is being returned and assign to variable "men";
     men.propValue = "";     // put property directly on that "men" object
@@ -309,7 +309,7 @@
     mazda.print();
 
     // singleton pattern
-    var singletonPattern = (function Singleton () {
+    var singletonPattern = (function () {
         var privateData = 0;
         function doSomething() {
             console.log(privateData);
