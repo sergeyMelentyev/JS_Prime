@@ -174,7 +174,8 @@
             localStorage.removeItem(key);
     }
 
-    // IndexedDB API, NOSQL storage,
+    // IndexedDB API, NOSQL storage, key-value pairs, value can be complex structured obj
+    // work with request, pass callback func for answer via DOM notification
     window.indexedDB = window.indexedDB || window.mozIndexedDB  // check if API is supported
             || window.webkitIndexedDB || window.msIndexedDB;
 
