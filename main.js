@@ -1,3 +1,4 @@
+
 /* DATA TYPES */
 (function () {
     "use strict";
@@ -484,8 +485,47 @@
     getFile("file2");
     getFile("file3");
 })(window);
-(function (thunkPattern) {
+(function (promises) {
     "use strict";
+    // time independent state, async flow control
+    function fakeAjax(url, cb) {
+        var fake_responses = {
+            "file1": "The first response",
+            "file2": "The second response",
+            "file3": "The third response"
+        };
+        var randomDelay = (Math.round(Math.random() * 1E4) % 8000) + 10;
+        console.log("Requesting: " + url);
+
+        setTimeout(function () {
+            cb(fake_responses[url]);
+        }, randomDelay);
+    }
+    function getFile(file) {
+        return new Promise(function (resolve) {
+            fakeAjax(file, resolve);
+        });
+    }
+
+    var p1 = getFile("file1");
+    var p2 = getFile("file2");
+    var p3 = getFile("file3");
+
+    p1.then(function (data) {
+        console.log(data);
+    })
+        .then(function () {
+            return p2;
+        })
+        .then(function (data) {
+            console.log(data);
+        })
+        .then(function () {
+            return p3;
+        })
+        .then(function (data) {
+            console.log(data);
+        });
 
 })(window);
 
@@ -495,5 +535,7 @@
     var name = (x) => ++x;      // arrow function
     function foo (x = 42) {}        // default value of argument
     function bar(x = foo()) {}      // default function argument
+
+    // generators
 
 })();
