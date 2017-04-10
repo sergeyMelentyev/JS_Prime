@@ -11,6 +11,7 @@
     "use strict";
     // html collection, methods .length and .item(index)
     var elem = document.getElementsByTagName('p');      // life collection
+    var elem = document.getElementsByClassName('name');
     // node elements collection, methods .length and .item(index)
     var elem = document.querySelectorAll('div p');
     var elem = document.querySelectorAll('*[class="name"]');    // any elems with same class name
@@ -34,28 +35,29 @@
     "use strict";
     var atr = document.getElementById('one').getAttribute("data-role");
     atr.setAttribute("data-role", atr);
+    var img = document.querySelector('img'); 
+    img.setAttribute("src", "url");
 })();
 
 /* FRAGMENT, NODE ELEMENT, TEXT NODE */
 (function () {
     "use strict";
-    var fragment = document.createDocumentFragment();       // fragments for adding elems
+    var fragment = document.createDocumentFragment();
     var p = document.createElement('p');
     var span = document.createElement('span'); span.innerText = 'text';
     p.appendChild(span);
     fragment.appendChild(p);
     document.body.appendChild(fragment);
 
-    var oldNode = document.getElementById('id');        // fragments for updating elems
+    var oldNode = document.getElementById('id');
     var newNode = oldNode.cloneNode(true);
-    // work with newNode
     oldNode.parentNode.replaceChild(newNode, oldNode);
 
-    var elements = document.getElementsByTagName('p');      // add to a list of elems
+    var elements = document.getElementsByTagName('p');      // add to the list of elems
     elements[0].parentNode.appendChild(p);
 
     var div = document.getElementById('id');
-    var elems = div.getElementsByTagName('p');  // retrieve a collection of 'p' from 'div'
+    var elems = div.getElementsByTagName('p');
     var newElem = document.createElement('span');
     div.insertBefore(newElem, elems[3]);
 
@@ -76,11 +78,18 @@
     "use strict";
     elem.setAttribute('id', 'id-name');
     elem.setAttribute('class', 'class-name');
-    elem.classList.add('class-name');       // .remove
+    elem.classList.add('class-name');       // .remove .toggle
+})();
+
+/* CONTENT MANIPULATION */
+(function () {
+    "use strict";
+    elem.innerHTML = "";        // text in 'elem' plus all inner tags
+    elem.textContent = "";      // only text in 'elem' plus text from all inner tags
 })();
 
 /* ADD CALLBACKS TO ARRAY OF ELEMS */
-(function () {
+(function (forEach) {
     "use strict";
     var elem = document.querySelectorAll('div p');
     var array = [].slice.call(elem);
@@ -93,7 +102,14 @@
             item.textContent = "any text";      // set any content text
         });
     }
-})();
+})(window);
+(function (forLoop) {
+    "use strict";
+    var elems = document.querySelectorAll('name');
+    for (var i = 0; i< elems.length; i++) {
+        this.style.color = "green";     // this key word will target only clicked element
+    }
+})(window);
 
 /* STYLES */
 (function () {
@@ -121,13 +137,13 @@
 /* EVENTS */
 (function () {
     "use strict";
-    var p = document.getElementById('id');
+    var div = document.getElementById('btn-wrapper');
     if (document.addEventListener) {    // W3C
-        p.addEventListener('click', myHandler, false);
+        div.addEventListener('click', myHandler, false);
     } else if (document.attachEvent) {  // IE
-        p.attachEvent('onclick', myHandler);
+        div.attachEvent('onclick', myHandler);
     } else {        // last resort
-        p.onclick = myHandler;
+        div.onclick = myHandler;
     }
 
     function myHandler(e) {
@@ -220,7 +236,7 @@
 
     // WebSocket
     // browser send GET request, if server response success, TCP connection stay open
-    // Each side can send data without headers and metadata
+    // each side can send data without headers and metadata
     var ws = new WebSocket("ws://site.com/demo");
     ws.onopen = function() { /* success callback, connection established */ };
     ws.onclose = function() { /* closing callback, connection ended */ };
@@ -231,6 +247,10 @@
 (function (global) {
     "use strict";
     var $ = global.jQuery;
+
+    $('elem').keypress(function (event) {
+        // receive event each time key pressed
+    });
 
     var windowHeight = $(window).height();
     $('selector').on('click', function () {
