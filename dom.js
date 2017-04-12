@@ -114,6 +114,22 @@
 /* STYLES */
 (function () {
     "use strict";
+
+    /*
+        { box-sizing: border-box }        // padding and border will be included in the width
+
+    */
+
+    /* intrinsic ration based on content aspect ration
+        .container { position: relative; padding-bottom: 56.25%; height: 0; }
+        .content { position: absolute; width: 100%; height: 100%; top: 0; left: 0; }
+    */
+
+    /* small resolution styles first, then
+        @media (min-width: 400px) {}
+        @media (min-width: 600px) {}
+    */
+    
     elem.style.backgroundColor = 'red';
     elem.setAttribute('style', 'background-color: red; color: white;');
 })();
