@@ -38,7 +38,7 @@
     window.a = 0;       // global vars are props of the global scope
     var one;        // will stick only to function scope
     let two;        // will stick to any block scope
-    const three = 0;    // constant value will stick to any block scope
+    const three = 0;    // constant value will stick to any block scope, like let
 
     function funcOne(bigData){}     // engine will remove block-scoping after executing
     {
@@ -50,7 +50,8 @@
 /* FUNCTION & CLOSURE */
 (function () {
     "use strict";
-    var x = (function () { return 10; })();     // the same as lambda expression
+    function name() {}         // function declaration, will be hoisted
+    var x = function () {};     // function expression, will not be hoisted
     var size = x.length;        // will return number of arguments
 
     // closure: func is able to access its lexical scope even when that func
@@ -532,10 +533,26 @@
 /* ES6 */
 (function () {
     "use strict";
+
     var name = (x) => ++x;      // arrow function
+    function baz(arg, ...args) {}   // ...args will be available as a proper array
     function foo (x = 42) {}        // default value of argument
     function bar(x = foo()) {}      // default function argument
 
-    // generators
+    // spread operator
+    var nums = [1,2]; var chars = ["a", "b"];
+    console.log(...nums);        // the same as console.log(arr[0] + " " + arr[1]);
+
+    function nameless() { return [1,2]; }
+    var num = [0, ...nameless()];       // array concatenation
+    var concat = [...nums, ...chars];
+
+    // destructuring
+    var person = { name: "S", age: 35 };
+    display(person);
+    function display({name, age}) {}    // the same as below
+    function display(p) { let {name, age} = p; }    // the same as above,
+        // any let or a hole pattern can be prefix with '?', will bind with undefined
+    
 
 })();
