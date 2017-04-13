@@ -134,46 +134,18 @@
         a: "object"
     };
     foo.call(obj);
-})();
 
-/* OBJECT */
-(function () {
-    "use strict";
-    // create a new object
-    var obj = {};
-    var obj = Object.create(null);
-    var obj = new Object();
-
-    // add key-value pare
-    obj.key = "";
-    obj['key'] = "";
-    Object.defineProperty(obj, 'key', {
-        value: "",
-        writable: true,
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperties(obj, {
-        'keyOne': {
-            value: "",
-            writable: true
+    var widget = {
+        init: function () {
+            var self = this;
+            document.addEventListener('click', function (event) {
+                self.doSomething(event.type);
+            }, false);
         },
-        'keyTwo': {
-            value: "",
-            writable: true
+        doSomething: function (type) {
+            console.log(type);
         }
-    });
-
-    var bool = ("key" in obj);      // check if property is exist also included prototype link
-    obj.hasOwnProperty("key");      // check if property is exist only in that object
-    delete obj.key;         // delete 'value' by targeting its 'key' from obj
-
-    // iterate over object
-    for (var key in obj) {
-        // "key" will show all keys, "objOne[key]" all values
-    }
-    Object.keys(obj);        // get array of keys
-
+    };      // use case with document.addEventListener()
 })();
 
 /* ARRAY */
@@ -226,6 +198,46 @@
 
     var iterator = arr[Symbol.iterator]();    // { value: 1, done: false }
     iterator.next();
+})();
+
+/* OBJECT */
+(function () {
+    "use strict";
+    // create a new object
+    var obj = {};
+    var obj = Object.create(null);
+    var obj = new Object();
+
+    // add key-value pare
+    obj.key = "";
+    obj['key'] = "";
+    Object.defineProperty(obj, 'key', {
+        value: "",
+        writable: true,
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperties(obj, {
+        'keyOne': {
+            value: "",
+            writable: true
+        },
+        'keyTwo': {
+            value: "",
+            writable: true
+        }
+    });
+
+    var bool = ("key" in obj);      // check if property is exist also included prototype link
+    obj.hasOwnProperty("key");      // check if property is exist only in that object
+    delete obj.key;         // delete 'value' by targeting its 'key' from obj
+
+    // iterate over object
+    for (var key in obj) {
+        // "key" will show all keys, "objOne[key]" all values
+    }
+    Object.keys(obj);        // get array of keys
+
 })();
 
 /* PROTOTYPE */
@@ -420,27 +432,6 @@
     pubsub.unsubscribe(subscription);
 })
 
-/* UTILS */
-(function () {
-    "use strict";
-    if (typeof varName !== "undefined") {}  // use global var only if it exist
-
-    if (!Number.EPSILON) Number.EPSILON = Math.pow(2, -52); // compare floating point numbers
-    function closeToEqual(n1, n2) {
-        return Math.abs(n1 - n2) < Number.EPSILON;
-    }
-
-    function doSomething() {
-        if (!APP.ready)
-            return void setTimeout(doSomething, 100);   // try again later
-        var result;     // do some stuff
-        return result;
-    }       // wait until something is done
-    if (doSomething()) {
-        // handle next task
-    }
-})();
-
 /* CONCURRENCY */
 (function (callbackPattern) {
     "use strict";
@@ -534,7 +525,6 @@
 (function () {
     "use strict";
 
-    var name = (x) => ++x;      // arrow function
     function baz(arg, ...args) {}   // ...args will be available as a proper array
     function foo (x = 42) {}        // default value of argument
     function bar(x = foo()) {}      // default function argument
@@ -553,6 +543,74 @@
     function display({name, age}) {}    // the same as below
     function display(p) { let {name, age} = p; }    // the same as above,
         // any let or a hole pattern can be prefix with '?', will bind with undefined
-    
 
+    var num = [1,2,3,4,5];
+    var [first,,,last] = num;       // '[1,5]'
+
+    // arrow function, use case in lexical bind of 'this' in document.addEventListener()
+    var name = (x) => ++x;      // function name(x) { return ++x; }
+    var name = (x) => { return ++x; };  // for multi line body use braces and explicit return
+
+    // classes
+    class Human {
+        constructor(name, age) {
+            this.name = name;
+            this.age = age;
+        }
+    }
+    class Men extends Human {
+        constructor(name, age, id){
+            super(name, age);
+            this.id = id;
+        }
+    }
+    var person = new Men("S", 35, 123);
+
+    // set collection of unique items
+    var set = new Set();
+    set.add(1); set.has(1); set.clear(); set.delete(1);   // add, check, clear all, delete one
+    for (let n of set) {}     // for-of iterate over a set
+
+    // weakmap collection, like a map, does not put strong reference on obj, prevent mem licks
+    // map key-value collection, can use complex object as a key
+    var user = { name: "S", id: 123 };
+    var userSkills = new Map(); userSkills.set(user, ["JS", "React"]);
+
+    // promise
+    var promise = new Promise(function (resolve, reject) {
+        // logic here, ajax call or DOM manipulation
+        if (doSomething()) {
+            resolve("Stuff worked");
+        } else {
+            reject("Stuff broken");
+        }
+    });
+    promise.then(function (result) {
+        console.log(result);    // "Stuff worked"
+    }, function (err) {
+        console.log(err);       // "Stuff broken"
+    });
+
+
+})();
+
+/* UTILS */
+(function () {
+    "use strict";
+    if (typeof varName !== "undefined") {}  // use global var only if it exist
+
+    if (!Number.EPSILON) Number.EPSILON = Math.pow(2, -52); // compare floating point numbers
+    function closeToEqual(n1, n2) {
+        return Math.abs(n1 - n2) < Number.EPSILON;
+    }
+
+    function doSomething() {
+        if (!APP.ready)
+            return void setTimeout(doSomething, 100);   // try again later
+        var result;     // do some stuff
+        return result;
+    }       // wait until something is done
+    if (doSomething()) {
+        // handle next task
+    }
 })();
