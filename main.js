@@ -610,6 +610,35 @@
     }, function (err) {
         console.log(err);       // "Stuff broken"
     });
+
+    // babel + gulp
+    dev_folder:> npm init
+    dev_folder:> npm install --save-dev babel-cli
+    dev_folder/.babelrc:>
+            { "presets": [ "es2015" ] }
+    dev_folder:> npm install --save-dev babel-preset-es2015 
+
+    dev_folder:> npm install --global gulp-cli
+    dev_folder:> npm install --save-dev gulp 
+    dev_folder/gulpfile.js:>
+            const gulp = require('gulp'); const babel = require('gulp-babel');
+            gulp.task('default', ['babel']);
+            gulp.task('babel', function () {
+                return gulp.src('src/*.js')
+                    .pipe(babel({
+                        presets: ['es2015']
+                    }))
+                    .pipe(gulp.dest('assets/js/'))
+            });
+            gulp.task('watch', function(){
+                gulp.watch('src/*.js', ['babel']);
+            })
+    dev_folder:> npm install --save-dev gulp-babel
+
+    dev_folder:> gulp watch
+
+    // dev_folder.package.json:> "scripts": { "start": "node_modules/.bin/babel src -d assets/js" }
+    // dev_folder:> npm start
 })();
 
 // UTILS
