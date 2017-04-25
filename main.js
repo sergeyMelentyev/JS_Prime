@@ -1,5 +1,4 @@
-
-/* DATA TYPES */
+// DATA TYPES
 (function () {
     "use strict";
     typeof null;            // "object"
@@ -11,7 +10,7 @@
     typeof function () {};  // "function"
 })();
 
-/* COERCION */
+// COERCION
 (function () {
     "use strict";
 
@@ -32,7 +31,7 @@
 
 })();
 
-/* SCOPE */
+// SCOPE
 (function (window) {
     "use strict";
     window.a = 0;       // global vars are props of the global scope
@@ -47,7 +46,7 @@
     }
 })(window);
 
-/* FUNCTION & CLOSURE */
+// FUNCTION & CLOSURE
 (function () {
     "use strict";
     function name() {}         // function declaration, will be hoisted
@@ -66,7 +65,7 @@
     var varD = outerOne(); varD();
 })();
 
-/* THIS POINTER */
+// THIS POINTER
 (function () {
     "use strict";
 // if func called with "new" (new binding), this = newly constructed object
@@ -148,7 +147,7 @@
     };      // use case with document.addEventListener()
 })();
 
-/* ARRAY */
+// ARRAY
 (function () {
     "use strict";
     var arr = [1, 2, 3, 4];
@@ -200,7 +199,7 @@
     iterator.next();
 })();
 
-/* OBJECT */
+// OBJECT
 (function () {
     "use strict";
     // create a new object
@@ -240,7 +239,7 @@
 
 })();
 
-/* PROTOTYPE */
+// PROTOTYPE
 (function () {
     "use strict";
     function Human(arg) {
@@ -287,7 +286,7 @@
     Cat.prototype.constructor = Cat;
 })();
 
-/* BEHAVIOR DELEGATION */
+// BEHAVIOR DELEGATION
 (function () {
     "use strict";
     var Foo = {
@@ -307,7 +306,7 @@
     bam.speak();
 })();
 
-/* DESIGN PATTERNS */
+// DESIGN PATTERNS
 (function () {
     "use strict";
     // function constructor pattern
@@ -432,7 +431,7 @@
     pubsub.unsubscribe(subscription);
 })
 
-/* CONCURRENCY */
+// CONCURRENCY
 (function (callbackPattern) {
     "use strict";
     function fakeAjax(url, cb) {
@@ -518,16 +517,28 @@
         .then(function (data) {
             console.log(data);
         });
-
 })(window);
 
-/* ES6 */
+// ES6
 (function () {
     "use strict";
 
+    // modules
+    var name = "S"; function getAge(){ return 35; }
+    export default {name, getAge};
+    import person from './modules'; person.name; person.getAge();
+
+    export var name = "S"; export function getAge(){ return 35; }
+    import {name, getAge} from './module';
+
+    // function arguments
     function baz(arg, ...args) {}   // ...args will be available as a proper array
     function foo (x = 42) {}        // default value of argument
     function bar(x = foo()) {}      // default function argument
+
+    // template literal
+    let name = "S";
+    console.log(`Hello ${name}`);   // equivalent to string concatenation "Hello " + name
 
     // spread operator
     var nums = [1,2]; var chars = ["a", "b"];
@@ -547,7 +558,7 @@
     var num = [1,2,3,4,5];
     var [first,,,last] = num;       // '[1,5]'
 
-    // arrow function, use case in lexical bind of 'this' in document.addEventListener()
+    // arrow function, share the same lexical 'this' as surrounding code, document.addEventListener()
     var name = (x) => ++x;      // function name(x) { return ++x; }
     var name = (x) => { return ++x; };  // for multi line body use braces and explicit return
 
@@ -556,6 +567,15 @@
         constructor(name, age) {
             this.name = name;
             this.age = age;
+        }
+        dataFormatter() {
+            return this.name + this.age;
+        }
+        get data(){
+            return this.dataFormatter();
+        }
+        set data(name){
+            this.name = name;
         }
     }
     class Men extends Human {
@@ -590,11 +610,9 @@
     }, function (err) {
         console.log(err);       // "Stuff broken"
     });
-
-
 })();
 
-/* UTILS */
+// UTILS
 (function () {
     "use strict";
     if (typeof varName !== "undefined") {}  // use global var only if it exist
