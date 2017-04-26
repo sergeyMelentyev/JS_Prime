@@ -611,17 +611,23 @@
         console.log(err);       // "Stuff broken"
     });
 
-    // babel + gulp
+    // babel (transpile) + gulp (automate) + webpack (check dependencies and concatenate in static asset)
     dev_folder:> npm init
     dev_folder:> npm install --save-dev babel-cli
     dev_folder/.babelrc:>
             { "presets": [ "es2015" ] }
     dev_folder:> npm install --save-dev babel-preset-es2015 
 
+    dev_folder:> npm install --save-dev webpack
+    dev_folder:> npm install webpack-stream --save-dev
+
     dev_folder:> npm install --global gulp-cli
-    dev_folder:> npm install --save-dev gulp 
+    dev_folder:> npm install --save-dev gulp
+    dev_folder:> npm install --save-dev gulp-babel
     dev_folder/gulpfile.js:>
-            const gulp = require('gulp'); const babel = require('gulp-babel');
+            const gulp = require('gulp');
+            const babel = require('gulp-babel');
+            const webpack = require('webpack-stream');
             gulp.task('default', ['babel']);
             gulp.task('babel', function () {
                 return gulp.src('src/*.js')
@@ -630,15 +636,20 @@
                     }))
                     .pipe(gulp.dest('assets/js/'))
             });
+            gulp.task('webpack', ['babel'], function () {
+                return gulp.src('assets/js/app.js')
+                    .pipe(webpack({
+                        output: {
+                            path: "/assets/webpacked",
+                            filename: "production.js"
+                        }
+                    }))
+                    .pipe(gulp.dest('assets/webpacked'));
+            });
             gulp.task('watch', function(){
-                gulp.watch('src/*.js', ['babel']);
-            })
-    dev_folder:> npm install --save-dev gulp-babel
-
+                gulp.watch('src/*.js', ['babel', 'webpack']);
+            });
     dev_folder:> gulp watch
-
-    // dev_folder.package.json:> "scripts": { "start": "node_modules/.bin/babel src -d assets/js" }
-    // dev_folder:> npm start
 })();
 
 // UTILS
