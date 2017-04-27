@@ -650,6 +650,11 @@
                 gulp.watch('src/*.js', ['babel', 'webpack']);
             });
     dev_folder:> gulp watch
+
+    // vue templates
+    dev_folder:> npm install -g vue-cli
+    dev_folder:> npm install vue-router
+
 })();
 
 // UTILS
