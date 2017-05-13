@@ -1,5 +1,4 @@
-// DATA TYPES
-(function () {
+(function (dataTypes) {
     "use strict";
     typeof null;            // "object"
     typeof foo;             // "undefined"
@@ -9,9 +8,7 @@
     typeof {a:1};           // "object"
     typeof function () {};  // "function"
 })();
-
-// COERCION
-(function () {
+(function (coercion) {
     "use strict";
 
     var str = "123", val;
@@ -28,11 +25,8 @@
 
     // from string/number to boolean
     var bool = Boolean(str); bool = !!str; bool = str ? true : false;
-
 })();
-
-// SCOPE
-(function (window) {
+(function (scope) {
     "use strict";
     window.a = 0;       // global vars are props of the global scope
     var one;        // will stick only to function scope
@@ -44,10 +38,8 @@
         let bigData = {};
         funcOne(bigData);
     }
-})(window);
-
-// FUNCTION & CLOSURE
-(function () {
+})();
+(function (functionAndClosure) {
     "use strict";
     function name() {}         // function declaration, will be hoisted
     var x = function () {};     // function expression, will not be hoisted
@@ -64,14 +56,12 @@
     }   // return reference of the innerOne() func object
     var varD = outerOne(); varD();
 })();
-
-// THIS POINTER
-(function () {
+(function (thisPointer) {
     "use strict";
-// if func called with "new" (new binding), this = newly constructed object
-// if func called with "call" or "apply" (explicit binding), this = explicitly specified object
-// if func called with a context (implicit binding), this = context object
-// otherwise default binding to undefined in strict mode or global object
+    // if func called with "new" (new binding), this = newly constructed object
+    // if func called with "call" or "apply" (explicit binding), this = explicitly specified object
+    // if func called with a context (implicit binding), this = context object
+    // otherwise default binding to undefined in strict mode or global object
     function foo() {
         console.log("Call from foo function: " + this.a);
     }       // implicit binding
@@ -146,9 +136,7 @@
         }
     };      // use case with document.addEventListener()
 })();
-
-// ARRAY
-(function () {
+(function (array) {
     "use strict";
     var arr = [1, 2, 3, 4];
     function makeArray() {
@@ -198,9 +186,7 @@
     var iterator = arr[Symbol.iterator]();    // { value: 1, done: false }
     iterator.next();
 })();
-
-// OBJECT
-(function () {
+(function (object) {
     "use strict";
     // create a new object
     var obj = {};
@@ -236,11 +222,8 @@
         // "key" will show all keys, "objOne[key]" all values
     }
     Object.keys(obj);        // get array of keys
-
 })();
-
-// PROTOTYPE
-(function () {
+(function (prototype) {
     "use strict";
     function Human(arg) {
         // func will create arbitrary labeled "object"
@@ -285,9 +268,7 @@
     Cat.prototype = Object.create(Animal.prototype);    // assign "Animal" as a prototype for "Cat"
     Cat.prototype.constructor = Cat;
 })();
-
-// BEHAVIOR DELEGATION
-(function () {
+(function (behaviorDelegation) {
     "use strict";
     var Foo = {
         init: function(who) {
@@ -305,9 +286,7 @@
     bam.init("S");
     bam.speak();
 })();
-
-// DESIGN PATTERNS
-(function () {
+(function (designePatterns) {
     "use strict";
     // function constructor pattern
     function Car(model, year, km) {
@@ -430,8 +409,6 @@
     pubsub.publish("example", "Hello, World!");
     pubsub.unsubscribe(subscription);
 })
-
-// CONCURRENCY
 (function (callbackPattern) {
     "use strict";
     function fakeAjax(url, cb) {
@@ -475,7 +452,7 @@
     getFile("file1");
     getFile("file2");
     getFile("file3");
-})(window);
+})();
 (function (promises) {
     "use strict";
     // time independent state, async flow control
@@ -517,10 +494,8 @@
         .then(function (data) {
             console.log(data);
         });
-})(window);
-
-// ES6
-(function () {
+})();
+(function (ES6) {
     "use strict";
 
     // modules
@@ -654,11 +629,8 @@
     // vue templates
     dev_folder:> npm install -g vue-cli
     dev_folder:> npm install vue-router
-
 })();
-
-// UTILS
-(function () {
+(function (utils) {
     "use strict";
     if (typeof varName !== "undefined") {}  // use global var only if it exist
 
