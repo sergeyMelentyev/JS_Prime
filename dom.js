@@ -1,13 +1,10 @@
-/* SINGLE ELEM SELECTOR */
-(function () {
+(function (singleElemSelector) {
     "use strict";
     var elem = document.getElementById('id');
     var elem = document.querySelector('div p');
     var elem = document.querySelector("[data-role='p']");
 })();
-
-/* COLLECTIONS SELECTOR */
-(function () {
+(function (collectionsSelector) {
     "use strict";
     // html collection, methods .length and .item(index)
     var elem = document.getElementsByTagName('p');      // life collection
@@ -17,9 +14,7 @@
     var elem = document.querySelectorAll('*[class="name"]');    // any elems with same class name
     var array = [].slice.call(elem);        // get array from NodeList object
 })();
-
-/* GET NODE ELEMENT */
-(function () {
+(function (getNodeElement) {
     "use strict";
     var elem = document.getElementById('id');
     var childNodesName = [];
@@ -29,18 +24,14 @@
             childNodesName.push(children[i].nodeName);
     }
 })();
-
-/* GET AND SET ATTRIBUTE */
-(function () {
+(function (getSetAttr) {
     "use strict";
     var atr = document.getElementById('one').getAttribute("data-role");
     atr.setAttribute("data-role", atr);
     var img = document.querySelector('img'); 
     img.setAttribute("src", "url");
 })();
-
-/* FRAGMENT, NODE ELEMENT, TEXT NODE */
-(function () {
+(function (fragment) {
     "use strict";
     var fragment = document.createDocumentFragment();
     var p = document.createElement('p');
@@ -64,32 +55,24 @@
     var text = document.createTextNode("text");
     var p = document.createElement('p').appendChild(text);
 })();
-
-/* DELETE NODE ELEMENT */
-(function () {
+(function (deleteNode) {
     "use strict";
     var one = document.getElementById('one');
     var set = one.getElementsByTagName('p');
     one.removeChild(set[0]);
 })();
-
-/* ADD ID, CLASS IDENTIFIER */
-(function () {
+(function (addIdCalss) {
     "use strict";
     elem.setAttribute('id', 'id-name');
     elem.setAttribute('class', 'class-name');
     elem.classList.add('class-name');       // .remove .toggle
 })();
-
-/* CONTENT MANIPULATION */
-(function () {
+(function (contentManipulation) {
     "use strict";
     elem.innerHTML = "";        // text in 'elem' plus all inner tags
     elem.textContent = "";      // only text in 'elem' plus text from all inner tags
 })();
-
-/* ADD CALLBACKS TO ARRAY OF ELEMS */
-(function (forEach) {
+(function (addFunctionalityToArray) {
     "use strict";
     var elem = document.querySelectorAll('div p');
     var array = [].slice.call(elem);
@@ -102,17 +85,8 @@
             item.textContent = "any text";      // set any content text
         });
     }
-})(window);
-(function (forLoop) {
-    "use strict";
-    var elems = document.querySelectorAll('name');
-    for (var i = 0; i< elems.length; i++) {
-        this.style.color = "green";     // this key word will target only clicked element
-    }
-})(window);
-
-/* STYLES */
-(function () {
+})();
+(function (styles) {
     "use strict";
 
     /*
@@ -133,9 +107,7 @@
     elem.style.backgroundColor = 'red';
     elem.setAttribute('style', 'background-color: red; color: white;');
 })();
-
-/* POPUP OVERLAY */
-(function (global) {
+(function (popupOverlay) {
     "use strict";
     function displayPopup() {
         var overlay = document.createElement('div').setAttribute('id', 'overlay');
@@ -148,10 +120,8 @@
     global.onload = function () {
         displayPopup();
     };
-})(window);
-
-/* EVENTS */
-(function () {
+})();
+(function (events) {
     "use strict";
     var div = document.getElementById('btn-wrapper');
     if (document.addEventListener) {    // W3C
@@ -188,9 +158,7 @@
             e.returnValue = false;
     }
 })();
-
-/* PERSISTENCE */
-(function () {
+(function (pesistence) {
     "use strict";
     // Web Storage API sessionStorage and localStorage, key-value pairs, value in string format,
     // indexed array like object
@@ -215,26 +183,19 @@
     var request = window.indexedDB.open("name", 1); // open 'name' database, ver 1.0
     request.onerror = function(event) { /* error logic */ };
     request.onsuccess = function(event) { db = event.target.result; };
-
 })();
-
-/* BACKGROUND THREAD */
-(function () {
+(function (backgroundThread) {
     "use strict";
     var ww = new Worker('ww.js');
     ww.onmessage = function (event) {
         // subscribe to the event and receive updates via 'event.data'
     };
-})();
-(function () {
-    "use strict";
+
     postMessage("post event before start");
     // logic here
-    postMessage("post event before end");
-})();       // ww.js file
-
-/* SEND REQUEST TO THE SERVER */
-(function () {
+    postMessage("post event before end");   // ww.js file
+})();    
+(function (request) {
     "use strict";
 
     // XMLHttpRequest + $.ajax
@@ -258,9 +219,7 @@
     ws.onclose = function() { /* closing callback, connection ended */ };
     ws.onmessage = function(data) { /* receiving data callback */ };
 })();
-
-/* JQUERY */
-(function (global) {
+(function (jQuery) {
     "use strict";
     var $ = global.jQuery;
 
@@ -278,11 +237,8 @@
         if ($(window).scrollTop() > (div / 4))
             $('selector').animate({top: div + 100}, 1000);
     });
-
-})(window);
-
-/* UNIT TESTING */
-(function () {
+})();
+(function (testing) {
     "use strict";
     // QUnit модульные тесты для каждой функции
 })();
