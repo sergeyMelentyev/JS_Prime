@@ -1,11 +1,9 @@
 (function (singleElemSelector) {
-    "use strict";
     var elem = document.getElementById('id');
     var elem = document.querySelector('div p');
     var elem = document.querySelector("[data-role='p']");
 })();
 (function (collectionsSelector) {
-    "use strict";
     // html collection, methods .length and .item(index)
     var elem = document.getElementsByTagName('p');      // life collection
     var elem = document.getElementsByClassName('name');
@@ -15,7 +13,6 @@
     var array = [].slice.call(elem);        // get array from NodeList object
 })();
 (function (getNodeElement) {
-    "use strict";
     var elem = document.getElementById('id');
     var childNodesName = [];
     if (elem.hasChildNodes()) {
@@ -25,14 +22,12 @@
     }
 })();
 (function (getSetAttr) {
-    "use strict";
     var atr = document.getElementById('one').getAttribute("data-role");
     atr.setAttribute("data-role", atr);
     var img = document.querySelector('img'); 
     img.setAttribute("src", "url");
 })();
 (function (fragment) {
-    "use strict";
     var fragment = document.createDocumentFragment();
     var p = document.createElement('p');
     var span = document.createElement('span'); span.innerText = 'text';
@@ -56,24 +51,20 @@
     var p = document.createElement('p').appendChild(text);
 })();
 (function (deleteNode) {
-    "use strict";
     var one = document.getElementById('one');
     var set = one.getElementsByTagName('p');
     one.removeChild(set[0]);
 })();
 (function (addIdCalss) {
-    "use strict";
     elem.setAttribute('id', 'id-name');
     elem.setAttribute('class', 'class-name');
     elem.classList.add('class-name');       // .remove .toggle
 })();
 (function (contentManipulation) {
-    "use strict";
     elem.innerHTML = "";        // text in 'elem' plus all inner tags
     elem.textContent = "";      // only text in 'elem' plus text from all inner tags
 })();
 (function (addFunctionalityToArray) {
-    "use strict";
     var elem = document.querySelectorAll('div p');
     var array = [].slice.call(elem);
     array.forEach(namedFunc);        // pass each obj from array to namedFunc as an arg
@@ -87,8 +78,6 @@
     }
 })();
 (function (styles) {
-    "use strict";
-
     /*
         { box-sizing: border-box }        // padding and border will be included in the width
 
@@ -108,7 +97,6 @@
     elem.setAttribute('style', 'background-color: red; color: white;');
 })();
 (function (popupOverlay) {
-    "use strict";
     function displayPopup() {
         var overlay = document.createElement('div').setAttribute('id', 'overlay');
         document.body.appendChild(overlay);
@@ -122,7 +110,6 @@
     };
 })();
 (function (events) {
-    "use strict";
     var div = document.getElementById('btn-wrapper');
     if (document.addEventListener) {    // W3C
         div.addEventListener('click', myHandler, false);
@@ -159,7 +146,6 @@
     }
 })();
 (function (pesistence) {
-    "use strict";
     // Web Storage API sessionStorage and localStorage, key-value pairs, value in string format,
     // indexed array like object
 
@@ -185,7 +171,6 @@
     request.onsuccess = function(event) { db = event.target.result; };
 })();
 (function (backgroundThread) {
-    "use strict";
     var ww = new Worker('ww.js');
     ww.onmessage = function (event) {
         // subscribe to the event and receive updates via 'event.data'
@@ -196,11 +181,8 @@
     postMessage("post event before end");   // ww.js file
 })();    
 (function (request) {
-    "use strict";
-
     // XMLHttpRequest + $.ajax
     jQuery.ajax();
-
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function () {      // provide a callback to the event
         if ((xhr.readyState === 4) && (xhr.status === 200)) {
@@ -220,18 +202,14 @@
     ws.onmessage = function(data) { /* receiving data callback */ };
 })();
 (function (jQuery) {
-    "use strict";
     var $ = global.jQuery;
-
     $('elem').keypress(function (event) {
         // receive event each time key pressed
     });
-
     var windowHeight = $(window).height();
     $('selector').on('click', function () {
         $('body').scrollTop(windowHeight);
     });
-
     $(window).scroll(function () {
         var div = $('div').height();
         if ($(window).scrollTop() > (div / 4))
