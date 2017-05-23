@@ -1,5 +1,4 @@
 (function (dataTypes) {
-    "use strict";
     typeof null;            // "object"
     typeof foo;             // "undefined"
     typeof "foo";           // "string"
@@ -9,8 +8,6 @@
     typeof function () {};  // "function"
 })();
 (function (coercion) {
-    "use strict";
-
     var str = "123", val;
     // explicit from string to number
     val = parseInt(str, 10); val = Number(str); val = +str;
@@ -27,11 +24,9 @@
     var bool = Boolean(str); bool = !!str; bool = str ? true : false;
 })();
 (function (scope) {
-    "use strict";
-    window.a = 0;       // global vars are props of the global scope
-    var one;        // will stick only to function scope
-    let two;        // will stick to any block scope
-    const three = 0;    // constant value will stick to any block scope, like let
+    var a;      // hoisted, new binding is created in global scope and NEW prop is added to the global obj
+    let b;      // new binding is created in global scope but NO prop is added to the global obj
+    const c = 0;    // constant value will stick to any block scope, like 'let'
 
     function funcOne(bigData){}     // engine will remove block-scoping after executing
     {
@@ -40,24 +35,58 @@
     }
 })();
 (function (functionAndClosure) {
-    "use strict";
     function name() {}         // function declaration, will be hoisted
-    var x = function () {};     // function expression, will not be hoisted
-    var size = x.length;        // will return number of arguments
+    var funcName = function () {};      // function expression, will not be hoisted
 
-    // closure: func is able to access its lexical scope even when that func
-    // is executing outside its scope
+    // arguments
+    var argsSize = funcName.length;     // number of arguments
+    function baz(arg) { arg === arguments[0]; }     // arguments object, contains all params
+
+    // rest param, contains all params passed after 'obj', must be only one rest param and it must be last
+    function pick(obj, ...keys) {
+        let result = Object.create(null);
+        for (let i = 0, len = keys.length; i < len; i++)
+            result[keys[i]] = obj[keys[i]];
+        return result;
+    }
+    let book = { title: "", author: "", year: 2015 };
+    let bookData = pick(book, "author", "year");
+    
+    // default arguments ES5
+    function makeRequest(url, timeout, callback) {
+        timeout = (typeof timeout !== "undefined") ? timeout : 2000;
+        callback = (typeof callback !== "undefined") ? callback : function() {};
+    }
+    // default arguments ES6
+    function makeRequest(url, timeout = 2000, callback = funcName() {}) {
+        // logic here
+    }
+
+    // function constructor
+    var add = new Function("first", "second = first", "return first + second");
+    add(1, 1); add(1);      // 2
+    var pickFirst = new Function("...args", "return args[0]");
+    pickFirst(1, 2);        // 1
+
+    // spread operator
+    var nums = [1,2]; var chars = ["a", "b"];
+    console.log(...nums);       // the same as console.log(arr[0] + " " + arr[1]);
+    function nameless() { return [1,2]; }
+    var num = [0, ...nameless()];       // array concatenation
+    var concat = [...nums, ...chars];
+
+    // closure, func is able to access its lexical scope even when executing outside it
     function outerOne() {
-        var a = 2;
-        function innerOne() {
-            // logic here
-        }
-        return innerOne;
-    }   // return reference of the innerOne() func object
-    var varD = outerOne(); varD();
+        function innerOne() { /* logic here */ }
+        return innerOne;    // return reference of the innerOne() func object
+    }
+    var closure = outerOne(); closure();
+
+    // arrow function, share the same lexical 'this' as surrounding code
+    var name = (x) => ++x;      // function name(x) { return ++x; }
+    var name = (x) => { return ++x; };  // for multi line body use braces and explicit return
 })();
 (function (thisPointer) {
-    "use strict";
     // if func called with "new" (new binding), this = newly constructed object
     // if func called with "call" or "apply" (explicit binding), this = explicitly specified object
     // if func called with a context (implicit binding), this = context object
@@ -77,7 +106,7 @@
     var bar = {
         a: "bar object"
     };
-    var baz = function () {
+    var baz = function() {
         foo.call(bar);
     };
     baz(); setTimeout(baz, 100);
@@ -136,8 +165,21 @@
         }
     };      // use case with document.addEventListener()
 })();
+(function (string) {
+    var msg = "";
+    msg.indexOf("a");           // .lastIndexOf("a"); find the actual position, return index
+    msg.startsWith("a");        // .endsWith("a"); .includes("a"); search the whole 'msg', return boolean
+    msg.startsWith("a", 4);     // .endsWith("a", 4); .includes("a", 4); check part of the 'msg', return boolean
+    msg.repeat(2);
+
+    // template literal
+    let message = `Multiline
+        string`;                // indentation is counting in 'message.length'
+    let count = 10,             // template literal substitution === string concatenation
+        price = 0.25,
+        message = `${count} items cost ${(count * price).toFixed(2)}.`;
+})();
 (function (array) {
-    "use strict";
     var arr = [1, 2, 3, 4];
     function makeArray() {
         return Array.prototype.slice.call(arguments);
@@ -187,7 +229,6 @@
     iterator.next();
 })();
 (function (object) {
-    "use strict";
     // create a new object
     var obj = {};
     var obj = Object.create(null);
@@ -224,7 +265,6 @@
     Object.keys(obj);        // get array of keys
 })();
 (function (prototype) {
-    "use strict";
     function Human(arg) {
         // func will create arbitrary labeled "object"
         // "Foo.prototype" will point (link) to that "object"
@@ -269,7 +309,6 @@
     Cat.prototype.constructor = Cat;
 })();
 (function (behaviorDelegation) {
-    "use strict";
     var Foo = {
         init: function(who) {
             this.me = who;
@@ -286,8 +325,116 @@
     bam.init("S");
     bam.speak();
 })();
+(function (promise) {
+    // time independent state, async flow control
+    function fakeAjax(url, cb) {
+        var fake_responses = {
+            "file1": "The first response",
+            "file2": "The second response",
+            "file3": "The third response"
+        };
+        var randomDelay = (Math.round(Math.random() * 1E4) % 8000) + 10;
+        console.log("Requesting: " + url);
+
+        setTimeout(function () {
+            cb(fake_responses[url]);
+        }, randomDelay);
+    }
+    function getFile(file) {
+        return new Promise(function (resolve) {
+            fakeAjax(file, resolve);
+        });
+    }
+
+    var p1 = getFile("file1");
+    var p2 = getFile("file2");
+    var p3 = getFile("file3");
+
+    p1.then(function (data) {
+        console.log(data);
+    })
+        .then(function () {
+            return p2;
+        })
+        .then(function (data) {
+            console.log(data);
+        })
+        .then(function () {
+            return p3;
+        })
+        .then(function (data) {
+            console.log(data);
+        });
+
+
+    var promise = new Promise(function (resolve, reject) {
+        // logic here, ajax call or DOM manipulation
+        if (doSomething()) {
+            resolve("Stuff worked");
+        } else {
+            reject("Stuff broken");
+        }
+    });
+    promise.then(function (result) {
+        console.log(result);    // "Stuff worked"
+    }, function (err) {
+        console.log(err);       // "Stuff broken"
+    });
+})();
+(function (ES6) {
+    // modules
+    var name = "S"; function getAge(){ return 35; }
+    export default {name, getAge};
+    import person from './modules'; person.name; person.getAge();
+
+    export var name = "S"; export function getAge(){ return 35; }
+    import {name, getAge} from './module';
+
+    // destructuring
+    var person = { name: "S", age: 35 };
+    display(person);
+    function display({name, age}) {}    // the same as below
+    function display(p) { let {name, age} = p; }    // the same as above,
+        // any let or a hole pattern can be prefix with '?', will bind with undefined
+
+    var num = [1,2,3,4,5];
+    var [first,,,last] = num;       // '[1,5]'
+
+    // classes
+    class Human {
+        constructor(name, age) {
+            this.name = name;
+            this.age = age;
+        }
+        dataFormatter() {
+            return this.name + this.age;
+        }
+        get data(){
+            return this.dataFormatter();
+        }
+        set data(name){
+            this.name = name;
+        }
+    }
+    class Men extends Human {
+        constructor(name, age, id){
+            super(name, age);
+            this.id = id;
+        }
+    }
+    var person = new Men("S", 35, 123);
+
+    // set collection of unique items
+    var set = new Set();
+    set.add(1); set.has(1); set.clear(); set.delete(1);   // add, check, clear all, delete one
+    for (let n of set) {}     // for-of iterate over a set
+
+    // weakmap collection, like a map, does not put strong reference on obj, prevent mem licks
+    // map key-value collection, can use complex object as a key
+    var user = { name: "S", id: 123 };
+    var userSkills = new Map(); userSkills.set(user, ["JS", "React"]);
+})();
 (function (designePatterns) {
-    "use strict";
     // function constructor pattern
     function Car(model, year, km) {
         this.model = model;
@@ -408,9 +555,8 @@
     var subscription = pubsub.subscribe("example", observerHandler);
     pubsub.publish("example", "Hello, World!");
     pubsub.unsubscribe(subscription);
-})
+})();
 (function (callbackPattern) {
-    "use strict";
     function fakeAjax(url, cb) {
         var fake_responses = {
             "file1": "The first response",
@@ -453,138 +599,23 @@
     getFile("file2");
     getFile("file3");
 })();
-(function (promises) {
-    "use strict";
-    // time independent state, async flow control
-    function fakeAjax(url, cb) {
-        var fake_responses = {
-            "file1": "The first response",
-            "file2": "The second response",
-            "file3": "The third response"
-        };
-        var randomDelay = (Math.round(Math.random() * 1E4) % 8000) + 10;
-        console.log("Requesting: " + url);
+(function (utils) {
+    if (typeof varName !== "undefined") {}  // use global var only if it exist
 
-        setTimeout(function () {
-            cb(fake_responses[url]);
-        }, randomDelay);
-    }
-    function getFile(file) {
-        return new Promise(function (resolve) {
-            fakeAjax(file, resolve);
-        });
+    if (!Number.EPSILON) Number.EPSILON = Math.pow(2, -52); // compare floating point numbers
+    function closeToEqual(n1, n2) {
+        return Math.abs(n1 - n2) < Number.EPSILON;
     }
 
-    var p1 = getFile("file1");
-    var p2 = getFile("file2");
-    var p3 = getFile("file3");
-
-    p1.then(function (data) {
-        console.log(data);
-    })
-        .then(function () {
-            return p2;
-        })
-        .then(function (data) {
-            console.log(data);
-        })
-        .then(function () {
-            return p3;
-        })
-        .then(function (data) {
-            console.log(data);
-        });
-})();
-(function (ES6) {
-    "use strict";
-
-    // modules
-    var name = "S"; function getAge(){ return 35; }
-    export default {name, getAge};
-    import person from './modules'; person.name; person.getAge();
-
-    export var name = "S"; export function getAge(){ return 35; }
-    import {name, getAge} from './module';
-
-    // function arguments
-    function baz(arg, ...args) {}   // ...args will be available as a proper array
-    function foo (x = 42) {}        // default value of argument
-    function bar(x = foo()) {}      // default function argument
-
-    // template literal
-    let name = "S";
-    console.log(`Hello ${name}`);   // equivalent to string concatenation "Hello " + name
-
-    // spread operator
-    var nums = [1,2]; var chars = ["a", "b"];
-    console.log(...nums);        // the same as console.log(arr[0] + " " + arr[1]);
-
-    function nameless() { return [1,2]; }
-    var num = [0, ...nameless()];       // array concatenation
-    var concat = [...nums, ...chars];
-
-    // destructuring
-    var person = { name: "S", age: 35 };
-    display(person);
-    function display({name, age}) {}    // the same as below
-    function display(p) { let {name, age} = p; }    // the same as above,
-        // any let or a hole pattern can be prefix with '?', will bind with undefined
-
-    var num = [1,2,3,4,5];
-    var [first,,,last] = num;       // '[1,5]'
-
-    // arrow function, share the same lexical 'this' as surrounding code, document.addEventListener()
-    var name = (x) => ++x;      // function name(x) { return ++x; }
-    var name = (x) => { return ++x; };  // for multi line body use braces and explicit return
-
-    // classes
-    class Human {
-        constructor(name, age) {
-            this.name = name;
-            this.age = age;
-        }
-        dataFormatter() {
-            return this.name + this.age;
-        }
-        get data(){
-            return this.dataFormatter();
-        }
-        set data(name){
-            this.name = name;
-        }
+    function doSomething() {
+        if (!APP.ready)
+            return void setTimeout(doSomething, 100);   // try again later
+        var result;     // do some stuff
+        return result;
+    }       // wait until something is done
+    if (doSomething()) {
+        // handle next task
     }
-    class Men extends Human {
-        constructor(name, age, id){
-            super(name, age);
-            this.id = id;
-        }
-    }
-    var person = new Men("S", 35, 123);
-
-    // set collection of unique items
-    var set = new Set();
-    set.add(1); set.has(1); set.clear(); set.delete(1);   // add, check, clear all, delete one
-    for (let n of set) {}     // for-of iterate over a set
-
-    // weakmap collection, like a map, does not put strong reference on obj, prevent mem licks
-    // map key-value collection, can use complex object as a key
-    var user = { name: "S", id: 123 };
-    var userSkills = new Map(); userSkills.set(user, ["JS", "React"]);
-
-    // promise
-    var promise = new Promise(function (resolve, reject) {
-        // logic here, ajax call or DOM manipulation
-        if (doSomething()) {
-            resolve("Stuff worked");
-        } else {
-            reject("Stuff broken");
-        }
-    });
-    promise.then(function (result) {
-        console.log(result);    // "Stuff worked"
-    }, function (err) {
-        console.log(err);       // "Stuff broken"
-    });
 
     // babel (transpile) + gulp (automate) + webpack (check dependencies and concatenate in static asset)
     dev_folder:> npm init
@@ -629,23 +660,4 @@
     // vue templates
     dev_folder:> npm install -g vue-cli
     dev_folder:> npm install vue-router
-})();
-(function (utils) {
-    "use strict";
-    if (typeof varName !== "undefined") {}  // use global var only if it exist
-
-    if (!Number.EPSILON) Number.EPSILON = Math.pow(2, -52); // compare floating point numbers
-    function closeToEqual(n1, n2) {
-        return Math.abs(n1 - n2) < Number.EPSILON;
-    }
-
-    function doSomething() {
-        if (!APP.ready)
-            return void setTimeout(doSomething, 100);   // try again later
-        var result;     // do some stuff
-        return result;
-    }       // wait until something is done
-    if (doSomething()) {
-        // handle next task
-    }
 })();
