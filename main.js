@@ -34,7 +34,7 @@
         funcOne(bigData);
     }
 })();
-(function (functionAndClosure) {
+(function (function) {
     function name() {}         // function declaration, will be hoisted
     var funcName = function () {};      // function expression, will not be hoisted
 
@@ -82,9 +82,33 @@
     }
     var closure = outerOne(); closure();
 
-    // arrow function, share the same lexical 'this' as surrounding code
+    // functions internal-only methods
+    function Person(name) { this.name = name; }
+    var x = Person("Sergey");       // [[Call]] method executes the body of func as it is
+    var y = new Person("Sergey");   // [[Construct]] methods executes, new object is created,
+        // then executing the func body with 'this' set to the new target
+
+    // arrow func, have no 'this' binding, the value of 'this' can be determined by looking up the scope chain
+    // call(), apply(), bind() will not affect 'this' binding
     var name = (x) => ++x;      // function name(x) { return ++x; }
     var name = (x) => { return ++x; };  // for multi line body use braces and explicit return
+    
+    function createArrowFunctionReturningFirstArg() { return () => arguments[0]; }
+    var arrowFunction = createArrowFunctionReturningFirstArg(5);
+    arrowFunction();    // arrow func don’t have args obj, args remain accessible due to scope chain resolution of args identifier
+
+    // recursive function with tail call optimization, current stack frame is cleared and reused
+        // tail call does not require access to variables in the current stack frame (func is not a closure)
+        // func making the tail call has no further work to do after the tail call returns
+        // result of the tail call is returned as the function value
+    function factorial(n, p = 1) {
+        if (n <= 1) {
+            return 1 * p;
+        } else {
+            let result = n * p;
+            return factorial(n - 1, result);
+        }
+    }
 })();
 (function (thisPointer) {
     // if func called with "new" (new binding), this = newly constructed object
