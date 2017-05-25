@@ -98,9 +98,9 @@
     arrowFunction();    // arrow func don’t have args obj, args remain accessible due to scope chain resolution of args identifier
 
     // recursive function with tail call optimization, current stack frame is cleared and reused
-        // tail call does not require access to variables in the current stack frame (func is not a closure)
+        // no access to vars in the current stack frame (func is not a closure)
         // func making the tail call has no further work to do after the tail call returns
-        // result of the tail call is returned as the function value
+        // result of the tail call is returned as the funct value
     function factorial(n, p = 1) {
         if (n <= 1) {
             return 1 * p;
@@ -111,9 +111,9 @@
     }
 })();
 (function (thisPointer) {
-    // if func called with "new" (new binding), this = newly constructed object
-    // if func called with "call" or "apply" (explicit binding), this = explicitly specified object
-    // if func called with a context (implicit binding), this = context object
+    // if func called with "new" binding, 'this' = newly constructed obj
+    // if func called with "call" or "apply" explicit binding, 'this' = explicitly specified obj
+    // if func called with a context implicit binding, 'this' = context object
     // otherwise default binding to undefined in strict mode or global object
     function foo() {
         console.log("Call from foo function: " + this.a);
@@ -278,44 +278,85 @@
         }
     });
 
+    // computed prop name
+    var suffix  = " name";
+    var person = {
+        ["first" + suffix]: "Sergey"
+    };
+
+    // compare objects
+    Object.is(NaN, NaN);        // true, vals are equivalent if they are of the same type and have the same val
+
     var bool = ("key" in obj);      // check if property is exist also included prototype link
     obj.hasOwnProperty("key");      // check if property is exist only in that object
     delete obj.key;         // delete 'value' by targeting its 'key' from obj
 
-    // iterate over object
+    // mixing objs props and methods, shallow copy, receiver - supplier - supplier - ...
+    function EventTarget() { }
+    EventTarget.prototype = {
+        constructor: EventTarget,
+        emit: function() { },
+        on: function() { }
+    };
+    var myObject = {}; Object.assign(myObject, EventTarget.prototype, thirdObjIfNeeded);
+    myObject.emit();
+
+    // property enumeration, numeric keys in ascending, string keys in the order in which they were added
+    var obj = { b: 1, a: 1, 1: 1, 0: 1 };
+    Object.getOwnPropertyNames(obj).join("");   // 01ba
+
+    // iterate over object, unspecified enumeration order
     for (var key in obj) {
         // "key" will show all keys, "objOne[key]" all values
     }
-    Object.keys(obj);        // get array of keys
+    Object.keys(obj);        // get array of keys, unspecified enumeration order
 })();
 (function (prototype) {
+
+    // val of an obj prototype is stored in an internal-only prop [[Prototype]]
+    // method Object.getPrototypeOf() return val stored in [[Prototype]] and Object.setPrototypeOf() change it
+    let person = {
+        getGreeting() { return "Hello"; }
+    };
+    let dog = {
+        getGreeting() { return "Woof"; }
+    };
+    let cat = {
+        getGreeting() { return super.getGreeting() + ", hi!"; }
+        // the same as Object.getPrototypeOf(this).getGreeting.call(this)
+    };
+    let friend = Object.create(person);
+    Object.getPrototypeOf((friend) === person);     // true
+    Object.setPrototypeOf(friend, dog);
+    Object.getPrototypeOf((friend) === dog);        // true
+    
     function Human(arg) {
         // func will create arbitrary labeled "object"
-        // "Foo.prototype" will point (link) to that "object"
-        // "object.constructor" will point (link) back to "Foo"
+        // "Human.prototype" will point to that "object"
+        // "object.constructor" will point back to "Human"
         this.name = arg;
     }
     Human.prototype.propName = "";      // put property directly on arbitrary labeled "object"
-    // will be referenced by all objects
+        // will be referenced by all objects
 
     var men = new Human("S");
     var female = new Human("O");
-    // new obj is created;
-    // that obj get linked via [[Prototype]] to the arbitrary labeled "object"
-        // the same that "Human.prototype" points to;
-    // context get set to that new obj, "Human this.name" will be pointing to that obj;
-    // obj is being returned and assign to variable "men";
+        // new obj is created;
+        // that obj get linked via [[Prototype]] to the arbitrary labeled "object"
+            // the same that "Human.prototype" points to;
+        // context get set to that new obj, "Human this.name" will be pointing to that obj;
+        // obj is being returned and assign to variable "men";
     men.propValue = "";     // put property directly on that "men" object
 
     men.constructor === Human;      // true, "men" does not have that prop, will walk up the
-    // prototype chain via private [[Prototype]] link to the arbitrary labeled "object"
-    // that has ".constructor" property pointing to the "Human" function
+        // prototype chain via private [[Prototype]] link to the arbitrary labeled "object"
+        // that has ".constructor" property pointing to the "Human" function
     men.constructor === female.constructor;     // true, both points to the "Human" function
     men.__proto__ === Human.prototype;      // true, "men" does not have that function,
-    // will walk up the prototype chain via private [[Prototype]] link to the the arbitrary
-    // labeled "object" that also does not have that function, will walk up to the system
-    // arbitrary labeled "object" and call that func. It will return internal prototype
-    // linkage [[Prototype]] of called obj, in this case "men"
+        // will walk up the prototype chain via private [[Prototype]] link to the the arbitrary
+        // labeled "object" that also does not have that function, will walk up to the system
+        // arbitrary labeled "object" and call that func. It will return internal prototype
+        // linkage [[Prototype]] of called obj, in this case "men"
 
     function Animal(voice) {
         this.voice = voice || "default";
