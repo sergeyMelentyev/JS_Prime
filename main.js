@@ -6,6 +6,7 @@
     typeof true;            // "boolean"
     typeof {a:1};           // "object"
     typeof function () {};  // "function"
+    typeof symbol;          // "symbol"
 })();
 (function (coercion) {
     var str = "123", val;
@@ -203,6 +204,19 @@
         price = 0.25,
         message = `${count} items cost ${(count * price).toFixed(2)}.`;
 })();
+(function (symbol) {
+    let firstName = Symbol("first name");
+    let person = {
+        [firstName]: "Sergey"       // computed object literal property
+    };
+
+    let symbols = Object.getOwnPropertySymbols(person);     // get all symbols
+
+    // global symbol registry, method search global symbol registry for key "uid"
+    // if finds, returns the existing. If not, new symbol is created and registered
+    let uid = Symbol.for("uid");
+    let object = {}; object[uid] = "12345";
+})();
 (function (array) {
     var arr = [1, 2, 3, 4];
     function makeArray() {
@@ -286,7 +300,6 @@
 
     // compare objects
     Object.is(NaN, NaN);        // true, vals are equivalent if they are of the same type and have the same val
-
     var bool = ("key" in obj);      // check if property is exist also included prototype link
     obj.hasOwnProperty("key");      // check if property is exist only in that object
     delete obj.key;         // delete 'value' by targeting its 'key' from obj
@@ -312,24 +325,17 @@
     Object.keys(obj);        // get array of keys, unspecified enumeration order
 })();
 (function (prototype) {
-
-    // val of an obj prototype is stored in an internal-only prop [[Prototype]]
-    // method Object.getPrototypeOf() return val stored in [[Prototype]] and Object.setPrototypeOf() change it
+    // super reference
     let person = {
         getGreeting() { return "Hello"; }
     };
-    let dog = {
-        getGreeting() { return "Woof"; }
-    };
-    let cat = {
+    let friend = {
         getGreeting() { return super.getGreeting() + ", hi!"; }
-        // the same as Object.getPrototypeOf(this).getGreeting.call(this)
     };
-    let friend = Object.create(person);
-    Object.getPrototypeOf((friend) === person);     // true
-    Object.setPrototypeOf(friend, dog);
-    Object.getPrototypeOf((friend) === dog);        // true
-    
+    Object.setPrototypeOf(friend, person);      // prototype is person
+    let relative = Object.create(friend);       // prototype is friend
+    person.getGreeting(); friend.getGreeting(); relative.getGreeting();
+
     function Human(arg) {
         // func will create arbitrary labeled "object"
         // "Human.prototype" will point to that "object"
@@ -455,15 +461,15 @@
     export var name = "S"; export function getAge(){ return 35; }
     import {name, getAge} from './module';
 
-    // destructuring
+    // destructuring object
     var person = { name: "S", age: 35 };
-    display(person);
-    function display({name, age}) {}    // the same as below
-    function display(p) { let {name, age} = p; }    // the same as above,
-        // any let or a hole pattern can be prefix with '?', will bind with undefined
+    let {name, age} = person;       // let name = "S"; let age = 35;
+    function display({name, age}) {}
 
-    var num = [1,2,3,4,5];
-    var [first,,,last] = num;       // '[1,5]'
+    // destructuring array
+    let colors = [ "red", "green", "blue" ];
+    let [ firstColor, secondColor ] = colors;       // "red", "green"
+    let [ , firstColor, secondColor ] = colors;     // "green", "blue"
 
     // classes
     class Human {
