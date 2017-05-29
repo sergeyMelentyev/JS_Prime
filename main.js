@@ -1,4 +1,4 @@
-(function (dataTypes) {
+(function (dataType) {
     typeof null;            // "object"
     typeof foo;             // "undefined"
     typeof "foo";           // "string"
@@ -210,12 +210,14 @@
         [firstName]: "Sergey"       // computed object literal property
     };
 
-    let symbols = Object.getOwnPropertySymbols(person);     // get all symbols
-
     // global symbol registry, method search global symbol registry for key "uid"
     // if finds, returns the existing. If not, new symbol is created and registered
     let uid = Symbol.for("uid");
     let object = {}; object[uid] = "12345";
+
+    // get symbols
+    let symbols = Object.getOwnPropertySymbols(person); // array for-of symbols
+    Symbol.keyFor(uid)
 })();
 (function (array) {
     var arr = [1, 2, 3, 4];
@@ -265,11 +267,16 @@
 
     var iterator = arr[Symbol.iterator]();    // { value: 1, done: false }
     iterator.next();
+
+    // destructuring
+    let colors = [ "red", "green", "blue" ];
+    let [ firstColor, secondColor ] = colors;       // "red", "green"
+    let [ , firstColor, secondColor ] = colors;     // "green", "blue"
 })();
 (function (object) {
     // create a new object
     var obj = {};
-    var obj = Object.create(null);
+    var obj = Object.create(null);  // obj with a null prototype, ensuring that there are no inherited props
     var obj = new Object();
 
     // add key-value pare
@@ -323,6 +330,106 @@
         // "key" will show all keys, "objOne[key]" all values
     }
     Object.keys(obj);        // get array of keys, unspecified enumeration order
+
+    // destructuring
+    var person = { name: "S", age: 35 };
+    let {name, age} = person;       // let name = "S"; let age = 35;
+    function display({name, age}) {}
+})();
+(function (objPrivateFields) {
+    // ES5 implementation
+    var Person = (function() {
+        var privateData = {},
+            privateId = 0;
+        function Person(name) {
+            Object.defineProperty(this, "_id", {
+                value: privateId++
+            });
+            privateData[this._id] = {
+                name: name
+            };
+        }
+        Person.prototype.getName = function() {
+            return privateData[this._id].name;
+        };
+        return Person;
+    }());
+    // ES6 implementation
+    let Person = (function() {
+        let privateData = new WeakMap();
+        function Person(name) {
+            privateData.set(this, {
+                name: name
+            });
+        }
+        Person.prototype.getName = function() {
+            return privateData.get(this).name;
+        };
+        return Person;
+    }());
+})();
+(function (setAndMap) {
+    // set is an ordered collection of unique items, cannot be directly accessed by index
+    var set = new Set(); set.size();     // accept any iterable obj
+    set.add(1); set.has(1); set.clear(); set.delete(1);   // add, check, clear all, delete one
+
+    let set = new Set([1, 2, 3, 4, 5, 5, 5, 5]);    // from array to set
+    let array = [...set];       // from set to array with spread operator
+    function eliminateDuplicates(items) { return [...new Set(items)]; }
+
+    // iterate over set
+    for (let n of set) {}     // for-of iterate over a set
+
+    let set = new Set([1, 2]);
+    let processor = {
+        output(value, key, owner) {
+            console.log(value + " " + key + " " + owner);
+        },
+        process(dataSet) {      // the same as below
+            dataSet.forEach(function(value, key, owner) {
+                this.output(value, key, owner);
+            }, this);
+        },
+        process(dataSet) {      // the same as above
+            dataSet.forEach((value, key, owner) => {
+                this.output(value, key, owner);
+            });
+        }
+    };
+    processor.process(set);
+
+    // weak set, only store weak obj ref and CANNOT store primitive vals
+    // weak ref does`t prevent garbage collection
+    let set = new WeakSet();    // not iterable, cannot be used in for-of loop and forEach()
+
+    // map is ordered list of key-value pairs, both can have any type
+    var userSkills = new Map();
+    userSkills.set(key, ["vals"]);      // .get(), .has(), .delete(), .clear(), size()
+
+    let map = new Map([["name", "Sergey"], ["age", 35]]);   // map initialization
+    let processor = {
+        output(value, key, owner) {
+            console.log(value + " " + key + " " + owner);
+        },
+        process(dataSet) {      // the same as below
+            dataSet.forEach(function(value, key, owner) {
+                this.output(value, key, owner);
+            }, this);
+        },
+        process(dataSet) {      // the same as above
+            dataSet.forEach((value, key, owner) => {
+                this.output(value, key, owner);
+            });
+        }
+    };
+    processor.process(map);
+
+    // weakmap does`t put strong reference on obj, does`t prevent garbage collection
+    // every key must be an obj
+    let map = new WeakMap();
+    let key1 = {},
+        key2 = {},
+    map = new WeakMap([[key1, "Hello"], [key2, 42]]);
 })();
 (function (prototype) {
     // super reference
@@ -452,26 +559,7 @@
         console.log(err);       // "Stuff broken"
     });
 })();
-(function (ES6) {
-    // modules
-    var name = "S"; function getAge(){ return 35; }
-    export default {name, getAge};
-    import person from './modules'; person.name; person.getAge();
-
-    export var name = "S"; export function getAge(){ return 35; }
-    import {name, getAge} from './module';
-
-    // destructuring object
-    var person = { name: "S", age: 35 };
-    let {name, age} = person;       // let name = "S"; let age = 35;
-    function display({name, age}) {}
-
-    // destructuring array
-    let colors = [ "red", "green", "blue" ];
-    let [ firstColor, secondColor ] = colors;       // "red", "green"
-    let [ , firstColor, secondColor ] = colors;     // "green", "blue"
-
-    // classes
+(function (classes) {
     class Human {
         constructor(name, age) {
             this.name = name;
@@ -494,16 +582,14 @@
         }
     }
     var person = new Men("S", 35, 123);
+})();
+(function (module) {
+    var name = "S"; function getAge(){ return 35; }
+    export default {name, getAge};
+    import person from './modules'; person.name; person.getAge();
 
-    // set collection of unique items
-    var set = new Set();
-    set.add(1); set.has(1); set.clear(); set.delete(1);   // add, check, clear all, delete one
-    for (let n of set) {}     // for-of iterate over a set
-
-    // weakmap collection, like a map, does not put strong reference on obj, prevent mem licks
-    // map key-value collection, can use complex object as a key
-    var user = { name: "S", id: 123 };
-    var userSkills = new Map(); userSkills.set(user, ["JS", "React"]);
+    export var name = "S"; export function getAge(){ return 35; }
+    import {name, getAge} from './module';
 })();
 (function (designePatterns) {
     // function constructor pattern
