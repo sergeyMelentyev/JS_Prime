@@ -1,4 +1,4 @@
-(function (dataType) {
+function (dataType) {
     typeof null;            // "object"
     typeof foo;             // "undefined"
     typeof "foo";           // "string"
@@ -7,8 +7,8 @@
     typeof {a:1};           // "object"
     typeof function () {};  // "function"
     typeof symbol;          // "symbol"
-})();
-(function (coercion) {
+}
+function (coercion) {
     var str = "123", val;
     // explicit from string to number
     val = parseInt(str, 10); val = Number(str); val = +str;
@@ -23,8 +23,8 @@
 
     // from string/number to boolean
     var bool = Boolean(str); bool = !!str; bool = str ? true : false;
-})();
-(function (scope) {
+}
+function (scope) {
     var a;      // hoisted, new binding is created in global scope and NEW prop is added to the global obj
     let b;      // new binding is created in global scope but NO prop is added to the global obj
     const c = 0;    // constant value will stick to any block scope, like 'let'
@@ -34,8 +34,8 @@
         let bigData = {};
         funcOne(bigData);
     }
-})();
-(function (function) {
+}
+function (function) {
     function name() {}         // function declaration, will be hoisted
     var funcName = function () {};      // function expression, will not be hoisted
 
@@ -110,8 +110,8 @@
             return factorial(n - 1, result);
         }
     }
-})();
-(function (thisPointer) {
+}
+function (thisPointer) {
     // if func called with "new" binding, 'this' = newly constructed obj
     // if func called with "call" or "apply" explicit binding, 'this' = explicitly specified obj
     // if func called with a context implicit binding, 'this' = context object
@@ -189,8 +189,8 @@
             console.log(type);
         }
     };      // use case with document.addEventListener()
-})();
-(function (string) {
+}
+function (string) {
     var msg = "";
     msg.indexOf("a");           // .lastIndexOf("a"); find the actual position, return index
     msg.startsWith("a");        // .endsWith("a"); .includes("a"); search the whole 'msg', return boolean
@@ -203,8 +203,8 @@
     let count = 10,             // template literal substitution === string concatenation
         price = 0.25,
         message = `${count} items cost ${(count * price).toFixed(2)}.`;
-})();
-(function (symbol) {
+}
+function (symbol) {
     let firstName = Symbol("first name");
     let person = {
         [firstName]: "Sergey"       // computed object literal property
@@ -218,62 +218,92 @@
     // get symbols
     let symbols = Object.getOwnPropertySymbols(person); // array for-of symbols
     Symbol.keyFor(uid)
-})();
-(function (array) {
-    var arr = [1, 2, 3, 4];
-    function makeArray() {
-        return Array.prototype.slice.call(arguments);
-    }
+}
+function (array) {
+    // array constructor
+    let items = new Array(2);       // items.length = 2; items[0] === undefined;
+    let items = new Array(1, 2);    // items.length = 2; items[0] === 1;
+    let items = Array.of(1, 2);     // items.length = 2; items[0] === 1;
+    function makeArray() { return Array.prototype.slice.call(arguments); }
+    function makeArray() { let args = Array.from(arguments); return args; }
 
+    // methods
     arr.push(5);      // add to the end, return value will show new length
     arr.unshift(5);   // add to the front
     arr.pop();        // remove the last one element
     arr.shift();      // remove the fist one element
-
     arr.splice(arr.indexOf(3), 1);  // remove exact value '3' by index position
 
+    // passing array as arg
     func(array);                // passing array by reference
     func(array.slice());        // passing array by value
 
-    function predicateMap(v) {
-        return v + v;
-    }       // call predicate func on each value in an array
-    [1,2,3,4].map(predicateMap);        // no side effect, will return new array
+    [1,2,3,4].map(predicateMap);    // no side effect, will return new array
+    function predicateMap(v) { return v + v; }  // call predicate func on each val in arr
+    
+    [1,2,3,4].forEach(predicateForEach);    // with side effect, will change initial array
+    function predicateForEach(item, index, array) { }   // call predicate func on each value
 
-    function predicateFilter(v) {
-        return v % 2 == 1;
-    }       // filer values, predicate must return boolean
     [1,2,3,4].filter(predicateFilter);
-
-    function predicateCompose(x, y) {
-        return x * y;
-    }   // reduction example
+    function predicateFilter(v) { return v % 2 == 1; }  // filer vals, predicate must return bool
+    
+    compose([1,2,3,4], predicateCompose, 1);        // reduction
+    function predicateCompose(x, y) { return x * y; }
     function compose(arr, predicate, init) {
         var temp = init;
         for (var i = 0; i < arr.length; i++)
             temp = predicate(temp, arr[i]);
         return temp;
     }
-    compose([1,2,3,4], predicateCompose, 1);
-
-    function predicateForEach(item, index, array) {
-        // logic here
-    }   // call predicate func on each value
-    [1,2,3,4].forEach(predicateForEach);        // with side effect, will change initial array
 
     // iteration over array
-    for (var i in arr) {}     // will iterate over array index, not values
-    for (var j of arr) {}     // will iterate over array values
-
-    var iterator = arr[Symbol.iterator]();    // { value: 1, done: false }
-    iterator.next();
+    for (var i in arr) {}     // iterate over array index, not values
+    for (var j of arr) {}     // calls next() on an iterable each time the loop executes
+    let iterator = arr[Symbol.iterator]();   // iterator.next() => "{ value: 1, done: false }"
 
     // destructuring
     let colors = [ "red", "green", "blue" ];
     let [ firstColor, secondColor ] = colors;       // "red", "green"
     let [ , firstColor, secondColor ] = colors;     // "green", "blue"
-})();
-(function (object) {
+}
+function (typedArray) {
+    // typed array, allow storage and manipulation of eight different numeric types
+    Signed 8-bit integer (int8), Unsigned 8-bit integer (uint8)
+    Signed 16-bit integer (int16), Unsigned 16-bit integer (uint16)
+    Signed 32-bit integer (int32), Unsigned 32-bit integer (uint32)
+    32-bit float (float32), 64-bit float (float64)
+
+    // array buffer represent memory location
+    let buffer = new ArrayBuffer(10);       // allocate 10 bytes (8 bits X 10)
+    let size = buffer.byteLength;           // return 10 bytes
+    let buffer2 = buffer.slice(4, 6);       // return 2 bytes
+    let view = new DataView(buffer);        // 'view' obj has access to all 10 bytes
+    let view2 = new DataView(buffer, 5, 2); // access to bytes 5 and 6
+    view.byteLength; view.byteOffset;       // 10; 0
+
+    let buffer = new ArrayBuffer(2);
+    let view = new DataView(buffer);
+    view.getInt8(byteOffset, littleEndian);      // read an int8 starting at byteOffset
+    view.setInt8(byteOffset, value, littleEndian);   // write an int8 starting at byteOffset
+    view.getUint8(byteOffset, littleEndian);     // read an uint8 starting at byteOffset
+    view.setUint8(byteOffset, value, littleEndian);  // write an uint8 starting at byteOffset
+
+    // constructors
+    name            Size (bytes)
+    Int8Array           1
+    Uint8Array          1
+    Uint8ClampedArray   1
+    Int16Array          2
+    Uint16Array         2
+    Int32Array          4
+    Uint32Array         4
+    Float32Array        4
+    Float64Array        8
+    let init = new Int8Array(5);    //  pass number to constructor = number of elems, not bytes
+    let buffer = new ArrayBuffer(5); let init = new Int8Array(buffer);
+    init.BYTES_PER_ELEMENT;     // 1 byte each element
+}
+function (object) {
     // create a new object
     var obj = {};
     var obj = Object.create(null);  // obj with a null prototype, ensuring that there are no inherited props
@@ -335,8 +365,8 @@
     var person = { name: "S", age: 35 };
     let {name, age} = person;       // let name = "S"; let age = 35;
     function display({name, age}) {}
-})();
-(function (objPrivateFields) {
+}
+function (objPrivateFields) {
     // ES5 implementation
     var Person = (function() {
         var privateData = {},
@@ -367,8 +397,8 @@
         };
         return Person;
     }());
-})();
-(function (setAndMap) {
+}
+function (setAndMap) {
     // set is an ordered collection of unique items, cannot be directly accessed by index
     var set = new Set(); set.size();     // accept any iterable obj
     set.add(1); set.has(1); set.clear(); set.delete(1);   // add, check, clear all, delete one
@@ -430,8 +460,62 @@
     let key1 = {},
         key2 = {},
     map = new WeakMap([[key1, "Hello"], [key2, 42]]);
-})();
-(function (prototype) {
+}
+function (iteratorGenerator) {
+    // check if obj is iterable
+    function isIterable(object) {
+        return typeof object[Symbol.iterator] === "function";
+    }   // isIterable([1, 2, 3]); isIterable("Hello"); isIterable(new Map()); isIterable(new Set());
+
+    // default iterator
+    let values = [1, 2, 3];
+    let iterator = values[Symbol.iterator]();   // iterator.next() => "{ value: 1, done: false }"
+
+    // for-of loop
+    let values = [1, 2, 3];     // calls next() on an iterable each time the loop executes
+    for (let num of values);
+
+    // generator function
+    function *createIterator(items) {
+        for (let i = 0; i < items.length; i++) yield items[i];
+    }
+    let iterator = createIterator([1, 2, 3]);   // iterator.next() => "{ value: 1, done: false }"
+
+    // generator function expression
+    let createIterator = function *(items) {
+        for (let i = 0; i < items.length; i++) yield items[i];
+    };
+    let iterator = createIterator([1, 2, 3]);   // iterator.next() => "{ value: 1, done: false }"
+
+    // generator object method
+    var o = {
+        *createIterator(items) {
+            for (let i = 0; i < items.length; i++) yield items[i];
+        }
+    };
+    let iterator = o.createIterator([1, 2, 3]); // iterator.next() => "{ value: 1, done: false }"
+
+    // iterable object
+    let collection = {
+        items: [],
+        *[Symbol.iterator]() {
+            for (let item of this.items) yield item;
+        }
+    };
+    collection.items.push(1); collection.items.push(2); collection.items.push(3);
+    for (let x of collection);  // 1, 2, 3   
+
+    // default collection iterators
+    let anyCollection = [1, 2, 3];
+    for (let entry of anyCollection.entries()); // returns an iterator whose values are a key-value pair
+    for (let entry of anyCollection.values()); // returns an iterator whose vals are vals of the collection
+    for (let entry of anyCollection.keys()); // returns an iterator whose vals are the keys contained in the collection
+
+    // nodeList iterator
+    var divs = document.getElementsByTagName("div");
+    for (let div of divs) console.log(div.id);
+}
+function (prototype) {
     // super reference
     let person = {
         getGreeting() { return "Hello"; }
@@ -485,8 +569,8 @@
     }       // will inherit "teeth" prop and "speak" func
     Cat.prototype = Object.create(Animal.prototype);    // assign "Animal" as a prototype for "Cat"
     Cat.prototype.constructor = Cat;
-})();
-(function (behaviorDelegation) {
+}
+function (behaviorDelegation) {
     var Foo = {
         init: function(who) {
             this.me = who;
@@ -502,8 +586,8 @@
     var bam = Object.create(Bar);
     bam.init("S");
     bam.speak();
-})();
-(function (promise) {
+}
+function (promise) {
     // time independent state, async flow control
     function fakeAjax(url, cb) {
         var fake_responses = {
@@ -558,8 +642,8 @@
     }, function (err) {
         console.log(err);       // "Stuff broken"
     });
-})();
-(function (classes) {
+}
+function (class) {
     class Human {
         constructor(name, age) {
             this.name = name;
@@ -582,16 +666,16 @@
         }
     }
     var person = new Men("S", 35, 123);
-})();
-(function (module) {
+}
+function (module) {
     var name = "S"; function getAge(){ return 35; }
     export default {name, getAge};
     import person from './modules'; person.name; person.getAge();
 
     export var name = "S"; export function getAge(){ return 35; }
     import {name, getAge} from './module';
-})();
-(function (designePatterns) {
+}
+function (designPatterns) {
     // function constructor pattern
     function Car(model, year, km) {
         this.model = model;
@@ -712,8 +796,8 @@
     var subscription = pubsub.subscribe("example", observerHandler);
     pubsub.publish("example", "Hello, World!");
     pubsub.unsubscribe(subscription);
-})();
-(function (callbackPattern) {
+}
+function (callbackPattern) {
     function fakeAjax(url, cb) {
         var fake_responses = {
             "file1": "The first response",
@@ -755,8 +839,8 @@
     getFile("file1");
     getFile("file2");
     getFile("file3");
-})();
-(function (utils) {
+}
+function (utils) {
     if (typeof varName !== "undefined") {}  // use global var only if it exist
 
     if (!Number.EPSILON) Number.EPSILON = Math.pow(2, -52); // compare floating point numbers
@@ -817,4 +901,4 @@
     // vue templates
     dev_folder:> npm install -g vue-cli
     dev_folder:> npm install vue-router
-})();
+}
