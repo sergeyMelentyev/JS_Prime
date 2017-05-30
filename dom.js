@@ -1,9 +1,9 @@
-(function (singleElemSelector) {
+function (singleElemSelector) {
     var elem = document.getElementById('id');
     var elem = document.querySelector('div p');
     var elem = document.querySelector("[data-role='p']");
-})();
-(function (collectionsSelector) {
+}
+function (collectionsSelector) {
     // html collection, methods .length and .item(index)
     var elem = document.getElementsByTagName('p');      // life collection
     var elem = document.getElementsByClassName('name');
@@ -11,8 +11,8 @@
     var elem = document.querySelectorAll('div p');
     var elem = document.querySelectorAll('*[class="name"]');    // any elems with same class name
     var array = [].slice.call(elem);        // get array from NodeList object
-})();
-(function (getNodeElement) {
+}
+function (getNodeElement) {
     var elem = document.getElementById('id');
     var childNodesName = [];
     if (elem.hasChildNodes()) {
@@ -20,14 +20,14 @@
         for (var i = 0; i < children.length; i++)
             childNodesName.push(children[i].nodeName);
     }
-})();
-(function (getSetAttr) {
+}
+function (getSetAttr) {
     var atr = document.getElementById('one').getAttribute("data-role");
     atr.setAttribute("data-role", atr);
     var img = document.querySelector('img'); 
     img.setAttribute("src", "url");
-})();
-(function (fragment) {
+}
+function (fragment) {
     var fragment = document.createDocumentFragment();
     var p = document.createElement('p');
     var span = document.createElement('span'); span.innerText = 'text';
@@ -49,22 +49,22 @@
 
     var text = document.createTextNode("text");
     var p = document.createElement('p').appendChild(text);
-})();
-(function (deleteNode) {
+}
+function (deleteNode) {
     var one = document.getElementById('one');
     var set = one.getElementsByTagName('p');
     one.removeChild(set[0]);
-})();
-(function (addIdCalss) {
+}
+function (addIdCalss) {
     elem.setAttribute('id', 'id-name');
     elem.setAttribute('class', 'class-name');
     elem.classList.add('class-name');       // .remove .toggle
-})();
-(function (contentManipulation) {
+}
+function (contentManipulation) {
     elem.innerHTML = "";        // text in 'elem' plus all inner tags
     elem.textContent = "";      // only text in 'elem' plus text from all inner tags
-})();
-(function (addFunctionalityToArray) {
+}
+function (addFunctionalityToArray) {
     var elem = document.querySelectorAll('div p');
     var array = [].slice.call(elem);
     array.forEach(namedFunc);        // pass each obj from array to namedFunc as an arg
@@ -76,8 +76,8 @@
             item.textContent = "any text";      // set any content text
         });
     }
-})();
-(function (styles) {
+}
+function (styles) {
     /*
         { box-sizing: border-box }        // padding and border will be included in the width
 
@@ -95,8 +95,8 @@
     
     elem.style.backgroundColor = 'red';
     elem.setAttribute('style', 'background-color: red; color: white;');
-})();
-(function (popupOverlay) {
+}
+function (popupOverlay) {
     function displayPopup() {
         var overlay = document.createElement('div').setAttribute('id', 'overlay');
         document.body.appendChild(overlay);
@@ -108,8 +108,8 @@
     global.onload = function () {
         displayPopup();
     };
-})();
-(function (events) {
+}
+function (events) {
     var div = document.getElementById('btn-wrapper');
     if (document.addEventListener) {    // W3C
         div.addEventListener('click', myHandler, false);
@@ -144,8 +144,8 @@
         if (typeof e.returnValue !== "undefined")
             e.returnValue = false;
     }
-})();
-(function (pesistence) {
+}
+function (pesistence) {
     // Web Storage API sessionStorage and localStorage, key-value pairs, value in string format,
     // indexed array like object
 
@@ -169,18 +169,17 @@
     var request = window.indexedDB.open("name", 1); // open 'name' database, ver 1.0
     request.onerror = function(event) { /* error logic */ };
     request.onsuccess = function(event) { db = event.target.result; };
-})();
-(function (backgroundThread) {
+}
+function (backgroundThread) {
     var ww = new Worker('ww.js');
     ww.onmessage = function (event) {
         // subscribe to the event and receive updates via 'event.data'
     };
-
+    // ww.js file
     postMessage("post event before start");
-    // logic here
-    postMessage("post event before end");   // ww.js file
-})();    
-(function (request) {
+    postMessage("post event before end");
+}   
+function (request) {
     // XMLHttpRequest + $.ajax
     jQuery.ajax();
     var xhr = new XMLHttpRequest();
@@ -193,15 +192,15 @@
     xhr.open("GET", "page.html", true);     // method, url, asynchronous
     xhr.send("");
 
-    // WebSocket
+    // webSocket
     // browser send GET request, if server response success, TCP connection stay open
     // each side can send data without headers and metadata
     var ws = new WebSocket("ws://site.com/demo");
     ws.onopen = function() { /* success callback, connection established */ };
     ws.onclose = function() { /* closing callback, connection ended */ };
     ws.onmessage = function(data) { /* receiving data callback */ };
-})();
-(function (jQuery) {
+}
+function (jQuery) {
     var $ = global.jQuery;
     $('elem').keypress(function (event) {
         // receive event each time key pressed
@@ -215,8 +214,8 @@
         if ($(window).scrollTop() > (div / 4))
             $('selector').animate({top: div + 100}, 1000);
     });
-})();
-(function (testing) {
+}
+function (testing) {
     "use strict";
     // QUnit модульные тесты для каждой функции
-})();
+}
