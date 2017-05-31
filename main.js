@@ -1,6 +1,10 @@
+function (expression) {
+    (1 + 1, 2 + 2);     // 4
+    void 0;     // always evaluates to undefined
+}
 function (dataType) {
     typeof null;            // "object"
-    typeof foo;             // "undefined"
+    typeof foo;             // "undefined"; there is no value
     typeof "foo";           // "string"
     typeof 123;             // "number"
     typeof true;            // "boolean"
@@ -112,83 +116,45 @@ function (function) {
     }
 }
 function (thisPointer) {
-    // if func called with "new" binding, 'this' = newly constructed obj
-    // if func called with "call" or "apply" explicit binding, 'this' = explicitly specified obj
-    // if func called with a context implicit binding, 'this' = context object
-    // otherwise default binding to undefined in strict mode or global object
-    function foo() {
-        console.log("Call from foo function: " + this.a);
-    }       // implicit binding
-    var bar = {
-        a: "bar object",
-        b: foo
-    };
+    // "this" pointer the same as "context" object
+    var obj = { name: "Sergey" };
+    function foo() { return this.name.toUpperCase(); }
+    identify.call( obj );
+    function foo(context) { return context.name.toUpperCase(); }
+    identify( obj );
+
+    // implicit binding
+    var bar = { a: "bar object", b: foo };
+    function foo() { console.log(this.a); }     // "bar object"
     bar.b();
 
-    function foo() {
-        console.log(this.a);
-    }       // explicit binding with "call" function
-    var bar = {
-        a: "bar object"
-    };
-    var baz = function() {
-        foo.call(bar);
-    };
-    baz(); setTimeout(baz, 100);
+    // explicit binding with "call" function
+    var bar = { a: "bar object" };
+    var baz = function() { foo.call(bar); };
+    function foo() { console.log(this.a); }
+    baz();      // "bar object"
 
-    function foo(something) {
-        console.log(this.a + " " + something);
-        return this.a + something;
-    }   // explicit binding with "apply" function
-    var bar = {
-        a: "bar object"
-    };
-    var baz = function () {
-        return foo.apply(bar, arguments);
-    };
-    baz("args");
+    // explicit binding with "apply" function
+    var bar = { a: "bar object" };
+    var baz = function () { foo.apply(bar, arguments); };
+    function foo(argName) { console.log(this.a + " " + argName); }
+    baz("args");        // "bar object args"
 
-    function foo() {
-        console.log(this.bar);
-    }       // explicit hard binding, "this" reference cannot be changed
-    var objOne = { bar: "barOne" };
+    // explicit hard binding, "this" reference cannot be changed
+    function foo() { console.log(this.bar); }
+    var obj = { bar: "barOne" };
     var orig = foo;
-    foo = function () { orig.call(objOne); };   // if "foo" is called "barOne" will be returned
+    foo = function () { orig.call(obj); }; foo();  // "barOne"
 
-    function foo(baz, bam) {
-        console.log(this.bar + " " + baz + " " + bam);
-    }       // explicit hard binding with "bind" function
+    // explicit hard binding with "bind" function
     var obj = { bar: "bar" };
+    function foo(baz, bam) { console.log(this.bar + " " + baz + " " + bam); }
     foo = foo.bind(obj, "baz");
-    foo("bam");     // bar baz bam
+    foo("bam");     // "bar baz bam"
 
-    function foo(a) {
-        this.a = a;
-    }   // new binding
-    var baz = new foo(2);
-
-    function foo() {
-        var self = this;
-        setTimeout(function () {
-            console.log("Call foo() " + self.a);
-        }, 1000);
-    }       // use case with setTimeout function
-    var obj = {
-        a: "object"
-    };
-    foo.call(obj);
-
-    var widget = {
-        init: function () {
-            var self = this;
-            document.addEventListener('click', function (event) {
-                self.doSomething(event.type);
-            }, false);
-        },
-        doSomething: function (type) {
-            console.log(type);
-        }
-    };      // use case with document.addEventListener()
+    // new binding
+    function Foo(a) { this.a = a; }
+    var baz = new Foo(2);       // a = 2;
 }
 function (string) {
     var msg = "";
