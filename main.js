@@ -119,9 +119,9 @@ function (thisPointer) {
     // "this" pointer the same as "context" object
     var obj = { name: "Sergey" };
     function foo() { return this.name.toUpperCase(); }
-    identify.call( obj );
+    foo.call(obj);
     function foo(context) { return context.name.toUpperCase(); }
-    identify( obj );
+    foo(obj);
 
     // implicit binding
     var bar = { a: "bar object", b: foo };
@@ -140,21 +140,29 @@ function (thisPointer) {
     function foo(argName) { console.log(this.a + " " + argName); }
     baz("args");        // "bar object args"
 
+    // explicit hard binding with Function.prototype.bind
+    var obj = { bar: "bar" };
+    function foo(baz, bam) { console.log(this.bar + " " + baz + " " + bam); }
+    foo = foo.bind(obj, "baz");
+    foo("bam");     // "bar baz bam"
+
     // explicit hard binding, "this" reference cannot be changed
     function foo() { console.log(this.bar); }
     var obj = { bar: "barOne" };
     var orig = foo;
     foo = function () { orig.call(obj); }; foo();  // "barOne"
 
-    // explicit hard binding with "bind" function
-    var obj = { bar: "bar" };
-    function foo(baz, bam) { console.log(this.bar + " " + baz + " " + bam); }
-    foo = foo.bind(obj, "baz");
-    foo("bam");     // "bar baz bam"
+    // context optional parameter 
+    function foo(el) { console.log( el, this.id ); }
+    let obj = { id: "awesome" };
+    [1, 2, 3].forEach(foo, obj);
 
-    // new binding
+    // new binding, function constructor call
+    // new obj is created
+    // new obj is [[Prototype]] linked
+    // new obj is set as "this" binding
     function Foo(a) { this.a = a; }
-    var baz = new Foo(2);       // a = 2;
+    var baz = new Foo(2);
 }
 function (string) {
     var msg = "";
@@ -271,13 +279,20 @@ function (typedArray) {
 }
 function (object) {
     // create a new object
-    var obj = {};
-    var obj = Object.create(null);  // obj with a null prototype, ensuring that there are no inherited props
-    var obj = new Object();
+    var obj = {};                   // literal syntax
+    var obj = new Object();         // constructed syntax
+    var obj = Object.create(null);  // obj with a null prototype, no inherited props
 
-    // add key-value pare
+    // add key-value pare, key is always a string (primitive)
     obj.key = "";
     obj['key'] = "";
+
+    // getter and setter
+    var obj = {
+        get a() { return this._a_; },
+        set a(val) { this._a_ = val; }
+    };
+
     Object.defineProperty(obj, 'key', {
         value: "",
         writable: true,
@@ -302,10 +317,14 @@ function (object) {
     };
 
     // compare objects
-    Object.is(NaN, NaN);        // true, vals are equivalent if they are of the same type and have the same val
-    var bool = ("key" in obj);      // check if property is exist also included prototype link
+    Object.is(NaN, NaN);            // true, vals are equivalent if same type and same val
+    var bool = ("key" in obj);      // check if property is exist, including [[Prototype]] link
     obj.hasOwnProperty("key");      // check if property is exist only in that object
-    delete obj.key;         // delete 'value' by targeting its 'key' from obj
+    delete obj.key;                 // delete "value" by targeting its 'key' from obj
+
+    // duplicating objects
+    var newObj = JSON.parse( JSON.stringify( someObj ) );   // deep copy
+    var newObj = Object.assign( {}, someObj );              // shallow copy
 
     // mixing objs props and methods, shallow copy, receiver - supplier - supplier - ...
     function EventTarget() { }
