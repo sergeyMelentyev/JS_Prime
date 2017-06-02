@@ -501,57 +501,67 @@ function (iteratorGenerator) {
     for (let div of divs) console.log(div.id);
 }
 function (prototype) {
-    // super reference
-    let person = {
-        getGreeting() { return "Hello"; }
-    };
-    let friend = {
-        getGreeting() { return super.getGreeting() + ", hi!"; }
-    };
-    Object.setPrototypeOf(friend, person);      // prototype is person
-    let relative = Object.create(friend);       // prototype is friend
-    person.getGreeting(); friend.getGreeting(); relative.getGreeting();
+    // any obj have internal prop named [[Prototype]], that is ref to another obj
+    // [[Get]] operation in first step check if obj itself has requested prop
+    // [[Get]] operation follow [[Prototype]] link of the obj if cannot find requested obj prop directly
+    // Object.prototype === top-end of every normal [[Prototype]] chain
 
-    function Human(arg) {
-        // func will create arbitrary labeled "object"
-        // "Human.prototype" will point to that "object"
-        // "object.constructor" will point back to "Human"
-        this.name = arg;
-    }
-    Human.prototype.propName = "";      // put property directly on arbitrary labeled "object"
-        // will be referenced by all objects
+    obj.foo = "bar";
+    // normal data accessor prop named "foo" is found higher on the [[Prototype]] chain,
+        // and it's NOT writable:false, new prop "foo" is added directly to "obj", resulting in a shadowed prop
+    // "foo" is found on the [[Prototype]] chain, but it IS writable:false, error will be thrown,
+        // both setting of that existing prop as well as creation of shadowed prop on "obj" are disallowed
+    // "foo" is found on the [[Prototype]] chain and it's a setter, then the setter will always be called
+        // no "foo" will be added to "obj"
+    // have to use "Object.defineProperty()" for second and third cases in order to add "foo" to "obj"
 
+    // prototypal inheritance
+    function Foo() { }
+    let x = new Foo();        // "x" get [[Prototype]] link to the obj that "Foo.prototype" is pointing at
+    Object.getPrototypeOf(x) === Foo.prototype;   // true
+
+    Object.setPrototypeOf(a, b);        // prototype is b
+    let c = Object.create(b);           // prototype is b
+    a.getGreeting(); b.getGreeting(); c.getGreeting();
+    Foo.prototype.isPrototypeOf(x);     // in the entire [[Prototype]] chain of "x", does "Foo.prototype" ever appear
+
+    // function with constructor call, use "new" in order to construct an obj
+    // arbitrary labeled obj will be created, "Human.prototype" will point to that obj
+    // "obj.constructor" will point back to "Human
+    function Human(arg) { this.name = arg; }
+
+    // put props directly on arbitrary labeled obj, will be referenced by all objs
+    Human.prototype.propName = "";      
+    Human.prototype.methodName = function() { return this.name; };
     var men = new Human("S");
     var female = new Human("O");
-        // new obj is created;
-        // that obj get linked via [[Prototype]] to the arbitrary labeled "object"
-            // the same that "Human.prototype" points to;
-        // context get set to that new obj, "Human this.name" will be pointing to that obj;
-        // obj is being returned and assign to variable "men";
-    men.propValue = "";     // put property directly on that "men" object
+    men.propValue = "";         // put property directly on "men" obj
 
+    // public non-enumerable property ".constructor", extremely unreliable
+    Human.prototype.constructor === Human;  // true
     men.constructor === Human;      // true, "men" does not have that prop, will walk up the
-        // prototype chain via private [[Prototype]] link to the arbitrary labeled "object"
-        // that has ".constructor" property pointing to the "Human" function
-    men.constructor === female.constructor;     // true, both points to the "Human" function
-    men.__proto__ === Human.prototype;      // true, "men" does not have that function,
-        // will walk up the prototype chain via private [[Prototype]] link to the the arbitrary
-        // labeled "object" that also does not have that function, will walk up to the system
-        // arbitrary labeled "object" and call that func. It will return internal prototype
+        // prototype chain via private [[Prototype]] link to the arbitrary labeled obj
+        // that has ".constructor" prop pointing to the "Human" func
+    men.constructor === female.constructor;     // true, both points to the "Human" func
+    men.__proto__ === Human.prototype;      // true, "men" does not have that func,
+        // will walk up the prototype chain via private [[Prototype]] link to the arbitrary
+        // labeled obj that does not have that func, will walk up to the system
+        // arbitrary labeled obj and call that func. It will return internal prototype
         // linkage [[Prototype]] of called obj, in this case "men"
 
-    function Animal(voice) {
-        this.voice = voice || "default";
-    }
-    Animal.prototype.teeth = "10";      // add property to prototype, will be inherited
-    Animal.prototype.speak = function () {
-        console.log(this.voice);
-    };  // add function to prototype, wll be inherited
+    // enumerate via prototype chain
+    for (let i in obj);     // any prop of "obj" that can be reached via chain will be enumerated
+    let i = ("key" in obj); // check the entire chain of the obj
+
+    // 
+    function Animal(voice) { this.voice = voice || "default"; }
+    Animal.prototype.teeth = "10";
+    Animal.prototype.speak = function () { console.log(this.voice); };
 
     function Cat(name) {
         Animal.call(this, "not default");   // call "Animal" constructor with args
         this.name = name;
-    }       // will inherit "teeth" prop and "speak" func
+    }
     Cat.prototype = Object.create(Animal.prototype);    // assign "Animal" as a prototype for "Cat"
     Cat.prototype.constructor = Cat;
 }
