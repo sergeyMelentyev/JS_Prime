@@ -282,6 +282,12 @@ function (object) {
     var obj = {};                   // literal syntax
     var obj = new Object();         // constructed syntax
     var obj = Object.create(null);  // obj with a null prototype, no inherited props
+    var obj = Object.create(Foo);   // the same as "new Foo();"
+    
+    var obj = { a: 2 };     // second arg to Object.create() specifies prop names to add to new obj
+    var newObj = Object.create( obj, {
+        b: { enumerable: false, writable: true, configurable: false, value: 3 }
+    } );
 
     // add key-value pare, key is always a string (primitive)
     obj.key = "";
@@ -320,6 +326,12 @@ function (object) {
     Object.is(NaN, NaN);            // true, vals are equivalent if same type and same val
     var bool = ("key" in obj);      // check if property is exist, including [[Prototype]] link
     obj.hasOwnProperty("key");      // check if property is exist only in that object
+    
+    obj instanceof Foo; // in [[Prototype]] chain of "obj", does the "obj" arbitrarily pointed to by Foo.prototype appear
+    Foo.prototype.isPrototypeOf(obj);       // in the entire [[Prototype]] chain of "obj", does Foo.prototype ever appear
+    objOne.isPrototypeOf(objTwo);
+    Object.getPrototypeOf(obj) === Foo.prototype;
+
     delete obj.key;                 // delete "value" by targeting its 'key' from obj
 
     // duplicating objects
@@ -567,20 +579,79 @@ function (prototype) {
 }
 function (behaviorDelegation) {
     var Foo = {
-        init: function(who) {
-            this.me = who;
-        },
-        identify: function() {
-            return "I am " + this.me;
-        }
+        init: function(who) { this.me = who; },
+        identify: function() { return ("I am " + this.me); }
     };
     var Bar = Object.create(Foo);
-    Bar.speak = function () {
-        console.log("Hello, " + this.identify() + ".");
-    };
+    Bar.speak = function () { console.log("Hello, " + this.identify() + "."); };
     var bam = Object.create(Bar);
     bam.init("S");
     bam.speak();
+
+    // widget examaple
+    var Widget = {
+        init: function(width,height) {
+            this.width = width || 50;
+            this.height = height || 50;
+            this.$elem = null;
+        },
+        insert: function($where) {
+            if (this.$elem)
+                this.$elem.css({width: this.width+"px", height: this.height+"px"}).appendTo($where);
+        }
+    };
+    var Button = Object.create(Widget);
+    Button.setup = function(width, height, label) {
+        this.init(width, height);
+        this.label = label || "Default";
+        this.$elem = $("<button>").text(this.label);
+    };
+    Button.build = function($where) {
+        this.insert($where);
+        this.$elem.click(this.onClick.bind(this));
+    };
+    Button.onClick = function(evt) { console.log(this.label + "' clicked!"); };
+    $(document).ready(function() {
+        var $body = $(document.body);
+        var btn1 = Object.create(Button);
+        btn1.setup(125, 30, "Hello");
+        var btn2 = Object.create(Button);
+        btn2.setup(150, 40, "World");
+        btn1.build($body);
+        btn2.build($body);
+    });
+
+    // auth example
+    var LoginController = {
+        errors: [],
+        getUser: function() { return document.getElementById( "login_username" ).value; },
+        getPassword: function() { return document.getElementById( "login_password" ).value; },
+        validateEntry: function(user,pw) {
+            user = user || this.getUser();
+            pw = pw || this.getPassword();
+            if (!(user && pw)) return this.failure( "Please enter a username & password!" );
+            else if (pw.length < 5) return this.failure( "Password must be 5+ characters!" );
+            return true;
+        },
+        showDialog: function(title,msg) { /* display success message to user in dialog */ },
+        failure: function(err) { this.errors.push( err ); this.showDialog( "Login invalid: " + err ); }
+    };
+
+    var AuthController = Object.create( LoginController );
+    AuthController.errors = [];
+    AuthController.checkAuth = function() {
+        var user = this.getUser();
+        var pw = this.getPassword();
+        if (this.validateEntry(user, pw)) {
+            this.server("/check-auth", {
+                user: user,
+                pw: pw
+            }).then(this.accepted.bind(this)).fail(this.rejected.bind(this));
+        }
+    };
+    AuthController.server = function(url, data) {return $.ajax({url: url, data: data});};
+    AuthController.accepted = function() {this.showDialog("Success", "Authenticated!")};
+    AuthController.rejected = function(err) {this.failure("Auth Failed: " + err);};
 }
 function (promise) {
     // time independent state, async flow control
