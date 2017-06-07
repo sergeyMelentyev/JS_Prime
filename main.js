@@ -67,7 +67,7 @@ function (function) {
         // logic here
     }
 
-    // function constructor
+    // function constructor call
     var add = new Function("first", "second = first", "return first + second");
     add(1, 1); add(1);      // 2
     var pickFirst = new Function("...args", "return args[0]");
@@ -93,19 +93,20 @@ function (function) {
     var y = new Person("Sergey");   // [[Construct]] methods executes, new object is created,
         // then executing the func body with 'this' set to the new target
 
-    // arrow func, have no 'this' binding, the value of 'this' can be determined by looking up the scope chain
-    // call(), apply(), bind() will not affect 'this' binding
+    // arrow func no "this" binding, val of "this" can be determined by looking up the scope chain
+    // don’t have args obj, args remain accessible due to scope chain resolution of args identifier
+    // call(), apply(), bind() will not affect "this" binding
     var name = (x) => ++x;      // function name(x) { return ++x; }
     var name = (x) => { return ++x; };  // for multi line body use braces and explicit return
     
     function createArrowFunctionReturningFirstArg() { return () => arguments[0]; }
     var arrowFunction = createArrowFunctionReturningFirstArg(5);
-    arrowFunction();    // arrow func don’t have args obj, args remain accessible due to scope chain resolution of args identifier
+    arrowFunction();    
 
-    // recursive function with tail call optimization, current stack frame is cleared and reused
+    // recursive func with tail call optimization, current stack frame is cleared and reused
         // no access to vars in the current stack frame (func is not a closure)
         // func making the tail call has no further work to do after the tail call returns
-        // result of the tail call is returned as the funct value
+        // result of the tail call is returned as the func value
     function factorial(n, p = 1) {
         if (n <= 1) {
             return 1 * p;
@@ -654,6 +655,27 @@ function (behaviorDelegation) {
     AuthController.rejected = function(err) {this.failure("Auth Failed: " + err);};
 }
 function (promise) {
+    // node.js promise wrapper for reading from file
+    let fs = require("fs");
+    function readFile(filename) {
+        return new Promise(function(resolve, reject) {
+            fs.readFile(filename, { encoding: "utf8" }, function(err, contents) {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(contents);
+            });
+        });
+    }
+    let promise = readFile("file.txt");
+    // funcs passed to .then() and .catch() executed asynchronously, added to the job queue
+    promise.then(function(contents) {}, function(err) {});
+
+
+
+
+
     // time independent state, async flow control
     function fakeAjax(url, cb) {
         var fake_responses = {
