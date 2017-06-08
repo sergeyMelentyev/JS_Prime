@@ -655,80 +655,58 @@ function (behaviorDelegation) {
     AuthController.rejected = function(err) {this.failure("Auth Failed: " + err);};
 }
 function (promise) {
-    // node.js promise wrapper for reading from file
-    let fs = require("fs");
-    function readFile(filename) {
-        return new Promise(function(resolve, reject) {
-            fs.readFile(filename, { encoding: "utf8" }, function(err, contents) {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-                resolve(contents);
-            });
-        });
-    }
-    let promise = readFile("file.txt");
-    // funcs passed to .then() and .catch() executed asynchronously, added to the job queue
-    promise.then(function(contents) {}, function(err) {});
-
-
-
-
-
     // time independent state, async flow control
-    function fakeAjax(url, cb) {
-        var fake_responses = {
-            "file1": "The first response",
-            "file2": "The second response",
-            "file3": "The third response"
-        };
-        var randomDelay = (Math.round(Math.random() * 1E4) % 8000) + 10;
-        console.log("Requesting: " + url);
-
-        setTimeout(function () {
-            cb(fake_responses[url]);
-        }, randomDelay);
-    }
-    function getFile(file) {
-        return new Promise(function (resolve) {
-            fakeAjax(file, resolve);
-        });
-    }
-
-    var p1 = getFile("file1");
-    var p2 = getFile("file2");
-    var p3 = getFile("file3");
-
-    p1.then(function (data) {
-        console.log(data);
-    })
-        .then(function () {
-            return p2;
-        })
-        .then(function (data) {
-            console.log(data);
-        })
-        .then(function () {
-            return p3;
-        })
-        .then(function (data) {
-            console.log(data);
-        });
-
-
-    var promise = new Promise(function (resolve, reject) {
-        // logic here, ajax call or DOM manipulation
-        if (doSomething()) {
-            resolve("Stuff worked");
-        } else {
-            reject("Stuff broken");
-        }
+    let promise = new Promise(function(resolve, reject) {
+        // promise body, logic here, save result in var and check in next line
+        if (condition) resolve(data);
+        else reject(err);
     });
-    promise.then(function (result) {
-        console.log(result);    // "Stuff worked"
+    promise.then(function (data) {
+        // async data area
     }, function (err) {
-        console.log(err);       // "Stuff broken"
+        // async error area
+    });
+
+    // method Promise.resolve()
+    let promise = Promise.resolve(35);  // accept arg and return promise in the fulfilled state
+    promise.then(function(val) {
+        console.log(val);       // async operation
+    });
+
+    // returning vals in chain
+    let p1 = Promise.resolve(35);
+    p1.then(function(value) {
+        return value + 1;
+    }).then(function(value) {
+        console.log(value);     // 36
+    });
+
+    // returning promise in chain
+    let p1 = new Promise(function(resolve, reject) { resolve(35); });
+    let p2 = new Promise(function(resolve, reject) { resolve(36); });
+    p1.then(function(value) {
+        console.log(value);     // 35
+        return p2;
+    }).then(function(value) {
+        console.log(value);     // 36
+    });
+
+    // method Promise.all(), resolves only when every promise in the iterable is resolved
+    let p1 = new Promise(function(resolve, reject) { resolve(34); });
+    let p2 = new Promise(function(resolve, reject) { resolve(35); });
+    let p3 = new Promise(function(resolve, reject) { resolve(36); });
+    let p4 = Promise.all([p1, p2, p3]);     // iterable argument of promises to monitor
+    p4.then(function(arrOfVals) {
+        console.log(arrOfVals[0]);      // vals are stored in order promises were passed
+    });
+
+    // methods Promise.race(), resolves as soon as any first promise is resolved
+    let p1 = Promise.resolve(42);
+    let p2 = new Promise(function(resolve, reject) { resolve(43); });
+    let p3 = new Promise(function(resolve, reject) { resolve(44); });
+    let p4 = Promise.race([p1, p2, p3]);    // iterable argument of promises to monitor
+    p4.then(function(value) {
+        console.log(value);     // result ignores the other promises
     });
 }
 function (class) {
