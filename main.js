@@ -40,6 +40,8 @@ function (scope) {
     }
 }
 function (function) {
+    // after func is invoked, new environment is created, it is a dict that maps vars to vals by name
+
     function name() {}         // function declaration, will be hoisted
     var funcName = function () {};      // function expression, will not be hoisted
 
@@ -47,7 +49,7 @@ function (function) {
     var argsSize = funcName.length;     // number of arguments
     function baz(arg) { arg === arguments[0]; }     // arguments object, contains all params
 
-    // rest param, contains all params passed after 'obj', must be only one rest param and it must be last
+    // rest param, contains all params passed after "obj", must be only one rest param and it must be last
     function pick(obj, ...keys) {
         let result = Object.create(null);
         for (let i = 0, len = keys.length; i < len; i++)
@@ -80,18 +82,19 @@ function (function) {
     var num = [0, ...nameless()];       // array concatenation
     var concat = [...nums, ...chars];
 
-    // closure, func is able to access its lexical scope even when executing outside it
+    // closure, func is able to access its lexical scope even when executing outside of it
     function outerOne() {
-        function innerOne() { /* logic here */ }
+        let local = "value";
+        function innerOne() { console.log(local); }
         return innerOne;    // return reference of the innerOne() func object
     }
     var closure = outerOne(); closure();
 
-    // functions internal-only methods
+    // function internal-only methods
     function Person(name) { this.name = name; }
     var x = Person("Sergey");       // [[Call]] method executes the body of func as it is
     var y = new Person("Sergey");   // [[Construct]] methods executes, new object is created,
-        // then executing the func body with 'this' set to the new target
+        // then executing the func body with "this" set to the new target
 
     // arrow func no "this" binding, val of "this" can be determined by looking up the scope chain
     // don’t have args obj, args remain accessible due to scope chain resolution of args identifier
@@ -101,7 +104,7 @@ function (function) {
     
     function createArrowFunctionReturningFirstArg() { return () => arguments[0]; }
     var arrowFunction = createArrowFunctionReturningFirstArg(5);
-    arrowFunction();    
+    arrowFunction();
 
     // recursive func with tail call optimization, current stack frame is cleared and reused
         // no access to vars in the current stack frame (func is not a closure)
@@ -655,9 +658,12 @@ function (behaviorDelegation) {
     AuthController.rejected = function(err) {this.failure("Auth Failed: " + err);};
 }
 function (promise) {
-    // time independent state, async flow control
+    // setTimeout() func guaranteed that callback won't fire before time interval specified,
+    // but it can happen at or after time, depending on the state of the event queue
+
+    // promise = time independent state, async flow control, immutable once resolved
     let promise = new Promise(function(resolve, reject) {
-        // promise body, logic here, save result in var and check in next line
+        // promise body, logic here execute immediately, save result in var and check in next line
         if (condition) resolve(data);
         else reject(err);
     });
@@ -708,6 +714,11 @@ function (promise) {
     p4.then(function(value) {
         console.log(value);     // result ignores the other promises
     });
+}
+function (generator) {
+    function *foo(x,y) {
+        return x * y;
+    }
 }
 function (class) {
     class Human {
