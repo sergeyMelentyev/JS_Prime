@@ -41,9 +41,21 @@ function (scope) {
 }
 function (function) {
     // after func is invoked, new environment is created, it is a dict that maps vars to vals by name
+    // pure func = contain NO free vars, only binded vars (passed in as an argument)
+    // closures = contain free vars that is not bound within the func
+
+    ((z) => z)(1);          // environment {z: 1, '..': global}
+
+    ((x) => (y) => x)(1)(2);
+    ((x) => (y) => x)(1);   // environment {x: 1, ...}, called "I combinator" or "Identity function"
+    ((y) => x)(2);          // environment is {y: 2, '..': {x: 1, ...}}, called "K combinator" or "Kestrel"
 
     function name() {}         // function declaration, will be hoisted
     var funcName = function () {};      // function expression, will not be hoisted
+
+    const evenStevens = (n) => {
+        n += 1;                 // rebind new value to name bound with a parameter
+    };
 
     // arguments
     var argsSize = funcName.length;     // number of arguments
