@@ -1,8 +1,8 @@
-function (expression) {
+function expression() {
     (1 + 1, 2 + 2);     // 4
     void 0;     // always evaluates to undefined
 }
-function (dataType) {
+function dataType() {
     typeof null;            // "object"
     typeof foo;             // "undefined"; there is no value
     typeof "foo";           // "string"
@@ -12,7 +12,7 @@ function (dataType) {
     typeof function () {};  // "function"
     typeof symbol;          // "symbol"
 }
-function (coercion) {
+function coercion() {
     var str = "123", val;
     // explicit from string to number
     val = parseInt(str, 10); val = Number(str); val = +str;
@@ -28,7 +28,7 @@ function (coercion) {
     // from string/number to boolean
     var bool = Boolean(str); bool = !!str; bool = str ? true : false;
 }
-function (scope) {
+function scope() {
     var a;      // hoisted, new binding is created in global scope and NEW prop is added to the global obj
     let b;      // new binding is created in global scope but NO prop is added to the global obj
     const c = 0;    // constant value will stick to any block scope, like 'let'
@@ -39,10 +39,19 @@ function (scope) {
         funcOne(bigData);
     }
 }
-function (function) {
+function func() {
     // after func is invoked, new environment is created, it is a dict that maps vars to vals by name
     // pure func = contain NO free vars, only binded vars (passed in as an argument)
     // closures = contain free vars that is not bound within the func
+
+    // "combinator" higher-order pure func that take only func as args and return a func
+    const addOne = (number) => number + 1;
+    const doubleOf = (number) => number * 2;
+    const doubleOfAddOne = (number) => doubleOf(addOne(number));    // function compose combinator
+
+    const not = (fn) => (x) => !fn(x);
+    const something = (x) => x != null;
+    const nothing = not(something);                                 // function decorator
 
     ((z) => z)(1);          // environment {z: 1, '..': global}
 
@@ -51,7 +60,8 @@ function (function) {
     ((y) => x)(2);          // environment is {y: 2, '..': {x: 1, ...}}, called "K combinator" or "Kestrel"
 
     function name() {}         // function declaration, will be hoisted
-    var funcName = function () {};      // function expression, will not be hoisted
+    (function name() {})        // function expression, will not be hoisted
+    var name = function () {};      // function expression, will not be hoisted
 
     const evenStevens = (n) => {
         n += 1;                 // rebind new value to name bound with a parameter
@@ -131,7 +141,7 @@ function (function) {
         }
     }
 }
-function (thisPointer) {
+function thisPointer() {
     // "this" pointer the same as "context" object
     var obj = { name: "Sergey" };
     function foo() { return this.name.toUpperCase(); }
@@ -180,7 +190,7 @@ function (thisPointer) {
     function Foo(a) { this.a = a; }
     var baz = new Foo(2);
 }
-function (string) {
+function string() {
     var msg = "";
     msg.indexOf("a");           // .lastIndexOf("a"); find the actual position, return index
     msg.startsWith("a");        // .endsWith("a"); .includes("a"); search the whole 'msg', return boolean
@@ -194,7 +204,7 @@ function (string) {
         price = 0.25,
         message = `${count} items cost ${(count * price).toFixed(2)}.`;
 }
-function (symbol) {
+function symbol() {
     let firstName = Symbol("first name");
     let person = {
         [firstName]: "Sergey"       // computed object literal property
@@ -209,7 +219,7 @@ function (symbol) {
     let symbols = Object.getOwnPropertySymbols(person); // array for-of symbols
     Symbol.keyFor(uid)
 }
-function (array) {
+function array() {
     // array constructor
     let items = new Array(2);       // items.length = 2; items[0] === undefined;
     let items = new Array(1, 2);    // items.length = 2; items[0] === 1;
@@ -256,7 +266,7 @@ function (array) {
     let [ firstColor, secondColor ] = colors;       // "red", "green"
     let [ , firstColor, secondColor ] = colors;     // "green", "blue"
 }
-function (typedArray) {
+function typedArray() {
     // typed array, allow storage and manipulation of eight different numeric types
     Signed 8-bit integer (int8), Unsigned 8-bit integer (uint8)
     Signed 16-bit integer (int16), Unsigned 16-bit integer (uint16)
@@ -293,7 +303,7 @@ function (typedArray) {
     let buffer = new ArrayBuffer(5); let init = new Int8Array(buffer);
     init.BYTES_PER_ELEMENT;     // 1 byte each element
 }
-function (object) {
+function object() {
     // create a new object
     var obj = {};                   // literal syntax
     var obj = new Object();         // constructed syntax
@@ -379,7 +389,7 @@ function (object) {
     let {name, age} = person;       // let name = "S"; let age = 35;
     function display({name, age}) {}
 }
-function (objPrivateFields) {
+function objPrivateFields() {
     // ES5 implementation
     var Person = (function() {
         var privateData = {},
@@ -411,7 +421,7 @@ function (objPrivateFields) {
         return Person;
     }());
 }
-function (setAndMap) {
+function setAndMap() {
     // set is an ordered collection of unique items, cannot be directly accessed by index
     var set = new Set(); set.size();     // accept any iterable obj
     set.add(1); set.has(1); set.clear(); set.delete(1);   // add, check, clear all, delete one
@@ -474,7 +484,7 @@ function (setAndMap) {
         key2 = {},
     map = new WeakMap([[key1, "Hello"], [key2, 42]]);
 }
-function (iteratorGenerator) {
+function iteratorGenerator() {
     // check if obj is iterable
     function isIterable(object) {
         return typeof object[Symbol.iterator] === "function";
@@ -528,7 +538,7 @@ function (iteratorGenerator) {
     var divs = document.getElementsByTagName("div");
     for (let div of divs) console.log(div.id);
 }
-function (prototype) {
+function prototype() {
     // any obj have internal prop named [[Prototype]], that is ref to another obj
     // [[Get]] operation in first step check if obj itself has requested prop
     // [[Get]] operation follow [[Prototype]] link of the obj if cannot find requested obj prop directly
@@ -593,7 +603,7 @@ function (prototype) {
     Cat.prototype = Object.create(Animal.prototype);    // assign "Animal" as a prototype for "Cat"
     Cat.prototype.constructor = Cat;
 }
-function (behaviorDelegation) {
+function behaviorDelegation() {
     var Foo = {
         init: function(who) { this.me = who; },
         identify: function() { return ("I am " + this.me); }
@@ -669,7 +679,7 @@ function (behaviorDelegation) {
     AuthController.accepted = function() {this.showDialog("Success", "Authenticated!")};
     AuthController.rejected = function(err) {this.failure("Auth Failed: " + err);};
 }
-function (promise) {
+function promise() {
     // setTimeout() func guaranteed that callback won't fire before time interval specified,
     // but it can happen at or after time, depending on the state of the event queue
 
@@ -727,12 +737,12 @@ function (promise) {
         console.log(value);     // result ignores the other promises
     });
 }
-function (generator) {
+function generator() {
     function *foo(x,y) {
         return x * y;
     }
 }
-function (class) {
+function class() {
     class Human {
         constructor(name, age) {
             this.name = name;
@@ -756,7 +766,7 @@ function (class) {
     }
     var person = new Men("S", 35, 123);
 }
-function (module) {
+function module() {
     var name = "S"; function getAge(){ return 35; }
     export default {name, getAge};
     import person from './modules'; person.name; person.getAge();
