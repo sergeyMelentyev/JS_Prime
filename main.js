@@ -27,6 +27,9 @@ function coercion() {
 
     // from string/number to boolean
     var bool = Boolean(str); bool = !!str; bool = str ? true : false;
+
+    // from string to Date
+    var date = Date.parse("Sun, 22 Dec 2017 08:00:00 GMT");
 }
 function scope() {
     var a;      // hoisted, new binding is created in global scope and NEW prop is added to the global obj
@@ -40,7 +43,8 @@ function scope() {
     }
 }
 function func() {
-    // after func is invoked, new environment is created, it is a dict that maps vars to vals by name
+    // after func applied to args (invoked), new environment created,
+    // it is a dict that maps vars to vals by name
     // pure func = contain NO free vars, only binded vars (passed in as an argument)
     // closures = contain free vars that is not bound within the func
 
@@ -67,9 +71,9 @@ function func() {
         n += 1;                 // rebind new value to name bound with a parameter
     };
 
-    // arguments
+    // arguments object
     var argsSize = funcName.length;     // number of arguments
-    function baz(arg) { arg === arguments[0]; }     // arguments object, contains all params
+    function baz(arg) { arg === arguments[0]; }     // "arguments" is like an obj, contains all params
 
     // rest param, contains all params passed after "obj", must be only one rest param and it must be last
     function pick(obj, ...keys) {
@@ -118,15 +122,18 @@ function func() {
     var y = new Person("Sergey");   // [[Construct]] methods executes, new object is created,
         // then executing the func body with "this" set to the new target
 
-    // arrow func no "this" binding, val of "this" can be determined by looking up the scope chain
+    // fat arrow (arrow func)
+    // no "this" binding, will be determined by looking up the scope chain
     // don’t have args obj, args remain accessible due to scope chain resolution of args identifier
     // call(), apply(), bind() will not affect "this" binding
     var name = (x) => ++x;      // function name(x) { return ++x; }
     var name = (x) => { return ++x; };  // for multi line body use braces and explicit return
     
-    function createArrowFunctionReturningFirstArg() { return () => arguments[0]; }
-    var arrowFunction = createArrowFunctionReturningFirstArg(5);
-    arrowFunction();
+    row(3);     // [3,6,9,12,15]; fat arrow will bind arguments[0] to passed value "3"
+    let row = function () { return mapWith( column => column * arguments[0], [1, 2, 3, 4, 5] ) };
+    row(3);     // [1,4,9,16,25]; reg func will bind arguments[0] to val from iterable array
+    let row = function () { return mapWith(
+        function (column) { return column * arguments[0] }, [1, 2, 3, 4, 5] ) };
 
     // recursive func with tail call optimization, current stack frame is cleared and reused
         // no access to vars in the current stack frame (func is not a closure)
@@ -140,6 +147,15 @@ function func() {
             return factorial(n - 1, result);
         }
     }
+
+    // composition pattern
+    const compose = (a, b) => (c) => a(b(c));
+    const cookAndEat = compose(eat, cook);
+
+    // partial application pattern
+    const mapWith = (fn) => (array) => map(array, fn);  // apply func to each elem of an arr
+    const squareAll = mapWith((n) => n * n);
+    squareAll([1, 2, 3])            // [1, 4, 9]
 }
 function thisPointer() {
     // "this" pointer the same as "context" object
@@ -192,10 +208,13 @@ function thisPointer() {
 }
 function string() {
     var msg = "";
+    msg.charAt(0);              // get chat at given index
     msg.indexOf("a");           // .lastIndexOf("a"); find the actual position, return index
     msg.startsWith("a");        // .endsWith("a"); .includes("a"); search the whole 'msg', return boolean
     msg.startsWith("a", 4);     // .endsWith("a", 4); .includes("a", 4); check part of the 'msg', return boolean
     msg.repeat(2);
+
+    isNaN(msg.charAt(0));       // check if char at given index is not a number
 
     // template literal
     let message = `Multiline
@@ -239,10 +258,10 @@ function array() {
     func(array.slice());        // passing array by value
 
     [1,2,3,4].map(predicateMap);    // no side effect, will return new array
-    function predicateMap(v) { return v + v; }  // call predicate func on each val in arr
+    function predicateMap(item, index, array) {}  // call predicate func on each val in arr
     
     [1,2,3,4].forEach(predicateForEach);    // with side effect, will change initial array
-    function predicateForEach(item, index, array) { }   // call predicate func on each value
+    function predicateForEach(item, index, array) {}   // call predicate func on each value
 
     [1,2,3,4].filter(predicateFilter);
     function predicateFilter(v) { return v % 2 == 1; }  // filer vals, predicate must return bool
@@ -773,4 +792,10 @@ function module() {
 
     export var name = "S"; export function getAge(){ return 35; }
     import {name, getAge} from './module';
+}
+function sort() {
+    arr.sort(a,b) {
+        return a > b ? 1 : -1;      // negative if "a" should be before "b", positive if "b" should be before "a"
+        return 0;                   // two elements are equal
+    }
 }
