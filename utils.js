@@ -1,4 +1,4 @@
-function (designPatterns) {
+function designPatterns() {
     // function constructor pattern
     function Car(model, year, km) {
         this.model = model;
@@ -120,7 +120,7 @@ function (designPatterns) {
     pubsub.publish("example", "Hello, World!");
     pubsub.unsubscribe(subscription);
 }
-function (callbackPattern) {
+function callbackPattern() {
     function fakeAjax(url, cb) {
         var fake_responses = {
             "file1": "The first response",
@@ -163,7 +163,7 @@ function (callbackPattern) {
     getFile("file2");
     getFile("file3");
 }
-function (utils) {
+function utils() {
     if (typeof varName !== "undefined") {}  // use global var only if it exist
 
     if (!Number.EPSILON) Number.EPSILON = Math.pow(2, -52); // compare floating point numbers
@@ -224,4 +224,11 @@ function (utils) {
     // vue templates
     dev_folder:> npm install -g vue-cli
     dev_folder:> npm install vue-router
+}
+function sort() {
+    // argumets must be provided, if not behavior will be different
+    arr.sort(a,b) {
+        return a > b ? 1 : -1;      // negative if "a" should be before "b", positive if "b" should be before "a"
+        return 0;                   // two elements are equal
+    }
 }
