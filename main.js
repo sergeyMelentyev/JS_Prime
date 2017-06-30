@@ -1,6 +1,13 @@
 function expression() {
     (1 + 1, 2 + 2);     // 4
     void 0;     // always evaluates to undefined
+    
+    return      // always use braces on the right or compiler will add ";" after "return" statement
+    {
+        key: "value"
+    }
+
+    var x += 1;     // instead of x++
 }
 function dataType() {
     typeof null;            // "object"
@@ -61,7 +68,7 @@ function func() {
 
     ((x) => (y) => x)(1)(2);
     ((x) => (y) => x)(1);   // environment {x: 1, ...}, called "I combinator" or "Identity function"
-    ((y) => x)(2);          // environment is {y: 2, '..': {x: 1, ...}}, called "K combinator" or "Kestrel"
+    ((y) => x)(2);  // environment is {y: 2, '..': {x: 1, ...}}, called "K combinator" or "Kestrel"
 
     function name() {}         // function declaration, will be hoisted
     (function name() {})        // function expression, will not be hoisted
@@ -207,7 +214,9 @@ function thisPointer() {
     var baz = new Foo(2);
 }
 function string() {
-    var msg = "";
+    // immutable objects
+    String.prototype.yourMethodName = function() { return /* logic here */};    // add custom methods
+
     msg.charAt(0);              // get chat at given index
     msg.indexOf("a");           // .lastIndexOf("a"); find the actual position, return index
     msg.startsWith("a");        // .endsWith("a"); .includes("a"); search the whole 'msg', return boolean
@@ -239,7 +248,8 @@ function symbol() {
     Symbol.keyFor(uid)
 }
 function array() {
-    // array constructor
+    // inherits from Object, indexes are converted to strings and used as names for retrieving vals
+    // constructor
     let items = new Array(2);       // items.length = 2; items[0] === undefined;
     let items = new Array(1, 2);    // items.length = 2; items[0] === 1;
     let items = Array.of(1, 2);     // items.length = 2; items[0] === 1;
@@ -251,12 +261,18 @@ function array() {
     arr.unshift(5);   // add to the front
     arr.pop();        // remove the last one element
     arr.shift();      // remove the fist one element
-    arr.splice(arr.indexOf(3), 1);  // remove exact value '3' by index position
-
+    
     // passing array as arg
     func(array);                // passing array by reference
     func(array.slice());        // passing array by value
 
+    // removing values
+    let arr = ['a','b','c'];
+    delete arr[1];                      // => ['a',undefined,'c'];
+    arr.splice(1,1);                    // => ['a','c'];    slow operation
+    arr.splice(arr.indexOf('a'), 1);    // => ['a','c'];    slow operation
+
+    // ??
     [1,2,3,4].map(predicateMap);    // no side effect, will return new array
     function predicateMap(item, index, array) {}  // call predicate func on each val in arr
     
@@ -329,7 +345,8 @@ function object() {
     var obj = Object.create(null);  // obj with a null prototype, no inherited props
     var obj = Object.create(Foo);   // the same as "new Foo();"
     
-    var obj = { a: 2 };     // second arg to Object.create() specifies prop names to add to new obj
+    var obj = { a: 2 };
+    // second arg to Object.create() specifies prop names to add to new obj
     var newObj = Object.create( obj, {
         b: { enumerable: false, writable: true, configurable: false, value: 3 }
     } );
@@ -792,10 +809,4 @@ function module() {
 
     export var name = "S"; export function getAge(){ return 35; }
     import {name, getAge} from './module';
-}
-function sort() {
-    arr.sort(a,b) {
-        return a > b ? 1 : -1;      // negative if "a" should be before "b", positive if "b" should be before "a"
-        return 0;                   // two elements are equal
-    }
 }
