@@ -7,17 +7,31 @@ function expression() {
         key: "value"
     }
 
-    var x += 1;     // instead of x++
+    x += 1;     // instead of x++
+
+    // initialization order
+    let name = 0, last;     // will be split into two parts
+    let name = undefined, last = undefined; name = 0;       // two undefined declarations will be hoisted
 }
 function dataType() {
-    typeof null;            // "object"
-    typeof foo;             // "undefined"; there is no value
+    // "undefined" use instead  of "null"
+    typeof null;            // !?"object"
+    typeof undefined;       // "undefined"
+
     typeof "foo";           // "string"
     typeof 123;             // "number"
     typeof true;            // "boolean"
+    typeof ["a"];           // !?"object"
     typeof {a:1};           // "object"
-    typeof function () {};  // "function"
+    typeof foo;             // "function"
     typeof symbol;          // "symbol"
+
+    // ES5
+    Array.isArray(["a"]);   // "true"
+
+    // false value
+    false; null; undefined; ""; 0; NaN;
+    // any other value is truthy, including all objects
 }
 function coercion() {
     var str = "123", val;
@@ -50,37 +64,47 @@ function scope() {
     }
 }
 function func() {
+    // func expression, will not be hoisted, will return an instance of func obj that can be invoked
+    // func obj is a first class obj, inherit from Function.prototype
+    var name = function () {};      
+    (function name() {})        // also a function expression
+
+    // function declaration, will be hoisted
+    function name() {}                  // will expands to...
+    let name = function name() {};      // will expands to...
+    let name = undefined;               // will expands to...
+    name = function name() {};
+
     // after func applied to args (invoked), new environment created,
     // it is a dict that maps vars to vals by name
+    functionName(args);                     // function form of invocation
+    objectName.methodName(args);            // method form of invocation
+    objectName["methodName"](args);         // method form of invocation
+    new FunctionName(args);                 // constructor form of invocation
+    functionName.apply(objectName, [args])  // apply form of invocation
+
     // pure func = contain NO free vars, only binded vars (passed in as an argument)
     // closures = contain free vars that is not bound within the func
-
-    // "combinator" higher-order pure func that take only func as args and return a func
-    const addOne = (number) => number + 1;
-    const doubleOf = (number) => number * 2;
-    const doubleOfAddOne = (number) => doubleOf(addOne(number));    // function compose combinator
-
-    const not = (fn) => (x) => !fn(x);
-    const something = (x) => x != null;
-    const nothing = not(something);                                 // function decorator
-
-    ((z) => z)(1);          // environment {z: 1, '..': global}
-
+    ((z) => z)(1);              // environment {z: 1, '..': global}
     ((x) => (y) => x)(1)(2);
     ((x) => (y) => x)(1);   // environment {x: 1, ...}, called "I combinator" or "Identity function"
-    ((y) => x)(2);  // environment is {y: 2, '..': {x: 1, ...}}, called "K combinator" or "Kestrel"
-
-    function name() {}         // function declaration, will be hoisted
-    (function name() {})        // function expression, will not be hoisted
-    var name = function () {};      // function expression, will not be hoisted
+    ((y) => x)(2);      // environment is {y: 2, '..': {x: 1, ...}}, called "K combinator" or "Kestrel"
 
     const evenStevens = (n) => {
         n += 1;                 // rebind new value to name bound with a parameter
     };
 
     // arguments object
-    var argsSize = funcName.length;     // number of arguments
-    function baz(arg) { arg === arguments[0]; }     // "arguments" is like an obj, contains all params
+    sum(1,2,3,4);
+    function sum() {                    // "arguments" is an arr like an obj, contains all params
+        var i,
+            n = arguments.length,
+            total = 0;
+        for (i = 0; i < n; i += 1) {
+            total += arguments[i];
+        }
+        return total;
+    }
 
     // rest param, contains all params passed after "obj", must be only one rest param and it must be last
     function pick(obj, ...keys) {
@@ -163,12 +187,40 @@ function func() {
     const mapWith = (fn) => (array) => map(array, fn);  // apply func to each elem of an arr
     const squareAll = mapWith((n) => n * n);
     squareAll([1, 2, 3])            // [1, 4, 9]
+
+    // "combinator" higher-order pure func that take only func as args and return a func
+    const addOne = (number) => number + 1;
+    const doubleOf = (number) => number * 2;
+    const doubleOfAddOne = (number) => doubleOf(addOne(number));    // function compose combinator
+
+    const not = (fn) => (x) => !fn(x);
+    const something = (x) => x != null;
+    const nothing = not(something);                                 // function decorator
 }
 function thisPointer() {
+
+    // function form of invocation
+    functionName(args);
+    // "this" pointer will be set to global obj, will bind to "underfined" in strict mode
+
+    // method form of invocation
+    objectName.methodName(args); objectName["methodName"](args);
+    // "this" pointer will be set to "objectName", the obj containing the "methodName"
+
+    // constructor form of invocation
+    new FunctionName(args);
+    // "this" pointer will be set to new obj that will be returned
+
+    // apply form of invocation
+    functionName.apply(objectName, [arrOfArgs]);
+    functionName.call(objectName, argOne, argTwo);
+    // "this" pointer will be explicitly set to "objectName"
+
     // "this" pointer the same as "context" object
     var obj = { name: "Sergey" };
     function foo() { return this.name.toUpperCase(); }
     foo.call(obj);
+    // the same as passing a contex object
     function foo(context) { return context.name.toUpperCase(); }
     foo(obj);
 
@@ -255,12 +307,6 @@ function array() {
     let items = Array.of(1, 2);     // items.length = 2; items[0] === 1;
     function makeArray() { return Array.prototype.slice.call(arguments); }
     function makeArray() { let args = Array.from(arguments); return args; }
-
-    // methods
-    arr.push(5);      // add to the end, return value will show new length
-    arr.unshift(5);   // add to the front
-    arr.pop();        // remove the last one element
-    arr.shift();      // remove the fist one element
     
     // passing array as arg
     func(array);                // passing array by reference
@@ -272,14 +318,19 @@ function array() {
     arr.splice(1,1);                    // => ['a','c'];    slow operation
     arr.splice(arr.indexOf('a'), 1);    // => ['a','c'];    slow operation
 
-    // ??
-    [1,2,3,4].map(predicateMap);    // no side effect, will return new array
+    // methods
+    arr.push(5);      // add to the end, return value will show new length
+    arr.unshift(5);   // add to the front
+    arr.pop();        // remove the last one element
+    arr.shift();      // remove the fist one element
+
+    arr.map(predicateMap);    // no side effect, will return new array
     function predicateMap(item, index, array) {}  // call predicate func on each val in arr
     
-    [1,2,3,4].forEach(predicateForEach);    // with side effect, will change initial array
+    arr.forEach(predicateForEach);    // with side effect, will change initial array
     function predicateForEach(item, index, array) {}   // call predicate func on each value
 
-    [1,2,3,4].filter(predicateFilter);
+    arr.filter(predicateFilter);
     function predicateFilter(v) { return v % 2 == 1; }  // filer vals, predicate must return bool
     
     compose([1,2,3,4], predicateCompose, 1);        // reduction
@@ -292,8 +343,8 @@ function array() {
     }
 
     // iteration over array
-    for (var i in arr) {}     // iterate over array index, not values
-    for (var j of arr) {}     // calls next() on an iterable each time the loop executes
+    for (let i in arr) {}     // iterate over array index, not values
+    for (let i of arr) {}     // calls next() on an iterable each time the loop executes
     let iterator = arr[Symbol.iterator]();   // iterator.next() => "{ value: 1, done: false }"
 
     // destructuring
@@ -415,8 +466,10 @@ function object() {
     Object.getOwnPropertyNames(obj).join("");   // 01ba
 
     // iterate over object, unspecified enumeration order
-    for (var key in obj) {
-        // "key" will show all keys, "objOne[key]" all values
+    for (key in obj) {
+        if (object.hasOwnProperty(name)) {
+            // "key" will show all keys, "obj[key]" all values
+        }
     }
     Object.keys(obj);        // get array of keys, unspecified enumeration order
 
@@ -801,6 +854,20 @@ function class() {
         }
     }
     var person = new Men("S", 35, 123);
+}
+function exeption() {
+    throw new Error(reason);
+    
+    throw {
+        name: exeptionName,
+        message: reason
+    };
+
+    try {
+        methodOne();
+    } catch (ignore) {
+        mathodTwo();
+    }
 }
 function module() {
     var name = "S"; function getAge(){ return 35; }
