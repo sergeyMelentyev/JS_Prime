@@ -14,21 +14,22 @@ function designPatterns() {
     // singleton pattern
     var singletonPattern = (function () {
         var privateData = 0;
-        function doSomething() {
+        function privateMethod() {
             console.log(privateData);
         }
         return {
-            public: doSomething
+            public: privateMethod,
+            api: function() {
+                privateMethod();
+            }
         };
     })();
-    singletonPattern.public();
+    singletonPattern.public(); singletonPattern.api();
 
     // module pattern with object literals
     var basketModule = (function () {
         var basket = [];
-        function method() {
-            // logic
-        }
+        function privateMethod() { }
         return {
             addItem: function (value) {
                 basket.push(value);
@@ -36,7 +37,7 @@ function designPatterns() {
             getItemCount: function () {
                 return basket.length;
             },
-            doThing: method(),
+            doThing: privateMethod(),
             getTotal: function () {
                 var q = this.getItemCount();
                 var p;
