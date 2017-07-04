@@ -139,13 +139,14 @@ function func() {
     var num = [0, ...nameless()];       // array concatenation
     var concat = [...nums, ...chars];
 
-    // closure, func is able to access its lexical scope even when executing outside of it
-    function outerOne() {
-        let local = "value";
-        function innerOne() { console.log(local); }
-        return innerOne;    // return reference of the innerOne() func object
-    }
-    var closure = outerOne(); closure();
+    // closure is a func that is able to access its lexical scope even while executing outside of it
+        // after "outerOne" applied to args its vars is not saved on the stack as usual, but in HEAP mem,
+        // and that is why can be accesed by inner func after its execution
+    let letters = (function(){
+        const arr = ["a","b","c","d"];
+        return function(i) { return arr[i]; };
+    }());
+    letters(0);     // "a"
 
     // function internal-only methods
     function Person(name) { this.name = name; }
@@ -352,7 +353,7 @@ function array() {
     let [ firstColor, secondColor ] = colors;       // "red", "green"
     let [ , firstColor, secondColor ] = colors;     // "green", "blue"
 }
-function typedArray() {
+function arrayBuffer() {
     // typed array, allow storage and manipulation of eight different numeric types
     Signed 8-bit integer (int8), Unsigned 8-bit integer (uint8)
     Signed 16-bit integer (int16), Unsigned 16-bit integer (uint16)
@@ -388,6 +389,10 @@ function typedArray() {
     let init = new Int8Array(5);    //  pass number to constructor = number of elems, not bytes
     let buffer = new ArrayBuffer(5); let init = new Int8Array(buffer);
     init.BYTES_PER_ELEMENT;     // 1 byte each element
+}
+function sharedArrayBuffer() {
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects
+    Atomics.add();
 }
 function object() {
     // create a new object
@@ -767,6 +772,20 @@ function behaviorDelegation() {
     AuthController.server = function(url, data) {return $.ajax({url: url, data: data});};
     AuthController.accepted = function() {this.showDialog("Success", "Authenticated!")};
     AuthController.rejected = function(err) {this.failure("Auth Failed: " + err);};
+}
+function functionalInheritance() {
+    function nameOne(id) {
+        return {
+            toString: function() { return "nameOne " + id; }
+        };
+    }
+    function nameTwo(id) {
+        let that = nameOne(id);
+        that.test = function(testId) {
+            return testId === id;
+        };
+        return that;
+    }
 }
 function promise() {
     // setTimeout() func guaranteed that callback won't fire before time interval specified,
