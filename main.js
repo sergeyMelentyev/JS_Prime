@@ -1,3 +1,8 @@
+function mood() {
+    function name(x) {x = null; }
+    let y = []; name(y);        // ref to arr will be passed, not address of let, that contain ref to arr
+    console.log(y);             // => empty array
+}
 function expression() {
     (1 + 1, 2 + 2);     // 4
     void 0;     // always evaluates to undefined
@@ -331,7 +336,7 @@ function array() {
     arr.forEach(predicateForEach);    // with side effect, will change initial array
     function predicateForEach(item, index, array) {}   // call predicate func on each value
 
-    arr.filter(predicateFilter);
+    arr.filter(predicateFilter);        // no side effect, will return new array
     function predicateFilter(v) { return v % 2 == 1; }  // filer vals, predicate must return bool
     
     compose([1,2,3,4], predicateCompose, 1);        // reduction
@@ -417,6 +422,8 @@ function object() {
         set a(val) { this._a_ = val; }
     };
 
+    // data props
+    let obj = Object.create(Object.prototype);
     Object.defineProperty(obj, 'key', {
         value: "",
         writable: true,
