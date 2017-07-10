@@ -1,4 +1,4 @@
-function mood() {
+function basic() {
     function name(x) {x = null; }
     let y = []; name(y);        // ref to arr will be passed, not address of let, that contain ref to arr
     console.log(y);             // => empty array
