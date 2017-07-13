@@ -38,6 +38,27 @@ function dataType() {
     false; null; undefined; ""; 0; NaN;
     // any other value is truthy, including all objects
 }
+function string() {
+    // immutable type
+    String.prototype.yourMethodName = function() { return /* logic here */ };    // add custom methods
+
+    msg.charAt(0);              // get char at given index
+    msg.indexOf("a");           // .lastIndexOf("a"); find the actual position, return index
+    msg.startsWith("a");        // .endsWith("a"); .includes("a"); search the whole 'msg', return boolean
+    msg.split(",");             // split string by commas, return an array
+    msg.substr(x,y);            // start index, length
+    msg.slice(x,y);             // start index, end index
+    msg.trim();                 // delete trailing and ending spaces
+
+    isNaN(msg.charAt(0));       // check if char at given index is not a number
+
+    // template literal
+    let message = `Multiline
+        string`;                // indentation is counting in 'message.length'
+    let count = 10,             // template literal substitution === string concatenation
+        price = 0.25,
+        message = `${count} items cost ${(count * price).toFixed(2)}.`;
+}
 function coercion() {
     var str = "123", val;
     // explicit from string to number
@@ -271,25 +292,6 @@ function thisPointer() {
     function Foo(a) { this.a = a; }
     var baz = new Foo(2);
 }
-function string() {
-    // immutable objects
-    String.prototype.yourMethodName = function() { return /* logic here */};    // add custom methods
-
-    msg.charAt(0);              // get chat at given index
-    msg.indexOf("a");           // .lastIndexOf("a"); find the actual position, return index
-    msg.startsWith("a");        // .endsWith("a"); .includes("a"); search the whole 'msg', return boolean
-    msg.startsWith("a", 4);     // .endsWith("a", 4); .includes("a", 4); check part of the 'msg', return boolean
-    msg.repeat(2);
-
-    isNaN(msg.charAt(0));       // check if char at given index is not a number
-
-    // template literal
-    let message = `Multiline
-        string`;                // indentation is counting in 'message.length'
-    let count = 10,             // template literal substitution === string concatenation
-        price = 0.25,
-        message = `${count} items cost ${(count * price).toFixed(2)}.`;
-}
 function symbol() {
     let firstName = Symbol("first name");
     let person = {
@@ -325,10 +327,11 @@ function array() {
     arr.splice(arr.indexOf('a'), 1);    // => ['a','c'];    slow operation
 
     // methods
-    arr.push(5);      // add to the end, return value will show new length
-    arr.unshift(5);   // add to the front
-    arr.pop();        // remove the last one element
-    arr.shift();      // remove the fist one element
+    arr.push(5);                // add to the end, return value will show new length
+    arr.unshift(5);             // add to the front
+    arr.pop();                  // remove the last one element
+    arr.shift();                // remove the fist one element
+    ["a","b","c"].join(" ");    // "a b c" build a string from arr
 
     arr.map(predicateMap);    // no side effect, will return new array
     function predicateMap(item, index, array) {}  // call predicate func on each val in arr
@@ -891,8 +894,8 @@ function exeption() {
 
     try {
         methodOne();
-    } catch (ignore) {
-        mathodTwo();
+    } catch (e) {
+        mathodTwo(e);
     }
 }
 function module() {
