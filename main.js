@@ -1,63 +1,23 @@
+// 6.1.7.3
 function basic() {
     function name(x) {x = null; }
-    let y = []; name(y);        // ref to arr will be passed, not address of let, that contain ref to arr
-    console.log(y);             // => empty array
+    let y = []; name(y);    // ref to arr will be passed, not address of let, that contain ref to arr
+    console.log(y); // => empty array
 }
 function expression() {
-    (1 + 1, 2 + 2);     // 4
-    void 0;     // always evaluates to undefined
+    (1 + 1, 2 + 2); // 4
+    void 0; // always evaluates to undefined
     
-    return      // always use braces on the right or compiler will add ";" after "return" statement
+    return  // always use braces on the right or compiler will add ";" after "return" statement
     {
         key: "value"
     }
 
-    x += 1;     // instead of x++
+    x += 1; // instead of x++
 
     // initialization order
-    let name = 0, last;     // will be split into two parts
-    let name = undefined, last = undefined; name = 0;       // two undefined declarations will be hoisted
-}
-function dataType() {
-    // "undefined" use instead  of "null"
-    typeof null;            // !?"object"
-    typeof undefined;       // "undefined"
-
-    typeof "foo";           // "string"
-    typeof 123;             // "number"
-    typeof true;            // "boolean"
-    typeof ["a"];           // !?"object"
-    typeof {a:1};           // "object"
-    typeof foo;             // "function"
-    typeof symbol;          // "symbol"
-
-    // ES5
-    Array.isArray(["a"]);   // "true"
-
-    // false value
-    false; null; undefined; ""; 0; NaN;
-    // any other value is truthy, including all objects
-}
-function string() {
-    // immutable type
-    String.prototype.yourMethodName = function() { return /* logic here */ };    // add custom methods
-
-    msg.charAt(0);              // get char at given index
-    msg.indexOf("a");           // .lastIndexOf("a"); find the actual position, return index
-    msg.startsWith("a");        // .endsWith("a"); .includes("a"); search the whole 'msg', return boolean
-    msg.split(",");             // split string by commas, return an array
-    msg.substr(x,y);            // start index, length
-    msg.slice(x,y);             // start index, end index
-    msg.trim();                 // delete trailing and ending spaces
-
-    isNaN(msg.charAt(0));       // check if char at given index is not a number
-
-    // template literal
-    let message = `Multiline
-        string`;                // indentation is counting in 'message.length'
-    let count = 10,             // template literal substitution === string concatenation
-        price = 0.25,
-        message = `${count} items cost ${(count * price).toFixed(2)}.`;
+    let name = 0, last; // will be split into two parts
+    let name = undefined, last = undefined; name = 0;   // two undefined declarations will be hoisted
 }
 function coercion() {
     var str = "123", val;
@@ -78,18 +38,73 @@ function coercion() {
     // from string to Date
     var date = Date.parse("Sun, 22 Dec 2017 08:00:00 GMT");
 }
-function scope() {
-    var a;      // hoisted, new binding is created in global scope and NEW prop is added to the global obj
-    let b;      // new binding is created in global scope but NO prop is added to the global obj
-    const c = 0;    // constant value will stick to any block scope, like 'let'
+function dataTypes() {
+    // primitive values:
+    typeof null;    // !?"object"
+    typeof undefined;   // "undefined", always use it instead of "null"
+    typeof true;    // "boolean"
+    typeof 123;     // "number"
+    typeof "foo";   // "string"
+    typeof symbol;  // "symbol"
+   
+    // objects
+    typeof ["a"];   // !?"object"
+    typeof {a:1};   // "object"
+    typeof funcName; // "function"
 
-    function funcOne(bigData){}     // engine will remove block-scoping after executing
-    {
-        let bigData = {};
-        funcOne(bigData);
-    }
+    // ES5
+    Array.isArray(["a"]);   // "true"
+
+    // false value
+    false; null; undefined; ""; 0; NaN;
+    // any other value is truthy, including all objects
+}
+function number() {
+    // double-precision 64-bit binary
+    // set of all nums, NaN value, positive/negative infinity, positive/negative zero
+}
+function string() {
+    // immutable type, usually represents a single 16-bit unit of UTF-16 text
+    String.prototype.yourMethodName = function() { return /* logic here */ };    // add custom methods
+
+    msg.charAt(0);              // get char at given index
+    msg.indexOf("a");           // .lastIndexOf("a"); find the actual position, return index
+    msg.startsWith("a");        // .endsWith("a"); .includes("a"); search the whole 'msg', return boolean
+    msg.split(",");             // split string by commas, return an array
+    msg.substr(x,y);            // start index, length
+    msg.slice(x,y);             // start index, end index
+    msg.trim();                 // delete trailing and ending spaces
+
+    isNaN(msg.charAt(0));       // check if char at given index is not a number
+
+    // template literal
+    let message = `Multiline
+        string`;                // indentation is counting in 'message.length'
+    let count = 10,             // template literal substitution === string concatenation
+        price = 0.25,
+        message = `${count} items cost ${(count * price).toFixed(2)}.`;
+}
+function symbol() {
+    // unique and immutable non-String Object property key
+    // each symbol val holds an associated val called [[Description]] that is "undefined" or string val
+    Symbol.hasInstance; // if constructor obj recogniz an obj as one of the constructor instances (instanceof)
+    Symbol.iterator;    // returns the default iterator for an object (for-of)
+    let firstName = Symbol("first name");
+    let person = {
+        [firstName]: "Sergey"       // computed object literal property
+    };
+
+    // global symbol registry, method search global symbol registry for key "uid"
+    // if finds, returns the existing. If not, new symbol is created and registered
+    let uid = Symbol.for("uid");
+    let object = {}; object[uid] = "12345";
+
+    // get symbols
+    let symbols = Object.getOwnPropertySymbols(person); // array for-of symbols
+    Symbol.keyFor(uid)
 }
 function func() {
+    // member of Object type, may be invoked as a subroutine
     // func expression, will not be hoisted, will return an instance of func obj that can be invoked
     // func obj is a first class obj, inherit from Function.prototype
     var name = function () {};      
@@ -224,6 +239,17 @@ function func() {
     const something = (x) => x != null;
     const nothing = not(something);                                 // function decorator
 }
+function scope() {
+    var a;      // hoisted, new binding is created in global scope and NEW prop is added to the global obj
+    let b;      // new binding is created in global scope but NO prop is added to the global obj
+    const c = 0;    // constant value will stick to any block scope, like 'let'
+
+    function funcOne(bigData){}     // engine will remove block-scoping after executing
+    {
+        let bigData = {};
+        funcOne(bigData);
+    }
+}
 function thisPointer() {
 
     // function form of invocation
@@ -291,21 +317,6 @@ function thisPointer() {
     // new obj is set as "this" binding
     function Foo(a) { this.a = a; }
     var baz = new Foo(2);
-}
-function symbol() {
-    let firstName = Symbol("first name");
-    let person = {
-        [firstName]: "Sergey"       // computed object literal property
-    };
-
-    // global symbol registry, method search global symbol registry for key "uid"
-    // if finds, returns the existing. If not, new symbol is created and registered
-    let uid = Symbol.for("uid");
-    let object = {}; object[uid] = "12345";
-
-    // get symbols
-    let symbols = Object.getOwnPropertySymbols(person); // array for-of symbols
-    Symbol.keyFor(uid)
 }
 function array() {
     // inherits from Object, indexes are converted to strings and used as names for retrieving vals
@@ -403,21 +414,16 @@ function sharedArrayBuffer() {
     Atomics.add();
 }
 function object() {
-    // create a new object
-    var obj = {};                   // literal syntax
-    var obj = new Object();         // constructed syntax
-    var obj = Object.create(null);  // obj with a null prototype, no inherited props
-    var obj = Object.create(Foo);   // the same as "new Foo();"
-    
-    var obj = { a: 2 };
-    // second arg to Object.create() specifies prop names to add to new obj
-    var newObj = Object.create( obj, {
-        b: { enumerable: false, writable: true, configurable: false, value: 3 }
-    } );
+    // value may be represented as data (primitive, obj, func obj) or by pair of accessor funcs
+    let obj = {
+        key: value  // property, part of an obj that associates key (string/symbol) and value
+        name: method // func that is val of prop, when called the obj is passed to the func as its "this" val
+    };
 
-    // add key-value pare, key is always a string (primitive)
-    obj.key = "";
-    obj['key'] = "";
+    // own property
+        // property that is directly contained by its object
+    // inherited property
+        // property of an obj that is not an own property but is a property of the object’s prototype
 
     // getter and setter
     var obj = {
@@ -425,24 +431,48 @@ function object() {
         set a(val) { this._a_ = val; }
     };
 
+    // create new object
+    var obj = {};                   // literal syntax
+    var obj = new Object();         // constructed syntax
+    var obj = Object.create(null);  // obj with a null prototype, no inherited props
+    var obj = Object.create(Foo);   // the same as "new Foo();"
+
     // data props
     let obj = Object.create(Object.prototype);
-    Object.defineProperty(obj, 'key', {
-        value: "",
-        writable: true,
-        enumerable: true,
-        configurable: true
+    Object.defineProperty(obj, "key", {
+        value: "",                  // default "undefined"
+        writable: true,             // default false
+        enumerable: true,           // default false
+        configurable: true          // default false
     });
     Object.defineProperties(obj, {
-        'keyOne': {
+        "keyOne": {
             value: "",
             writable: true
         },
-        'keyTwo': {
+        "keyTwo": {
             value: "",
             writable: true
         }
     });
+
+    // internal methods
+    Object.getPrototypeOf(); // ()→Object|Null; Determine obj that provides inherited props for this obj
+    Object.setPrototypeOf(); // (Object|Null)→Boolean; Associate obj with another obj that provides inherited props
+    Object.getOwnProperty(); // (propKey)→Undefined|PropDescriptor; return PropDescriptor for own prop of this obj
+    Object.hasProperty(); // (propKey)→Boolean; Whether obj has own/inherited prop with propKey
+    Object.get(); // (propKey,Receiver)→any; Return val of prop whose key is propKey from this obj
+    Object.set(); // (propKey,value,Receiver)→Boolean; Set val of the prop whose key is propKey to val
+    Object.delete(); // (propKey)→Boolean; Remove own prop whose key is propKey from this obj
+    Object.enumerate(); // ()→Object; Return iter obj that produce keys of the string-keyed enumerable propes of obj
+    Object.ownPropertyKeys(); // ()→ListOfPropKey; Return list whose elems are all of the own prop keys for obj
+    
+    // internal methods for function objects
+    Object.call(); // (any, a List of any)→any; Executes code associated with this obj.
+        // args are "this" val and list containing the args passed to the func by a call expression
+    Object.construct(); // (a List of any, Object)→Object; Creates an obj. Invoked via "new" or "super" operators
+        // first arg is a list of args, second arg is an obj to which "new" operator was initially applied
+        // obj that implement this method are called constructors
 
     // computed prop name
     var suffix  = " name";
@@ -454,9 +484,8 @@ function object() {
     Object.is(NaN, NaN);            // true, vals are equivalent if same type and same val
     var bool = ("key" in obj);      // check if property is exist, including [[Prototype]] link
     obj.hasOwnProperty("key");      // check if property is exist only in that object
-    
-    obj instanceof Foo; // in [[Prototype]] chain of "obj", does the "obj" arbitrarily pointed to by Foo.prototype appear
-    Foo.prototype.isPrototypeOf(obj);       // in the entire [[Prototype]] chain of "obj", does Foo.prototype ever appear
+    obj instanceof Foo; // in prototype chain of "obj" does "obj" arbitrarily pointed to by Foo.prototype appear
+    Foo.prototype.isPrototypeOf(obj); // in the entire prototype chain of "obj", does Foo.prototype ever appear
     objOne.isPrototypeOf(objTwo);
     Object.getPrototypeOf(obj) === Foo.prototype;
 
@@ -669,7 +698,7 @@ function prototype() {
 
     // function with constructor call, use "new" in order to construct an obj
     // arbitrary labeled obj will be created, "Human.prototype" will point to that obj
-    // "obj.constructor" will point back to "Human
+    // "obj.constructor" will point back to "Human"
     function Human(arg) { this.name = arg; }
 
     // put props directly on arbitrary labeled obj, will be referenced by all objs
