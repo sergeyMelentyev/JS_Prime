@@ -1,4 +1,4 @@
-// 6.1.7.3
+// 8.1.1.
 function basic() {
     function name(x) {x = null; }
     let y = []; name(y);    // ref to arr will be passed, not address of let, that contain ref to arr
@@ -18,6 +18,28 @@ function expression() {
     // initialization order
     let name = 0, last; // will be split into two parts
     let name = undefined, last = undefined; name = 0;   // two undefined declarations will be hoisted
+}
+function scope() {
+    // global environment outer reference is null, also includes global obj that is a value of 
+        // global environment "this" binding
+
+    // module environment contains bindings for the top level declarations of a module, also
+        // contain bindings that explicitly imported by module
+        // the outer environment of module is a global environment
+
+    // func environment corresponds to invocation of func obj, may establish new "this" binding
+    // captures state necessary to support super method invocations
+
+
+    var a;      // hoisted, new binding is created in global scope and NEW prop is added to the global obj
+    let b;      // new binding is created in global scope but NO prop is added to the global obj
+    const c = 0;    // constant value will stick to any block scope, like 'let'
+
+    function funcOne(bigData){}     // engine will remove block-scoping after executing
+    {
+        let bigData = {};
+        funcOne(bigData);
+    }
 }
 function coercion() {
     var str = "123", val;
@@ -39,7 +61,7 @@ function coercion() {
     var date = Date.parse("Sun, 22 Dec 2017 08:00:00 GMT");
 }
 function dataTypes() {
-    // primitive values:
+    // primitive values
     typeof null;    // !?"object"
     typeof undefined;   // "undefined", always use it instead of "null"
     typeof true;    // "boolean"
@@ -52,12 +74,41 @@ function dataTypes() {
     typeof {a:1};   // "object"
     typeof funcName; // "function"
 
-    // ES5
-    Array.isArray(["a"]);   // "true"
-
     // false value
     false; null; undefined; ""; 0; NaN;
-    // any other value is truthy, including all objects
+    // any other values are truthy, including all objects
+}
+function compareAndCheck() {
+    // regular comparison
+    x < y;      // return "true", "false" or "undefined" if any operand is NaN
+    x == y;     // allow automatic type coercion
+    x === y;    // must be the same type
+
+    // number
+    Number.isInteger(val);      // "true"  
+
+    // string
+    isNaN(msg.charAt(0));       // check if char at given index is not a number
+
+    // object
+    Object.is(NaN, NaN);            // true, vals are equivalent if same type and same val
+    var bool = ("key" in obj);      // check if property is exist, including [[Prototype]] link
+    obj.hasOwnProperty("key");      // check if property is exist only in that object
+    obj instanceof Foo; // in prototype chain of "obj" does "obj" arbitrarily pointed to by Foo.prototype appear
+    Foo.prototype.isPrototypeOf(obj); // in the entire prototype chain of "obj", does Foo.prototype ever appear
+    objOne.isPrototypeOf(objTwo);
+    Object.getPrototypeOf(obj) === Foo.prototype;
+
+    // check if obj is iterable
+    function isIterable(object) {
+        return typeof object[Symbol.iterator] === "function";
+    }   // isIterable([1, 2, 3]); isIterable("Hello"); isIterable(new Map()); isIterable(new Set());
+
+    // array
+    Array.isArray(["a"]);   // "true"
+
+    // function
+    Function.isCallable(funcName);  // "true"
 }
 function number() {
     // double-precision 64-bit binary
@@ -74,8 +125,6 @@ function string() {
     msg.substr(x,y);            // start index, length
     msg.slice(x,y);             // start index, end index
     msg.trim();                 // delete trailing and ending spaces
-
-    isNaN(msg.charAt(0));       // check if char at given index is not a number
 
     // template literal
     let message = `Multiline
@@ -239,35 +288,23 @@ function func() {
     const something = (x) => x != null;
     const nothing = not(something);                                 // function decorator
 }
-function scope() {
-    var a;      // hoisted, new binding is created in global scope and NEW prop is added to the global obj
-    let b;      // new binding is created in global scope but NO prop is added to the global obj
-    const c = 0;    // constant value will stick to any block scope, like 'let'
-
-    function funcOne(bigData){}     // engine will remove block-scoping after executing
-    {
-        let bigData = {};
-        funcOne(bigData);
-    }
-}
 function thisPointer() {
-
     // function form of invocation
     functionName(args);
     // "this" pointer will be set to global obj, will bind to "underfined" in strict mode
 
     // method form of invocation
-    objectName.methodName(args); objectName["methodName"](args);
-    // "this" pointer will be set to "objectName", the obj containing the "methodName"
+    obj.methodName(args); obj["methodName"](args);
+    // "this" pointer will be set to "obj", the obj containing the "methodName"
 
     // constructor form of invocation
     new FunctionName(args);
     // "this" pointer will be set to new obj that will be returned
 
     // apply form of invocation
-    functionName.apply(objectName, [arrOfArgs]);
-    functionName.call(objectName, argOne, argTwo);
-    // "this" pointer will be explicitly set to "objectName"
+    functionName.apply(obj, [arrOfArgs]);
+    functionName.call(obj, argOne, argTwo);  // call the [[Call]] internal method of a func obj
+    // "this" pointer will be explicitly set to "obj"
 
     // "this" pointer the same as "context" object
     var obj = { name: "Sergey" };
@@ -437,7 +474,7 @@ function object() {
     var obj = Object.create(null);  // obj with a null prototype, no inherited props
     var obj = Object.create(Foo);   // the same as "new Foo();"
 
-    // data props
+    // create/delete data properties
     let obj = Object.create(Object.prototype);
     Object.defineProperty(obj, "key", {
         value: "",                  // default "undefined"
@@ -455,17 +492,12 @@ function object() {
             writable: true
         }
     });
+    delete obj.key;                 // delete "value" by targeting its 'key' from obj
 
     // internal methods
-    Object.getPrototypeOf(); // ()→Object|Null; Determine obj that provides inherited props for this obj
-    Object.setPrototypeOf(); // (Object|Null)→Boolean; Associate obj with another obj that provides inherited props
-    Object.getOwnProperty(); // (propKey)→Undefined|PropDescriptor; return PropDescriptor for own prop of this obj
-    Object.hasProperty(); // (propKey)→Boolean; Whether obj has own/inherited prop with propKey
-    Object.get(); // (propKey,Receiver)→any; Return val of prop whose key is propKey from this obj
-    Object.set(); // (propKey,value,Receiver)→Boolean; Set val of the prop whose key is propKey to val
-    Object.delete(); // (propKey)→Boolean; Remove own prop whose key is propKey from this obj
-    Object.enumerate(); // ()→Object; Return iter obj that produce keys of the string-keyed enumerable propes of obj
-    Object.ownPropertyKeys(); // ()→ListOfPropKey; Return list whose elems are all of the own prop keys for obj
+    Object.getPrototypeOf(target); // determine obj that provides inherited props for this obj
+    Object.setPrototypeOf(target,proto); // associate obj with another obj that provides inherited props
+    Object.getOwnPropertyNames(target); // get array of all properties
     
     // internal methods for function objects
     Object.call(); // (any, a List of any)→any; Executes code associated with this obj.
@@ -479,17 +511,6 @@ function object() {
     var person = {
         ["first" + suffix]: "Sergey"
     };
-
-    // compare objects
-    Object.is(NaN, NaN);            // true, vals are equivalent if same type and same val
-    var bool = ("key" in obj);      // check if property is exist, including [[Prototype]] link
-    obj.hasOwnProperty("key");      // check if property is exist only in that object
-    obj instanceof Foo; // in prototype chain of "obj" does "obj" arbitrarily pointed to by Foo.prototype appear
-    Foo.prototype.isPrototypeOf(obj); // in the entire prototype chain of "obj", does Foo.prototype ever appear
-    objOne.isPrototypeOf(objTwo);
-    Object.getPrototypeOf(obj) === Foo.prototype;
-
-    delete obj.key;                 // delete "value" by targeting its 'key' from obj
 
     // duplicating objects
     var newObj = JSON.parse( JSON.stringify( someObj ) );   // deep copy
@@ -553,123 +574,6 @@ function objPrivateFields() {
         };
         return Person;
     }());
-}
-function setAndMap() {
-    // set is an ordered collection of unique items, cannot be directly accessed by index
-    var set = new Set(); set.size();     // accept any iterable obj
-    set.add(1); set.has(1); set.clear(); set.delete(1);   // add, check, clear all, delete one
-
-    let set = new Set([1, 2, 3, 4, 5, 5, 5, 5]);    // from array to set
-    let array = [...set];       // from set to array with spread operator
-    function eliminateDuplicates(items) { return [...new Set(items)]; }
-
-    // iterate over set
-    for (let n of set) {}     // for-of iterate over a set
-
-    let set = new Set([1, 2]);
-    let processor = {
-        output(value, key, owner) {
-            console.log(value + " " + key + " " + owner);
-        },
-        process(dataSet) {      // the same as below
-            dataSet.forEach(function(value, key, owner) {
-                this.output(value, key, owner);
-            }, this);
-        },
-        process(dataSet) {      // the same as above
-            dataSet.forEach((value, key, owner) => {
-                this.output(value, key, owner);
-            });
-        }
-    };
-    processor.process(set);
-
-    // weak set, only store weak obj ref and CANNOT store primitive vals
-    // weak ref does`t prevent garbage collection
-    let set = new WeakSet();    // not iterable, cannot be used in for-of loop and forEach()
-
-    // map is ordered list of key-value pairs, both can have any type
-    var userSkills = new Map();
-    userSkills.set(key, ["vals"]);      // .get(), .has(), .delete(), .clear(), size()
-
-    let map = new Map([["name", "Sergey"], ["age", 35]]);   // map initialization
-    let processor = {
-        output(value, key, owner) {
-            console.log(value + " " + key + " " + owner);
-        },
-        process(dataSet) {      // the same as below
-            dataSet.forEach(function(value, key, owner) {
-                this.output(value, key, owner);
-            }, this);
-        },
-        process(dataSet) {      // the same as above
-            dataSet.forEach((value, key, owner) => {
-                this.output(value, key, owner);
-            });
-        }
-    };
-    processor.process(map);
-
-    // weakmap does`t put strong reference on obj, does`t prevent garbage collection
-    // every key must be an obj
-    let map = new WeakMap();
-    let key1 = {},
-        key2 = {},
-    map = new WeakMap([[key1, "Hello"], [key2, 42]]);
-}
-function iteratorGenerator() {
-    // check if obj is iterable
-    function isIterable(object) {
-        return typeof object[Symbol.iterator] === "function";
-    }   // isIterable([1, 2, 3]); isIterable("Hello"); isIterable(new Map()); isIterable(new Set());
-
-    // default iterator
-    let values = [1, 2, 3];
-    let iterator = values[Symbol.iterator]();   // iterator.next() => "{ value: 1, done: false }"
-
-    // for-of loop
-    let values = [1, 2, 3];     // calls next() on an iterable each time the loop executes
-    for (let num of values);
-
-    // generator function
-    function *createIterator(items) {
-        for (let i = 0; i < items.length; i++) yield items[i];
-    }
-    let iterator = createIterator([1, 2, 3]);   // iterator.next() => "{ value: 1, done: false }"
-
-    // generator function expression
-    let createIterator = function *(items) {
-        for (let i = 0; i < items.length; i++) yield items[i];
-    };
-    let iterator = createIterator([1, 2, 3]);   // iterator.next() => "{ value: 1, done: false }"
-
-    // generator object method
-    var o = {
-        *createIterator(items) {
-            for (let i = 0; i < items.length; i++) yield items[i];
-        }
-    };
-    let iterator = o.createIterator([1, 2, 3]); // iterator.next() => "{ value: 1, done: false }"
-
-    // iterable object
-    let collection = {
-        items: [],
-        *[Symbol.iterator]() {
-            for (let item of this.items) yield item;
-        }
-    };
-    collection.items.push(1); collection.items.push(2); collection.items.push(3);
-    for (let x of collection);  // 1, 2, 3   
-
-    // default collection iterators
-    let anyCollection = [1, 2, 3];
-    for (let entry of anyCollection.entries()); // returns an iterator whose values are a key-value pair
-    for (let entry of anyCollection.values()); // returns an iterator whose vals are vals of the collection
-    for (let entry of anyCollection.keys()); // returns an iterator whose vals are the keys contained in the collection
-
-    // nodeList iterator
-    var divs = document.getElementsByTagName("div");
-    for (let div of divs) console.log(div.id);
 }
 function prototype() {
     // any obj have internal prop named [[Prototype]], that is ref to another obj
@@ -826,6 +730,127 @@ function functionalInheritance() {
         return that;
     }
 }
+function setAndMap() {
+    // set is an ordered collection of unique items, cannot be directly accessed by index
+    var set = new Set(); set.size();     // accept any iterable obj
+    set.add(1); set.has(1); set.clear(); set.delete(1);   // add, check, clear all, delete one
+
+    let set = new Set([1, 2, 3, 4, 5, 5, 5, 5]);    // from array to set
+    let array = [...set];       // from set to array with spread operator
+    function eliminateDuplicates(items) { return [...new Set(items)]; }
+
+    // array difference
+    arrOne.filter( i => { return arrTwo.indexOf(i) === -1; })   // [].filter(predicate)
+    Array.prototype.diff = function (a) { return this.filter(i => a.indexOf(i) === -1); };  // [].diff([]);
+
+    // iterate over set
+    for (let n of set) {}     // for-of iterate over a set
+
+    let set = new Set([1, 2]);
+    let processor = {
+        output(value, key, owner) {
+            console.log(value + " " + key + " " + owner);
+        },
+        process(dataSet) {      // the same as below
+            dataSet.forEach(function(value, key, owner) {
+                this.output(value, key, owner);
+            }, this);
+        },
+        process(dataSet) {      // the same as above
+            dataSet.forEach((value, key, owner) => {
+                this.output(value, key, owner);
+            });
+        }
+    };
+    processor.process(set);
+
+    // weak set, only store weak obj ref and CANNOT store primitive vals
+    // weak ref does`t prevent garbage collection
+    let set = new WeakSet();    // not iterable, cannot be used in for-of loop and forEach()
+
+    // map is ordered list of key-value pairs, both can have any type
+    var userSkills = new Map();
+    userSkills.set(key, ["vals"]);      // .get(), .has(), .delete(), .clear(), size()
+
+    let map = new Map([["name", "Sergey"], ["age", 35]]);   // map initialization
+    let processor = {
+        output(value, key, owner) {
+            console.log(value + " " + key + " " + owner);
+        },
+        process(dataSet) {      // the same as below
+            dataSet.forEach(function(value, key, owner) {
+                this.output(value, key, owner);
+            }, this);
+        },
+        process(dataSet) {      // the same as above
+            dataSet.forEach((value, key, owner) => {
+                this.output(value, key, owner);
+            });
+        }
+    };
+    processor.process(map);
+
+    // weakmap does`t put strong reference on obj, does`t prevent garbage collection
+    // every key must be an obj
+    let map = new WeakMap();
+    let key1 = {},
+        key2 = {},
+    map = new WeakMap([[key1, "Hello"], [key2, 42]]);
+}
+function iterator() {
+    // default iterator
+    let values = [1, 2, 3];
+    let iterator = values[Symbol.iterator]();   // iterator.next() => "{ value: 1, done: false }"
+
+    // for-of loop
+    let values = [1, 2, 3];     // calls next() on an iterable each time the loop executes
+    for (let num of values);
+
+    // generator function
+    function *createIterator(items) {
+        for (let i = 0; i < items.length; i++) yield items[i];
+    }
+    let iterator = createIterator([1, 2, 3]);   // iterator.next() => "{ value: 1, done: false }"
+
+    // generator function expression
+    let createIterator = function *(items) {
+        for (let i = 0; i < items.length; i++) yield items[i];
+    };
+    let iterator = createIterator([1, 2, 3]);   // iterator.next() => "{ value: 1, done: false }"
+
+    // generator object method
+    var o = {
+        *createIterator(items) {
+            for (let i = 0; i < items.length; i++) yield items[i];
+        }
+    };
+    let iterator = o.createIterator([1, 2, 3]); // iterator.next() => "{ value: 1, done: false }"
+
+    // iterable object
+    let collection = {
+        items: [],
+        *[Symbol.iterator]() {
+            for (let item of this.items) yield item;
+        }
+    };
+    collection.items.push(1); collection.items.push(2); collection.items.push(3);
+    for (let x of collection);  // 1, 2, 3   
+
+    // default collection iterators
+    let anyCollection = [1, 2, 3];
+    for (let entry of anyCollection.entries()); // returns an iterator whose values are a key-value pair
+    for (let entry of anyCollection.values()); // returns an iterator whose vals are vals of the collection
+    for (let entry of anyCollection.keys()); // returns an iterator whose vals are keys contained in the collection
+
+    // nodeList iterator
+    var divs = document.getElementsByTagName("div");
+    for (let div of divs) console.log(div.id);
+}
+function generator() {
+    function *foo(x,y) {
+        return x * y;
+    }
+}
 function promise() {
     // setTimeout() func guaranteed that callback won't fire before time interval specified,
     // but it can happen at or after time, depending on the state of the event queue
@@ -883,11 +908,6 @@ function promise() {
     p4.then(function(value) {
         console.log(value);     // result ignores the other promises
     });
-}
-function generator() {
-    function *foo(x,y) {
-        return x * y;
-    }
 }
 function class() {
     class Human {
