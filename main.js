@@ -231,7 +231,7 @@ function func() {
 
     // closure is a func that is able to access its lexical scope even while executing outside of it
         // after "outerOne" applied to args its vars is not saved on the stack as usual, but in HEAP mem,
-        // and that is why can be accesed by inner func after its execution
+        // and that is why can be accessed by inner func after its execution
     let letters = (function(){
         const arr = ["a","b","c","d"];
         return function(i) { return arr[i]; };
@@ -533,10 +533,10 @@ function object() {
     // iterate over object, unspecified enumeration order
     for (key in obj) {
         if (object.hasOwnProperty(name)) {
-            // "key" will show all keys, "obj[key]" all values
+            // "key" will show all keys, "obj[key]" all values, including proto chain
         }
     }
-    Object.keys(obj);        // get array of keys, unspecified enumeration order
+    Object.keys(obj);   // get array of keys, unspecified enumeration order, not including proto chain
 
     // destructuring
     var person = { name: "S", age: 35 };
@@ -728,6 +728,20 @@ function functionalInheritance() {
             return testId === id;
         };
         return that;
+    }
+}
+function classesFreeOriented() {
+    function constructor(spec) {
+        let 
+            {member} = spec,
+            {other} = other_constructor(spec),
+            method = function() {
+                // member, other, method, spec
+            };
+        return Object.freeze({
+            method,
+            other
+        });
     }
 }
 function setAndMap() {
