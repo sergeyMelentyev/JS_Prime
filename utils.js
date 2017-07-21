@@ -350,8 +350,8 @@ function jQuery() {
     });
 }
 function testing() {
-    "use strict";
-    // QUnit модульные тесты для каждой функции
+    // QUnit module testing
+    // JSCheck case testing
 }
 function babelGulpWebpack() {
     // babel (transpile) + gulp (automate) + webpack (check dependencies and concatenate in static asset)
