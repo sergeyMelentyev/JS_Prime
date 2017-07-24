@@ -21,3 +21,7 @@ https://leanpub.com/understandinges6/read#leanpub-auto-using-symbols
 https://leanpub.com/javascriptallongesix/read#leanpub-auto-about-javascript-allong
 
 http://javascript.crockford.com/little
+
+-== TESTS ==-
+
+https://jsperf.com/
