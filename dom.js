@@ -12,13 +12,32 @@ function collectionsSelector() {
     var elem = document.querySelectorAll('*[class="name"]');    // any elems with same class name
     var array = [].slice.call(elem);        // get array from NodeList object
 }
-function getNodeElement() {
-    var elem = document.getElementById('id');
-    var childNodesName = [];
-    if (elem.hasChildNodes()) {
-        var children = elem.childNodes;      // .parentNode
-        for (var i = 0; i < children.length; i++)
-            childNodesName.push(children[i].nodeName);
+function getNodeTree() {
+    {   // get all children
+        var elem = document.getElementById('id');
+        var childNodesName = [];
+        if (elem.hasChildNodes()) {
+            var children = elem.childNodes;      // .parentNode
+            for (var i = 0; i < children.length; i++)
+                childNodesName.push(children[i].nodeName);
+        }
+    }
+    {   // get all parents
+        let currentNode = e.target;
+        let parentNodes = [];
+        while (currentNode) {
+            if (currentNode.nodeName === "BODY") {
+                break;
+            }
+            parentNodes.push(currentNode);
+            currentNode = currentNode.parentNode;
+        }
+        for (let i = 0; i < parentNodes.length; i += 1) {
+            if (parentNodes[i].getAttribute("svz-attr") === "vkb") {
+                return void 0;
+            }
+        }
+        // logic here if nodeTree does not have required attr
     }
 }
 function getSetAttr() {
