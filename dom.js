@@ -1,3 +1,4 @@
+// undated
 function singleElemSelector() {
     var elem = document.getElementById('id');
     var elem = document.querySelector('div p');
@@ -143,11 +144,8 @@ function events() {
         e = e || window.event;      // get event
         src = e.target || e.srcElement; // get source element
 
-        /*
-            <div id="btn-wrapper"> one element for all buttons
-            if (src.nodeName.toLowerCase() !== "button")
-                return;
-        */
+        <div id="btn-wrapper"> // one element for all buttons
+        if (src.nodeName.toLowerCase() !== "button") return;
 
         parts = src.innerHTML.split(': ');      // actual logic
         parts[1] = parseInt(parts[1], 10) + 1;
@@ -157,10 +155,28 @@ function events() {
             e.stopPropagation();
         if (typeof e.cancelBubble !== "undefined")
             e.cancelBubble = true;
-
         if (typeof e.preventDefault === "function")     // prevent default action
             e.preventDefault();
         if (typeof e.returnValue !== "undefined")
             e.returnValue = false;
+    }
+}
+function loading() {
+    {   // preloading
+        <link rel="prefetch" href="name.jpg">
+        let image = new Image();
+        image.src = "name.jpg";
+    }
+    {   // lazy loading
+        function scriptLoaded() { /* logic here */ }
+        let src = document.createElement("script");
+        src.src = "name.js";
+        document.head.appendChild(src);
+        src.onload = scriptLoaded;      // "onload" realy means "on done execute"
+        src.onreadystatechange = function () {
+            if (src.readyState === "laded" || src.readyState === "complete") {
+                scriptLoaded();
+            }
+        };
     }
 }
