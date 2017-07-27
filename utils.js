@@ -1,3 +1,4 @@
+// undated
 function designPatterns() {
     {   // function constructor pattern
         function Car(model, year, km) {
@@ -291,15 +292,20 @@ function persistence() {
         }
     }
 }
-function backgroundThread() {
-    var ww = new Worker('ww.js');
-    ww.onmessage = function (event) {
-        // subscribe to the event and receive updates via 'event.data'
-    };
-    // ww.js file
-    postMessage("post event before start");
-    postMessage("post event before end");
-}   
+function webWorker() {
+    // main.js with UI thread
+    var longThread = new Worker("long.js");                 // instantiate another thread
+    longThread.postMessage({ question: "value" });          // send request and data
+    longThread.onmessage = function (event) { const answer = event.data; /* logic here */ };
+    
+    // longThread.js with parallel thread
+    function name(question) { /* logic here */ return answer; }
+    self.onmessage(function (event) {                       // receive request and data
+        const question = event.data.question;
+        const answer = name(question);                      // logic
+        self.postMessage(answer);                           // send answer
+    });
+}
 function request() {
     {   // XMLHttpRequest
         var xhr = new XMLHttpRequest();
@@ -334,24 +340,29 @@ function request() {
         ws.onmessage = function(data) { /* receiving data callback */ };
     }
 }
-function jQuery() {
-    var $ = global.jQuery;
-    $('elem').keypress(function (event) {
-        // receive event each time key pressed
-    });
-    var windowHeight = $(window).height();
-    $('selector').on('click', function () {
-        $('body').scrollTop(windowHeight);
-    });
-    $(window).scroll(function () {
-        var div = $('div').height();
-        if ($(window).scrollTop() > (div / 4))
-            $('selector').animate({top: div + 100}, 1000);
-    });
-}
 function testing() {
     // QUnit module testing
     // JSCheck case testing
+}
+function utils() {
+    {   // compare floating point numbers
+        if (!Number.EPSILON) Number.EPSILON = Math.pow(2, -52);
+        function closeToEqual(n1, n2) {
+            return Math.abs(n1 - n2) < Number.EPSILON;
+        }
+    }
+    {   // wait until something is done
+        function doSomething() {
+            if (!APP.ready) {
+                return void setTimeout(doSomething, 100);   // try again later
+            }
+            var result;     // do some stuff
+            return result;
+        }
+        if (doSomething()) {
+            // handle next task
+        }
+    }
 }
 function babelGulpWebpack() {
     // babel (transpile) + gulp (automate) + webpack (check dependencies and concatenate in static asset)
@@ -397,22 +408,4 @@ function babelGulpWebpack() {
     // vue templates
     dev_folder:> npm install -g vue-cli
     dev_folder:> npm install vue-router
-}
-function utils() {
-    if (typeof varName !== "undefined") {}  // use global var only if it exist
-
-    if (!Number.EPSILON) Number.EPSILON = Math.pow(2, -52); // compare floating point numbers
-    function closeToEqual(n1, n2) {
-        return Math.abs(n1 - n2) < Number.EPSILON;
-    }
-
-    function doSomething() {
-        if (!APP.ready)
-            return void setTimeout(doSomething, 100);   // try again later
-        var result;     // do some stuff
-        return result;
-    }       // wait until something is done
-    if (doSomething()) {
-        // handle next task
-    }
 }
