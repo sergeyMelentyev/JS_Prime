@@ -1,4 +1,4 @@
-// 8.1.1.
+// undated
 function basic() {
     function name(x) {x = null; }
     let y = []; name(y);    // ref to arr will be passed, not address of let, that contain ref to arr
@@ -866,62 +866,127 @@ function generator() {
     }
 }
 function promise() {
-    // setTimeout() func guaranteed that callback won't fire before time interval specified,
-    // but it can happen at or after time, depending on the state of the event queue
+    // time independent state, async flow control, immutable once resolved
+    {   // simple promise
+        let promise = new Promise(function(resolve, reject) {
+            // promise body, logic here execute immediately, save result in var and check in next line
+            if (condition) resolve(data);
+            else reject(err);
+        });
+        promise.then(function (data) {
+            // async data area
+        }, function (err) {
+            // async error area
+        });
+    }
+    {   // chained promises with propagation data down the chain
+        function getData(data){
+            return new Promise(function(resolve, reject) {
+                setTimeout(function() {
+                    resolve(data)
+                }, 1000);
+            });
+        }
+        let x;
+        function print(data) { console.log(data); return data; }
+        getData(10)
+            .then(print)                // num 10 will be printed and fall down the chain
+            .then(function(num) {       // "num" === 10;
+                x = 1 + num;
+                return getData(30);
+            })
+            .then(print)                // num 30 will be printed and fall down the chain
+            .then(function(num) {       // "num" === 30;
+                let y = 1 + num;
+                return getData("Meaning of life: " + (x + y));
+            })
+            .then(function(answer) {    // "answer" === "Meaning of life: 42";
+                console.log(answer);
+            });
+    }
+    {   // compose arbitrary lenth list of urls and chained call .then()
+        const urls = ["urlOne", "urlToo", "urlThree"];
+        function getFile(file) {
+            return new Promise(function(resolve, reject) {
+                fakeAjax(file,resolve);
+            });
+        }
 
-    // promise = time independent state, async flow control, immutable once resolved
-    let promise = new Promise(function(resolve, reject) {
-        // promise body, logic here execute immediately, save result in var and check in next line
-        if (condition) resolve(data);
-        else reject(err);
-    });
-    promise.then(function (data) {
-        // async data area
-    }, function (err) {
-        // async error area
-    });
+        urls.map(getFile).reduce(function combine(chain,pr) {
+            return chain.then(function() {
+                return pr;
+            }).then(print);
+        }, Promise.resolve())
+            .then(function(){
+                print("complete");
+            });
 
-    // method Promise.resolve()
-    let promise = Promise.resolve(35);  // accept arg and return promise in the fulfilled state
-    promise.then(function(val) {
-        console.log(val);       // async operation
-    });
+        // the same as abive but without .map() and .reduce()
+        Promise.resolve()
+            .then(function() {
+                return p1;
+            })
+            .then(print)
+            .then(function() {
+                return p2;
+            })
+            .then(print)
+            .then(function() {
+                return p3;
+            })
+            .then(print);
+    }
+    {   // method .resolve()
+        let promise = Promise.resolve(35);  // accept arg and return promise in the fulfilled state
+        promise.then(function(val) {
+            console.log(val);       // async operation
+        });
+    }
+    {   // returning vals in chain
+        let p1 = Promise.resolve(35);
+        p1.then(function(value) {
+            return value + 1;
+        }).then(function(value) {
+            console.log(value);     // 36
+        });
+    }
+    {   // returning promise in chain
+        let p1 = new Promise(function(resolve, reject) { resolve(35); });
+        let p2 = new Promise(function(resolve, reject) { resolve(36); });
+        p1.then(function(value) {
+            console.log(value);     // 35
+            return p2;
+        }).then(function(value) {
+            console.log(value);     // 36
+        });
+    }
+    {   // method .all(), resolves only when every promise in the iterable is resolved
+        let p1 = new Promise (function (resolve, reject) { resolve(34); });
+        let p2 = new Promise (function (resolve, reject) { resolve(35); });
+        let p3 = new Promise (function (resolve, reject) { resolve(36); });
 
-    // returning vals in chain
-    let p1 = Promise.resolve(35);
-    p1.then(function(value) {
-        return value + 1;
-    }).then(function(value) {
-        console.log(value);     // 36
-    });
+        let p4 = Promise.all([p1, p2, p3]);     // iterable argument of promises to monitor
 
-    // returning promise in chain
-    let p1 = new Promise(function(resolve, reject) { resolve(35); });
-    let p2 = new Promise(function(resolve, reject) { resolve(36); });
-    p1.then(function(value) {
-        console.log(value);     // 35
-        return p2;
-    }).then(function(value) {
-        console.log(value);     // 36
-    });
+        p4.then(function (arrOfVals) {
+            console.log(arrOfVals[0]);      // vals are stored in order promises were passed
+        });
+    }
+    {   // methods .race(), resolves as soon as any first promise is resolved, not longer the 3000ms
+        let p1 = Promise.resolve(42);
+        let p2 = new Promise (function(resolve, reject) { resolve(43); });
+        let p3 = new Promise (function(resolve, reject) { resolve(44); });
+        let p0 = new Promise (function(_,reject) {
+            setTimeout(function() {
+                reject("Timeout, reject all");
+            }, 3000);
+        });
 
-    // method Promise.all(), resolves only when every promise in the iterable is resolved
-    let p1 = new Promise(function(resolve, reject) { resolve(34); });
-    let p2 = new Promise(function(resolve, reject) { resolve(35); });
-    let p3 = new Promise(function(resolve, reject) { resolve(36); });
-    let p4 = Promise.all([p1, p2, p3]);     // iterable argument of promises to monitor
-    p4.then(function(arrOfVals) {
-        console.log(arrOfVals[0]);      // vals are stored in order promises were passed
-    });
-
-    // methods Promise.race(), resolves as soon as any first promise is resolved
-    let p1 = Promise.resolve(42);
-    let p2 = new Promise(function(resolve, reject) { resolve(43); });
-    let p3 = new Promise(function(resolve, reject) { resolve(44); });
-    let p4 = Promise.race([p1, p2, p3]);    // iterable argument of promises to monitor
-    p4.then(function(value) {
-        console.log(value);     // result ignores the other promises
-    });
+        let p4 = Promise.race([p1, p2, p3, p0])     // result ignores the other promises
+            .then(
+                successFuncName,
+                errorFunctionName
+            );
+    }
 }
 function class() {
     class Human {
@@ -969,3 +1034,4 @@ function module() {
     export var name = "S"; export function getAge(){ return 35; }
     import {name, getAge} from './module';
 }
+// 8.1.1.
