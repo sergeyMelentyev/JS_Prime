@@ -25,3 +25,6 @@ http://javascript.crockford.com/little
 -== TESTS ==-
 
 https://jsperf.com/
+
+-== GENERATORS ==-
+https://davidwalsh.name/es6-generators
