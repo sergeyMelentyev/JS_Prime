@@ -1,4 +1,4 @@
-// undated
+// not undated
 function basic() {
     function name(x) {x = null; }
     let y = []; name(y);    // ref to arr will be passed, not address of let, that contain ref to arr
@@ -860,11 +860,6 @@ function iterator() {
     var divs = document.getElementsByTagName("div");
     for (let div of divs) console.log(div.id);
 }
-function generator() {
-    function *foo(x,y) {
-        return x * y;
-    }
-}
 function promise() {
     // time independent state, async flow control, immutable once resolved
     {   // simple promise
@@ -988,6 +983,61 @@ function promise() {
             );
     }
 }
+function generator() {
+    {   // yield undefined
+        function* gen() {
+            console.log("data");
+            yield undefined;
+            console.log("data");
+        }
+        let it = gen();   // generator func call produces iterator, no code will be executed
+        it.next();        // code execution starts, result => "data", code execution suspend
+        it.next();        // code execution restarts, result => "data", code execution suspend
+    }
+    {   // message passing out
+        function* gen() {
+            yield 1;
+            yield 2;
+            yield 3;
+            return 4;       // also return void 0;
+        }
+        let it = gen():
+        it.next();        // { value: 1, done: false }
+        it.next();        // { value: 2, done: false }
+        it.next();        // { value: 3, done: false }
+        it.next();        // { value: 4, done: true } or { value: undefined, done: true }
+    }
+    {   // message passing in
+        function coroutine(g) {
+            let it = g();
+            return function() {
+                return it.next.apply(it,arguments);
+            };
+        }
+        let run = coroutine(function* () {
+            let x = 1 + (yield);
+            let y = 1 + (yield);
+            yield (x + y);
+        });
+        console.log(run());     // { value: undefined, done: false }
+        console.log(run(10));   // { value: undefined, done: false }
+        console.log(run(30));   // { value: 42, done: false }
+        console.log(run());     // { value: undefined, done: true }
+
+        // the same as above
+        function fakeAjax(d) {
+            setTimeout(function() {
+                run(d);
+            }, 1000);
+        }
+        let run = coroutine(function* () {
+            let x = 1 + (yield fakeAjax(10));
+            let y = 1 + (yield fakeAjax(30));
+            let answer = (yield fakeAjax(x+y));     // 42;
+        });
+        run();
+    }
+}
 function class() {
     class Human {
         constructor(name, age) {
@@ -1033,5 +1083,11 @@ function module() {
 
     export var name = "S"; export function getAge(){ return 35; }
     import {name, getAge} from './module';
+}
+function observables() {
+    // ES2017
+    {   // 
+        // 
+    }
 }
 // 8.1.1.
