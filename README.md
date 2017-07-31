@@ -29,3 +29,7 @@ https://jsperf.com/
 -== GENERATORS ==-
 
 https://davidwalsh.name/es6-generators
+
+-==TESTS ==-
+
+https://habrahabr.ru/company/ruvds/blog/334538/
