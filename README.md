@@ -30,6 +30,6 @@ https://jsperf.com/
 
 https://davidwalsh.name/es6-generators
 
--==TESTS ==-
+-== TEST QUESTIONS ==-
 
 https://habrahabr.ru/company/ruvds/blog/334538/
