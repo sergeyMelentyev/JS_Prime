@@ -1,4 +1,3 @@
-// not undated
 function basic() {
     function name(x) {x = null; }
     let y = []; name(y);    // ref to arr will be passed, not address of let, that contain ref to arr
@@ -156,7 +155,7 @@ function func() {
     // member of Object type, may be invoked as a subroutine
     // func expression, will not be hoisted, will return an instance of func obj that can be invoked
     // func obj is a first class obj, inherit from Function.prototype
-    var name = function () {};      
+    var name = function () {};
     (function name() {})        // also a function expression
 
     // function declaration, will be hoisted
@@ -175,7 +174,7 @@ function func() {
 
     // pure func = contain NO free vars, only binded vars (passed in as an argument)
     // closures = contain free vars that is not bound within the func
-    ((z) => z)(1);              // environment {z: 1, '..': global}
+    ((z) => z)(1);              // environment { z: 1, '..': global }
     ((x) => (y) => x)(1)(2);
     ((x) => (y) => x)(1);   // environment {x: 1, ...}, called "I combinator" or "Identity function"
     ((y) => x)(2);      // environment is {y: 2, '..': {x: 1, ...}}, called "K combinator" or "Kestrel"
@@ -381,13 +380,15 @@ function array() {
     arr.shift();                // remove the fist one element
     ["a","b","c"].join(" ");    // "a b c" build a string from arr
 
-    arr.map(predicateMap);    // no side effect, will return new array
-    function predicateMap(item, index, array) {}  // call predicate func on each val in arr
+    arr.map(predicateMap);    // will return new array
+    function predicateMap(item, index, array) {}
     
-    arr.forEach(predicateForEach);    // with side effect, will change initial array
-    function predicateForEach(item, index, array) {}   // call predicate func on each value
+    arr.forEach(predicateForEach);    // will change initial array, can not break out while iteration
+    function predicateForEach(item, index, array) {}
 
-    arr.filter(predicateFilter);        // no side effect, will return new array
+    arr.every(predicateForEach);    // can be break out while iteration
+
+    arr.filter(predicateFilter);        // will return new array
     function predicateFilter(v) { return v % 2 == 1; }  // filer vals, predicate must return bool
     
     compose([1,2,3,4], predicateCompose, 1);        // reduction
@@ -574,6 +575,27 @@ function objPrivateFields() {
         };
         return Person;
     }());
+    // private field and exploit
+    function vector() {
+        let array = [];
+        return {
+            get: function get(i) {
+                return array[i];        // cure "return array[+i];"
+            },
+            store: function store(i,v) {
+                array[i] = v;           // cure "array[+i] = v;"
+            },
+            append: function append(v) {
+                array.push(v);          // cure "array[array.length] = v;"
+            }
+        };
+    }
+    let exploit;
+    const myVector = vector();
+    myVector.store("push", function () {
+        exploit = this;
+    });
+    myVector.append();      // now "exploit" === "array" and can be manipulated
 }
 function prototype() {
     // any obj have internal prop named [[Prototype]], that is ref to another obj
