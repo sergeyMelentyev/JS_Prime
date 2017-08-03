@@ -1,4 +1,3 @@
-// undated
 function designPatterns() {
     {   // function constructor pattern
         function Car(model, year, km) {
@@ -293,18 +292,58 @@ function persistence() {
     }
 }
 function webWorker() {
-    // main.js with UI thread
-    var longThread = new Worker("long.js");                 // instantiate another thread
-    longThread.postMessage({ question: "value" });          // send request and data
-    longThread.onmessage = function (event) { const answer = event.data; /* logic here */ };
+    {   // check for support
+        isWorkersAvailable() {
+            return !!window.Worker;
+        }
+    }
+    {   // main.js with UI thread
+        var longThread = new Worker("long.js");                 // instantiate another thread
+        longThread.onmessage = function (event) {
+            const answer = event.data;
+            /* logic here */
+        };
+        // the same as above
+        longThread.addEventListener("message", function(event) {
+            const answer = event.data;
+            /* logic here */
+        }, false);
+        longThread.postMessage({ question: "value" });          // send request with data
+    }
+    {   // longThread.js with parallel thread
+        importScripts('script1.js', 'script2.js');          // import external files
+
+        function name(question) {
+            /* logic here */
+            return answer;
+        }
+        self.onmessage(function (event) {                       // receive request and data
+            const question = event.data.question;
+            const answer = name(question);                      // logic
+            self.postMessage(answer);                           // send answer
+        });
+    }
+    {   // fetch json from rest api
+        // main "app.js"
+        function startWorker(settings) {
+            var myWorker = new Worker("scripts/worker.js");
+            myWorker.addEventListener("message", workerListener, false);
+            myWorker.postMessage(settings);
+        }
+
+        // "scripts/worker.js"
+        self.addEventListener("message", function(e) {
+            doSomeWork();
+        };
+        function doSomeWork() {
+            importScripts("http://twitter.com/statuses/user_timeline/"+user+".json?count=10&callback=process");
+        }
+        function process() {
+            /* parse json */
+            postMessage(result);
+        }
+    }
     
-    // longThread.js with parallel thread
-    function name(question) { /* logic here */ return answer; }
-    self.onmessage(function (event) {                       // receive request and data
-        const question = event.data.question;
-        const answer = name(question);                      // logic
-        self.postMessage(answer);                           // send answer
-    });
 }
 function request() {
     {   // XMLHttpRequest
