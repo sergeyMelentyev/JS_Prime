@@ -323,27 +323,70 @@ function webWorker() {
             self.postMessage(answer);                           // send answer
         });
     }
-    {   // fetch json from rest api
-        // main "app.js"
-        function startWorker(settings) {
-            var myWorker = new Worker("scripts/worker.js");
-            myWorker.addEventListener("message", workerListener, false);
-            myWorker.postMessage(settings);
+    {   // fetch every 30 sec tweets from Twitter and save to local storage
+        // main app.js
+        const worker = new Worker("long.js");
+        worker.addEventListener("message", function(e) {
+            var curTime = new Date();
+            $('#result').append( curTime + " ) " + e.data + "<br/>");
+            var source = e.data[0].source;
+            if (typeof source != "undefined" ) {
+                var tweets = document.createElement("ul");
+                for (var i=0; i < 10; i++) {
+                    if (typeof e.data[i] != "undefined" && e.data[i].text != "undefined") {
+                        var tweetTextItem = document.createElement("li");
+                        var tweetText = document.createTextNode(e.data[i].text + " | " +
+                                        e.data[i].source  + " (" +
+                                        e.data[i].created_at + ")" ) ;
+                        tweetTextItem.appendChild(tweetText);
+                        tweets.appendChild(tweetTextItem);
+                        saveTweet(e.data[i]);
+                    }
+                }
+                $("#tweets").append(tweets);
+            }
+        }, false);
+        worker.onerror = function(e){
+            throw new Error(e.message + " (" + e.filename + ":" + e.lineno + ")");
+        };
+        function saveTweet(tweet) {
+            localStorage.setItem(tweet.id_str, "{" + "'created': '" + tweet.created_at + "'," +
+            "'tweet-text': '" + tweet.text + "'}");
+        }
+        function getTweet(tweetID) {
+            return localStorage.getItem(tweetID);
         }
 
-        // "scripts/worker.js"
-        self.addEventListener("message", function(e) {
-            doSomeWork();
-        };
-        function doSomeWork() {
-            importScripts("http://twitter.com/statuses/user_timeline/"+user+".json?count=10&callback=process");
+        // worker long.js
+        var updateDelay = 30000;
+        var user = "greenido";
+        function getURL(user) {
+            return 'http://twitter.com/statuses/user_timeline/' + user
+            + '.json?count=' + 12 + '&callback=processTweets';
         }
-        function process() {
-            /* parse json */
-            postMessage(result);
+        function readTweets() {
+            try {
+                var url = getURL(user);
+                postMessage("Worker Status: Attempting To Read Tweets for user - " + user +
+                " from: "+ url);
+                importScripts(url);
+            } catch (e) {
+                postMessage("Worker Status: Error - " + e.message);
+                setTimeout(readTweets, updateDelay);
+            }
         }
+        function processTweets(data) {
+            var numTweets = data.length;
+            if (numTweets > 0) {
+                postMessage("Worker Status: New Tweets - " +  numTweets);
+                postMessage(data);
+            } else {
+                postMessage("Worker Status: New Tweets - 0");
+            }
+            setTimeout(readTweets, updateDelay);
+        }
+        readTweets();   // start worker
     }
-    
 }
 function request() {
     {   // XMLHttpRequest
