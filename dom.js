@@ -1,4 +1,3 @@
-// undated
 function singleElemSelector() {
     var elem = document.getElementById('id');
     var elem = document.querySelector('div p');
@@ -179,4 +178,26 @@ function loading() {
             }
         };
     }
+}
+function css() {
+    // container
+    display: flex;          // block level (h = 100%, v = wrap content)
+    display: inline-flex;   // inline level (h = wrap content, v = wrap content)
+    flex-direction: row;    // default, from left to right, next row from top to bottom
+    flex-direction: column; // vertical, from top to bottom, next column from left to right
+    flex-wrap: wrap;        // wrap content, check flex-direction for final result
+    flex-grow: 1;           // items will grow equaly to take all space (except with flex-basis prop)
+    justify-content: center;    // center all items horisontaly
+    align-items: center;    // center all items verticaly
+    align-content: center;  // align lines withing container, only works with several lines containers
+
+    // all items inside container
+    width: 300px;           // items will grow accordingly, but not greater ther parent container
+
+    // separate item
+    flex-grow: 4;           // item will occupy more extra free space
+    flex-shrink: 4;         // item will occupy less extra free space
+    flex-shrink: 0;         // item will maintain its origional size (300px for example)
+    flex-basis: 100px;      // item will start with 100px width, extra space will destributed in addition
+    align-self: center;     // align each item separately
 }
