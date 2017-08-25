@@ -4,8 +4,8 @@ function basic() {
     console.log(y); // => empty array
 }
 function expression() {
-    (1 + 1, 2 + 2); // 4
-    void 0; // always evaluates to undefined
+    (1 + 1, 2 + 2);     // 4
+    void 0;     // always evaluates to undefined
     
     return  // always use braces on the right or compiler will add ";" after "return" statement
     {
@@ -58,24 +58,59 @@ function coercion() {
 
     // from string to Date
     var date = Date.parse("Sun, 22 Dec 2017 08:00:00 GMT");
+
+    // from array to string
+    [].toString() = "";
+    [1,2,3].toString() = "1,2,3";
+    [null,undefined].toString() = ",";
+
+    // from object to string
+    {}.toString() = "[object Object]";
+    {a:1}.toString() = "[object Object]";
 }
-function dataTypes() {
+function primitive() {
     // primitive values
-    typeof null;    // !?"object"
+    typeof null;        // !?"object"
     typeof undefined;   // "undefined", always use it instead of "null"
-    typeof true;    // "boolean"
-    typeof 123;     // "number"
-    typeof "foo";   // "string"
-    typeof symbol;  // "symbol"
-   
+    typeof true;        // "boolean"
+    typeof 123;         // "number"
+    typeof "foo";       // "string"
+    typeof symbol;      // "symbol"
+
     // objects
-    typeof ["a"];   // !?"object"
-    typeof {a:1};   // "object"
-    typeof funcName; // "function"
+    typeof ["a"];       // !?"object"
+    typeof {a:1};       // "object"
+    typeof funcName;     // "function", callable object type
 
     // false value
     false; null; undefined; ""; 0; NaN;
     // any other values are truthy, including all objects
+
+    // number => double-precision 64-bit binary
+    // set of all nums, NaN value, positive/negative infinity, positive/negative zero
+    NaN === "if failed in number coercion or math operation";
+}
+function native() {
+    // String, Number, Boolean, Function, Object, Array, RegExp, Date, Error
+    var foo = new String("foo");
+    typeof foo;     // "object"; keys = [0,1,2]; vals = ['f','o','o'];
+
+    // string => immutable type, represents a single 16-bit unit of UTF-16 text
+    String.prototype.yourMethodName = function() { return /* logic here */ };    // add custom methods
+    msg.charAt(0);              // get char at given index
+    msg.indexOf("a");           // .lastIndexOf("a"); find the actual position, return index
+    msg.startsWith("a");        // .endsWith("a"); .includes("a"); search the whole 'msg', return boolean
+    msg.split(",");             // split string by commas, return an array
+    msg.substr(x,y);            // start index, length
+    msg.slice(x,y);             // start index, end index
+    msg.trim();                 // delete trailing and ending spaces
+
+    // template literal
+    let message = `Multiline
+        string`;                // indentation is counting in 'message.length'
+    let count = 10,             // template literal substitution === string concatenation
+        price = 0.25,
+        message = `${count} items cost ${(count * price).toFixed(2)}.`;
 }
 function compareAndCheck() {
     // regular comparison
@@ -83,14 +118,20 @@ function compareAndCheck() {
     x == y;     // allow automatic type coercion
     x === y;    // must be the same type
 
+    undefined === "variable has been declared but has no value for now";
+    "undeclared" === "variable has not been declared for now";
+
     // number
     Number.isInteger(val);      // "true"  
 
     // string
-    isNaN(msg.charAt(0));       // check if char at given index is not a number
+    Number.isNaN(msg.charAt(0));       // check if char at given index is not a number
+
+    // NaN or -0
+    Object.is(NaN, NaN);            // true, vals are equivalent if same type and same val
+    Object.is("foo", NaN);          // false
 
     // object
-    Object.is(NaN, NaN);            // true, vals are equivalent if same type and same val
     var bool = ("key" in obj);      // check if property is exist, including [[Prototype]] link
     obj.hasOwnProperty("key");      // check if property is exist only in that object
     obj instanceof Foo; // in prototype chain of "obj" does "obj" arbitrarily pointed to by Foo.prototype appear
@@ -108,29 +149,6 @@ function compareAndCheck() {
 
     // function
     Function.isCallable(funcName);  // "true"
-}
-function number() {
-    // double-precision 64-bit binary
-    // set of all nums, NaN value, positive/negative infinity, positive/negative zero
-}
-function string() {
-    // immutable type, usually represents a single 16-bit unit of UTF-16 text
-    String.prototype.yourMethodName = function() { return /* logic here */ };    // add custom methods
-
-    msg.charAt(0);              // get char at given index
-    msg.indexOf("a");           // .lastIndexOf("a"); find the actual position, return index
-    msg.startsWith("a");        // .endsWith("a"); .includes("a"); search the whole 'msg', return boolean
-    msg.split(",");             // split string by commas, return an array
-    msg.substr(x,y);            // start index, length
-    msg.slice(x,y);             // start index, end index
-    msg.trim();                 // delete trailing and ending spaces
-
-    // template literal
-    let message = `Multiline
-        string`;                // indentation is counting in 'message.length'
-    let count = 10,             // template literal substitution === string concatenation
-        price = 0.25,
-        message = `${count} items cost ${(count * price).toFixed(2)}.`;
 }
 function symbol() {
     // unique and immutable non-String Object property key
@@ -532,8 +550,8 @@ function object() {
     Object.getOwnPropertyNames(obj).join("");   // 01ba
 
     // iterate over object, unspecified enumeration order
-    for (key in obj) {
-        if (object.hasOwnProperty(name)) {
+    for (let key in obj) {
+        if (obj.hasOwnProperty(key)) {
             // "key" will show all keys, "obj[key]" all values, including proto chain
         }
     }
