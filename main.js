@@ -18,45 +18,25 @@ function expression() {
     let name = 0, last; // will be split into two parts
     let name = undefined, last = undefined; name = 0;   // two undefined declarations will be hoisted
 }
-function scope() {
-    // global environment outer reference is null, also includes global obj that is a value of 
-        // global environment "this" binding
-
-    // module environment contains bindings for the top level declarations of a module, also
-        // contain bindings that explicitly imported by module
-        // the outer environment of module is a global environment
-
-    // func environment corresponds to invocation of func obj, may establish new "this" binding
-    // captures state necessary to support super method invocations
-
-
-    var a;      // hoisted, new binding is created in global scope and NEW prop is added to the global obj
-    let b;      // new binding is created in global scope but NO prop is added to the global obj
-    const c = 0;    // constant value will stick to any block scope, like 'let'
-
-    function funcOne(bigData){}     // engine will remove block-scoping after executing
-    {
-        let bigData = {};
-        funcOne(bigData);
-    }
-}
 function coercion() {
-    var str = "123", val;
-    // explicit from string to number
-    val = parseInt(str, 10); val = Number(str); val = +str;
-    // implicit from string to number
-    val = str - 0; val = str - "0"; val = str / 1;
+    // from string to number
+    val = parseInt(str, 10);    // "10px" ==== 10; stops when not valud value reached
+    val = Number(str);
+    val = +str;
+    val = str - 0;
+    val = str - "0";
+    val = str / 1;
 
-    var num = 123;
-    // explicit from number to string
-    str = num.toString(); str = String(num);
-    // implicit from number to string
+    // from number to string
+    str = num.toString();
+    str = String(num);
     str = num + "";
 
-    // from string/number to boolean
-    var bool = Boolean(str); bool = !!str; bool = str ? true : false;
+    // to boolean
+    var bool = Boolean(str);
+    bool = !!str;
+    bool = str ? true : false;
 
-    // from string to Date
     var date = Date.parse("Sun, 22 Dec 2017 08:00:00 GMT");
 
     // from array to string
@@ -112,17 +92,36 @@ function native() {
         price = 0.25,
         message = `${count} items cost ${(count * price).toFixed(2)}.`;
 }
+function symbol() {
+    // unique and immutable non-String Object property key
+    // each symbol val holds an associated val called [[Description]] that is "undefined" or string val
+    Symbol.hasInstance; // if constructor obj recogniz an obj as one of the constructor instances (instanceof)
+    Symbol.iterator;    // returns the default iterator for an object (for-of)
+    let firstName = Symbol("first name");
+    let person = {
+        [firstName]: "Sergey"       // computed object literal property
+    };
+
+    // global symbol registry, method search global symbol registry for key "uid"
+    // if finds, returns the existing. If not, new symbol is created and registered
+    let uid = Symbol.for("uid");
+    let object = {}; object[uid] = "12345";
+
+    // get symbols
+    let symbols = Object.getOwnPropertySymbols(person); // array for-of symbols
+    Symbol.keyFor(uid)
+}
 function compareAndCheck() {
     // regular comparison
     x < y;      // return "true", "false" or "undefined" if any operand is NaN
-    x == y;     // allow automatic type coercion
-    x === y;    // must be the same type
+    x == y;     // numeric coercion, only for compare numbers with numbers, never with bools
+    x === y;    // values must be the same type
 
     undefined === "variable has been declared but has no value for now";
     "undeclared" === "variable has not been declared for now";
 
     // number
-    Number.isInteger(val);      // "true"  
+    Number.isInteger(val);      // "true"
 
     // string
     Number.isNaN(msg.charAt(0));       // check if char at given index is not a number
@@ -150,24 +149,27 @@ function compareAndCheck() {
     // function
     Function.isCallable(funcName);  // "true"
 }
-function symbol() {
-    // unique and immutable non-String Object property key
-    // each symbol val holds an associated val called [[Description]] that is "undefined" or string val
-    Symbol.hasInstance; // if constructor obj recogniz an obj as one of the constructor instances (instanceof)
-    Symbol.iterator;    // returns the default iterator for an object (for-of)
-    let firstName = Symbol("first name");
-    let person = {
-        [firstName]: "Sergey"       // computed object literal property
-    };
+function scope() {
+    // global environment outer reference is null, also includes global obj that is a value of 
+        // global environment "this" binding
 
-    // global symbol registry, method search global symbol registry for key "uid"
-    // if finds, returns the existing. If not, new symbol is created and registered
-    let uid = Symbol.for("uid");
-    let object = {}; object[uid] = "12345";
+    // module environment contains bindings for the top level declarations of a module, also
+        // contain bindings that explicitly imported by module
+        // the outer environment of module is a global environment
 
-    // get symbols
-    let symbols = Object.getOwnPropertySymbols(person); // array for-of symbols
-    Symbol.keyFor(uid)
+    // func environment corresponds to invocation of func obj, may establish new "this" binding
+    // captures state necessary to support super method invocations
+
+
+    var a;      // hoisted, new binding is created in global scope and NEW prop is added to the global obj
+    let b;      // new binding is created in global scope but NO prop is added to the global obj
+    const c = 0;    // constant value will stick to any block scope, like 'let'
+
+    function funcOne(bigData){}     // engine will remove block-scoping after executing
+    {
+        let bigData = {};
+        funcOne(bigData);
+    }
 }
 function func() {
     // member of Object type, may be invoked as a subroutine
