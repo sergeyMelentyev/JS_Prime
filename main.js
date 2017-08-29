@@ -1,7 +1,8 @@
 function basic() {
-    function name(x) {x = null; }
-    let y = []; name(y);    // ref to arr will be passed, not address of let, that contain ref to arr
-    console.log(y); // => empty array
+    function name(x) { x = null; }
+    let y = [];
+    name(y);            // ref to arr will be passed, not address of let, that contain ref to arr
+    console.log(y);     // => empty array
 }
 function expression() {
     (1 + 1, 2 + 2);     // 4
@@ -150,6 +151,8 @@ function compareAndCheck() {
     Function.isCallable(funcName);  // "true"
 }
 function scope() {
+    // jit compiler at first pass will look for any formal var/func declaration, both global and func scope
+
     // global environment outer reference is null, also includes global obj that is a value of 
         // global environment "this" binding
 
@@ -160,10 +163,19 @@ function scope() {
     // func environment corresponds to invocation of func obj, may establish new "this" binding
     // captures state necessary to support super method invocations
 
-
     var a;      // hoisted, new binding is created in global scope and NEW prop is added to the global obj
     let b;      // new binding is created in global scope but NO prop is added to the global obj
-    const c = 0;    // constant value will stick to any block scope, like 'let'
+    const c = 0;    // constant value will stick to any block scope, like "let"
+
+    var foo = "bar";        // will expands to...
+    var foo = undefined;    // will expands to...
+    foo = "bar";
+
+    // function declaration, will be hoisted
+    function name() {}                  // will expands to...
+    let name = function name() {};      // will expands to...
+    let name = undefined;               // will expands to...
+    name = function name() {};
 
     function funcOne(bigData){}     // engine will remove block-scoping after executing
     {
@@ -177,12 +189,6 @@ function func() {
     // func obj is a first class obj, inherit from Function.prototype
     var name = function () {};
     (function name() {})        // also a function expression
-
-    // function declaration, will be hoisted
-    function name() {}                  // will expands to...
-    let name = function name() {};      // will expands to...
-    let name = undefined;               // will expands to...
-    name = function name() {};
 
     // after func applied to args (invoked), new environment created,
     // it is a dict that maps vars to vals by name
