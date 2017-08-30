@@ -151,6 +151,8 @@ function compareAndCheck() {
     Function.isCallable(funcName);  // "true"
 }
 function scope() {
+    // only lexical scope is present in js 
+
     // jit compiler at first pass will look for any formal var/func declaration, both global and func scope
 
     // global environment outer reference is null, also includes global obj that is a value of 
