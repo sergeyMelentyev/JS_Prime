@@ -153,7 +153,8 @@ function compareAndCheck() {
 function scope() {
     // only lexical scope is present in js 
 
-    // jit compiler at first pass will look for any formal var/func declaration, both global and func scope
+    // jit compiler at first pass will look for any formal var/func declaration,
+        // will go both global and func scope
 
     // global environment outer reference is null, also includes global obj that is a value of 
         // global environment "this" binding
@@ -165,34 +166,44 @@ function scope() {
     // func environment corresponds to invocation of func obj, may establish new "this" binding
     // captures state necessary to support super method invocations
 
-    var a;      // hoisted, new binding is created in global scope and NEW prop is added to the global obj
+    // variable declaration
+    var a;      // new binding is created in global scope and NEW prop is added to the global obj
     let b;      // new binding is created in global scope but NO prop is added to the global obj
     const c = 0;    // constant value will stick to any block scope, like "let"
 
     var foo = "bar";        // will expands to...
-    var foo = undefined;    // will expands to...
-    foo = "bar";
+    var foo;                // var hoisted and declared at the top of the module
+    foo = undefined;        // initialization point
+    foo = "bar";            // data assigned
 
-    // function declaration, will be hoisted
+    let foo = "bar";        // will expands to...
+    let foo;                // var hoisted and declared at the top of the module
+    ...                     // no initialization point
+    foo = "bar";            // initialization and assignment
+
+    // function declaration
     function name() {}                  // will expands to...
-    let name = function name() {};      // will expands to...
-    let name = undefined;               // will expands to...
+    var name = function name() {};
+    var name;
+    name = undefined;
     name = function name() {};
 
-    function funcOne(bigData){}     // engine will remove block-scoping after executing
-    {
-        let bigData = {};
-        funcOne(bigData);
+    // engine will remove block-scoping after executing
+    var projectEntryData;
+    { let projectId;
+        projectId = Math.round(Math.random()*1E4);
+        projectEntryData = { id: projectId, description: "description" };
     }
 }
 function func() {
+    // first class obj, inherit from Function.prototype
     // member of Object type, may be invoked as a subroutine
-    // func expression, will not be hoisted, will return an instance of func obj that can be invoked
-    // func obj is a first class obj, inherit from Function.prototype
-    var name = function () {};
-    (function name() {})        // also a function expression
+    
+    function a() {}         // func declaration, hoisted
+    var a = function() {};  // func expression, not hoisted, return an instance of func obj that can be invoked
+    (function a() {})();    // func expression, not hoisted
 
-    // after func applied to args (invoked), new environment created,
+    // after func applied to args (invoked), new environment created
     // it is a dict that maps vars to vals by name
     functionName(args);                     // function form of invocation
     objectName.methodName(args);            // method form of invocation
@@ -200,26 +211,18 @@ function func() {
     new FunctionName(args);                 // constructor form of invocation
     functionName.apply(objectName, [args])  // apply form of invocation
 
-    // pure func = contain NO free vars, only binded vars (passed in as an argument)
-    // closures = contain free vars that is not bound within the func
+    // pure func = contain NO free vars, only binded vars (passed in as an args)
     ((z) => z)(1);              // environment { z: 1, '..': global }
     ((x) => (y) => x)(1)(2);
-    ((x) => (y) => x)(1);   // environment {x: 1, ...}, called "I combinator" or "Identity function"
-    ((y) => x)(2);      // environment is {y: 2, '..': {x: 1, ...}}, called "K combinator" or "Kestrel"
+    ((x) => (y) => x)(1);       // environment {x: 1, ...}, called "I combinator" or "Identity function"
+    ((y) => x)(2);              // environment is {y: 2, '..': {x: 1, ...}}, called "K combinator" or "Kestrel"
 
-    const evenStevens = (n) => {
-        n += 1;                 // rebind new value to name bound with a parameter
-    };
-
-    // arguments object
+    // arguments object, can be rebind with new value withing func body
     sum(1,2,3,4);
-    function sum() {                    // "arguments" is an arr like an obj, contains all params
-        var i,
-            n = arguments.length,
-            total = 0;
-        for (i = 0; i < n; i += 1) {
+    function sum() {                    // "arguments" is an arr like obj, contains all params
+        var i, n = arguments.length, total = 0;
+        for (i = 0; i < n; i += 1)
             total += arguments[i];
-        }
         return total;
     }
 
@@ -230,8 +233,6 @@ function func() {
             result[keys[i]] = obj[keys[i]];
         return result;
     }
-    let book = { title: "", author: "", year: 2015 };
-    let bookData = pick(book, "author", "year");
     
     // default arguments ES5
     function makeRequest(url, timeout, callback) {
@@ -239,9 +240,7 @@ function func() {
         callback = (typeof callback !== "undefined") ? callback : function() {};
     }
     // default arguments ES6
-    function makeRequest(url, timeout = 2000, callback = funcName() {}) {
-        // logic here
-    }
+    function makeRequest(url, timeout = 2000, callback = funcName() {}) {}
 
     // function constructor call
     var add = new Function("first", "second = first", "return first + second");
@@ -249,45 +248,43 @@ function func() {
     var pickFirst = new Function("...args", "return args[0]");
     pickFirst(1, 2);        // 1
 
-    // spread operator
-    var nums = [1,2]; var chars = ["a", "b"];
-    console.log(...nums);       // the same as console.log(arr[0] + " " + arr[1]);
-    function nameless() { return [1,2]; }
-    var num = [0, ...nameless()];       // array concatenation
-    var concat = [...nums, ...chars];
-
-    // closure is a func that is able to access its lexical scope even while executing outside of it
-        // after "outerOne" applied to args its vars is not saved on the stack as usual, but in HEAP mem,
-        // and that is why can be accessed by inner func after its execution
-    let letters = (function(){
-        const arr = ["a","b","c","d"];
-        return function(i) { return arr[i]; };
-    }());
-    letters(0);     // "a"
-
     // function internal-only methods
     function Person(name) { this.name = name; }
     var x = Person("Sergey");       // [[Call]] method executes the body of func as it is
     var y = new Person("Sergey");   // [[Construct]] methods executes, new object is created,
         // then executing the func body with "this" set to the new target
-
+}
+function arrowFunc() {
     // fat arrow (arrow func)
-    // no "this" binding, will be determined by looking up the scope chain
+    // no "this" binding, "this" is just a var name, lexical scope rules are applied
+    // "this" inhereted from enclosing scope by looking up scope chain
     // don’t have args obj, args remain accessible due to scope chain resolution of args identifier
     // call(), apply(), bind() will not affect "this" binding
-    var name = (x) => ++x;      // function name(x) { return ++x; }
+    var name = (x) => ++x;              // function name(x) { return ++x; }
     var name = (x) => { return ++x; };  // for multi line body use braces and explicit return
     
     row(3);     // [3,6,9,12,15]; fat arrow will bind arguments[0] to passed value "3"
     let row = function () { return mapWith( column => column * arguments[0], [1, 2, 3, 4, 5] ) };
     row(3);     // [1,4,9,16,25]; reg func will bind arguments[0] to val from iterable array
     let row = function () { return mapWith(
-        function (column) { return column * arguments[0] }, [1, 2, 3, 4, 5] ) };
-
+    function (column) { return column * arguments[0] }, [1, 2, 3, 4, 5] ) };
+}
+function closure() {
+    // closure is characteristic of func that allows to access its lexical scope while executing outside of it
+    // closures contain free vars that is not bound within the func
+    // after "outerOne" func applied to args its vars is not saved on the stack as usual, but in HEAP
+        // that is why can be accessed by inner func after its execution
+    let letters = (function(){
+        const arr = ["a","b","c","d"];
+        return function(i) { return arr[i]; };
+    }());
+    letters(0);     // "a"
+}
+function recursion() {
     // recursive func with tail call optimization, current stack frame is cleared and reused
-        // no access to vars in the current stack frame (func is not a closure)
-        // func making the tail call has no further work to do after the tail call returns
-        // result of the tail call is returned as the func value
+    // no access to vars in the current stack frame (func is not a closure)
+    // func making the tail call has no further work to do after the tail call returns
+    // result of the tail call is returned as the func value
     function factorial(n, p = 1) {
         if (n <= 1) {
             return 1 * p;
@@ -296,24 +293,36 @@ function func() {
             return factorial(n - 1, result);
         }
     }
+}
+function patterns() {
+    {   // get required key-value from object
+        // pass object and get new obj with only required key-value pares
+        function pick(obj, ...keys) {
+            let result = Object.create(null);
+            for (let i = 0, len = keys.length; i < len; i++)
+                result[keys[i]] = obj[keys[i]];
+            return result;
+        }
+    }
+    {   // functional patterns
+        // composition pattern
+        const compose = (a, b) => (c) => a(b(c));
+        const cookAndEat = compose(eat, cook);
 
-    // composition pattern
-    const compose = (a, b) => (c) => a(b(c));
-    const cookAndEat = compose(eat, cook);
+        // partial application pattern
+        const mapWith = (fn) => (array) => map(array, fn);  // apply func to each elem of an arr
+        const squareAll = mapWith((n) => n * n);
+        squareAll([1, 2, 3])            // [1, 4, 9]
 
-    // partial application pattern
-    const mapWith = (fn) => (array) => map(array, fn);  // apply func to each elem of an arr
-    const squareAll = mapWith((n) => n * n);
-    squareAll([1, 2, 3])            // [1, 4, 9]
+        // "combinator" higher-order pure func that take only func as args and return a func
+        const addOne = (number) => number + 1;
+        const doubleOf = (number) => number * 2;
+        const doubleOfAddOne = (number) => doubleOf(addOne(number));    // function compose combinator
 
-    // "combinator" higher-order pure func that take only func as args and return a func
-    const addOne = (number) => number + 1;
-    const doubleOf = (number) => number * 2;
-    const doubleOfAddOne = (number) => doubleOf(addOne(number));    // function compose combinator
-
-    const not = (fn) => (x) => !fn(x);
-    const something = (x) => x != null;
-    const nothing = not(something);                                 // function decorator
+        const not = (fn) => (x) => !fn(x);
+        const something = (x) => x != null;
+        const nothing = not(something);                                 // function decorator
+    } 
 }
 function thisPointer() {
     // function form of invocation
@@ -331,7 +340,7 @@ function thisPointer() {
     // apply form of invocation
     functionName.apply(obj, [arrOfArgs]);
     functionName.call(obj, argOne, argTwo);  // call the [[Call]] internal method of a func obj
-    // "this" pointer will be explicitly set to "obj"
+        // "this" pointer will be explicitly set to "obj"
 
     // "this" pointer the same as "context" object
     var obj = { name: "Sergey" };
@@ -370,15 +379,16 @@ function thisPointer() {
     var orig = foo;
     foo = function () { orig.call(obj); }; foo();  // "barOne"
 
-    // context optional parameter 
+    // context optional parameter
     function foo(el) { console.log( el, this.id ); }
     let obj = { id: "awesome" };
     [1, 2, 3].forEach(foo, obj);
 
     // new binding, function constructor call
-    // new obj is created
-    // new obj is [[Prototype]] linked
-    // new obj is set as "this" binding
+        // new empty obj is created
+        // this new obj is [[Prototype]] linked to another obj
+        // pass that obj in as a "this" context
+        // return that "this"
     function Foo(a) { this.a = a; }
     var baz = new Foo(2);
 }
@@ -408,7 +418,7 @@ function array() {
     arr.shift();                // remove the fist one element
     ["a","b","c"].join(" ");    // "a b c" build a string from arr
 
-    arr.map(predicateMap);    // will return new array
+    arr.map(predicateMap);      // will return new array
     function predicateMap(item, index, array) {}
     
     arr.forEach(predicateForEach);    // will change initial array, can not break out while iteration
@@ -573,6 +583,20 @@ function object() {
     function display({name, age}) {}
 }
 function objPrivateFields() {
+    // simple module pattern
+    var foo = (function() {
+        var publicAPI = {
+            bar: function() {
+                publicAPI.baz();
+            },
+            baz: function() {
+                console.log("logic");
+            }
+        };
+        return publicAPI;
+    })();
+    foo.bar();          // "logic"
+
     // ES5 implementation
     var Person = (function() {
         var privateData = {},
@@ -910,6 +934,13 @@ function iterator() {
     var divs = document.getElementsByTagName("div");
     for (let div of divs) console.log(div.id);
 }
+function spreadOperator() {
+    var nums = [1,2]; var chars = ["a", "b"];
+    console.log(...nums);       // the same as console.log(arr[0] + " " + arr[1]);
+    function nameless() { return [1,2]; }
+    var num = [0, ...nameless()];       // array concatenation
+    var concat = [...nums, ...chars];
+}
 function promise() {
     // time independent state, async flow control, immutable once resolved
     {   // simple promise
@@ -1127,12 +1158,19 @@ function exeption() {
     }
 }
 function module() {
-    var name = "S"; function getAge(){ return 35; }
+    // must work with http2.0 protocol
+    var name = "S";
+    function getAge(){ return 35; }
     export default {name, getAge};
-    import person from './modules'; person.name; person.getAge();
 
-    export var name = "S"; export function getAge(){ return 35; }
+    import person from './modules';
+    person.name; person.getAge();
+
+    export var name = "S";
+    export function getAge(){ return 35; }
     import {name, getAge} from './module';
+
+    import * as foo from "./modules";
 }
 function observables() {
     // ES2017
