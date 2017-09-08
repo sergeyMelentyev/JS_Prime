@@ -148,7 +148,7 @@ function compareAndCheck() {
     Array.isArray(["a"]);   // "true"
 
     // function
-    Function.isCallable(funcName);  // "true"
+    Function.isCallable(funcName);      // "true"
 }
 function scope() {
     // only lexical scope is present in js 
@@ -240,6 +240,8 @@ function func() {
         callback = (typeof callback !== "undefined") ? callback : function() {};
     }
     // default arguments ES6
+    var defaultPerson = { name: "" };
+    function logActivity(p=defaultPerson) { console.log(`${p.name}`) }
     function makeRequest(url, timeout = 2000, callback = funcName() {}) {}
 
     // function constructor call
@@ -253,6 +255,11 @@ function func() {
     var x = Person("Sergey");       // [[Call]] method executes the body of func as it is
     var y = new Person("Sergey");   // [[Construct]] methods executes, new object is created,
         // then executing the func body with "this" set to the new target
+
+    // destructuring
+    var regularPerson = { firstname: "Bill" };
+    var lordify = ({firstname}) => { console.log(`${firstname} of Canterbury`); }
+    lordify(regularPerson);     // Bill of Canterbury
 }
 function arrowFunc() {
     // fat arrow (arrow func)
@@ -285,14 +292,35 @@ function recursion() {
     // no access to vars in the current stack frame (func is not a closure)
     // func making the tail call has no further work to do after the tail call returns
     // result of the tail call is returned as the func value
-    function factorial(n, p = 1) {
-        if (n <= 1) {
-            return 1 * p;
-        } else {
-            let result = n * p;
-            return factorial(n - 1, result);
-        }
+    
+    countdown(10, value => console.log(value));
+    const countdown = (value, fn) => {
+        fn(value);
+        return (value > 0) ? countdown(value-1, fn) : value;
     }
+
+    // iterate deeply into an object to retrieve a nested value
+    var dan = {
+        type: "person",
+        data: {
+          gender: "male",
+          info: {
+            id: 22,
+            fullname: {
+              first: "Dan",
+              last: "Deacon"
+            }
+          }
+        }
+      }
+    const deepPick = (fields, object={}) => { 
+       const [first, ...remaining] = fields.split(".");
+       return (remaining.length) ?
+           deepPick(remaining.join("."), object[first]) :
+           object[first]
+    };
+    deepPick("type", dan);                      // "person"
+    deepPick("data.info.fullname.first", dan);  // "Dan"
 }
 function patterns() {
     {   // get required key-value from object
@@ -322,6 +350,14 @@ function patterns() {
         const not = (fn) => (x) => !fn(x);
         const something = (x) => x != null;
         const nothing = not(something);                                 // function decorator
+
+        // currying
+        const userLogs = userName => message => 
+            console.log(`${userName} -> ${message}`);
+        const log = userLogs("grandpa23");
+        getFakeMembers(20).then(        // grandpa23 -> successfully loaded 20 members
+            members => log(`successfully loaded ${members.length} members`)
+        )
     } 
 }
 function thisPointer() {
@@ -417,26 +453,46 @@ function array() {
     arr.pop();                  // remove the last one element
     arr.shift();                // remove the fist one element
     ["a","b","c"].join(" ");    // "a b c" build a string from arr
+    var peaks = ["", ""]; var [last] = peaks.reverse();    // get last, with side effect
+    var peaks = ["", ""]; var [last] = [...peaks].reverse() // get last, no side effect
 
-    arr.map(predicateMap);      // will return new array
-    function predicateMap(item, index, array) {}
-    
+    // MAP - FOREACH - FILTER - EVERY
+    var schools = [ "Yorktown", "Washington & Lee", "Wakefield" ];
+    var ages = [21,18,42,40];
+    function predicate(item, index, array) {}
+
+    var m = schools.map(school => `${school} High`); // no side effect, apply func arg to each elem, from arr of strs to arr of strs
+    var f = schools.filter(school => school[0] === "W"); // no side effect, predicate must return bool
+    var r = ages.reduce( (max, value) => (value > max) ? value : max, 0 );      // reduce array to a single value
+
+    // from array of strings to array of objects
+    var m = schools.map(school => ({ name: school }));
+
+    // from array of objects to object, reduce array to a single value
+    const colors = [ { id: "1", title: "red", rating: 2 }, { id: "2", title: "blue", rating: 1 } ];
+    const r = colors.reduce(
+        (hash, {id, title, rating}) => {
+            hash[id] = {title, rating};
+            return hash;
+        }, {}
+    );
+
+    // from array of same value to an array of distinct values
+    const colors = ["red", "red", "green", "blue", "green"];
+    const distinctColors = colors.reduce(
+        (distinct, color) => 
+            (distinct.indexOf(color) !== -1) ? 
+                distinct : 
+                [...distinct, color],
+        []
+    );
+
+    // from object to array of objects
+    const schools = { "Yorktown": 10, "Washington & Lee": 2, "Wakefield": 5 };
+    const schools = Object.keys(schools).map(key => ({ name: key, wins: schools[key] }) );
+
     arr.forEach(predicateForEach);    // will change initial array, can not break out while iteration
-    function predicateForEach(item, index, array) {}
-
     arr.every(predicateForEach);    // can be break out while iteration
-
-    arr.filter(predicateFilter);        // will return new array
-    function predicateFilter(v) { return v % 2 == 1; }  // filer vals, predicate must return bool
-    
-    compose([1,2,3,4], predicateCompose, 1);        // reduction
-    function predicateCompose(x, y) { return x * y; }
-    function compose(arr, predicate, init) {
-        var temp = init;
-        for (var i = 0; i < arr.length; i++)
-            temp = predicate(temp, arr[i]);
-        return temp;
-    }
 
     // iteration over array
     for (let i in arr) {}     // iterate over array index, not values
@@ -580,7 +636,11 @@ function object() {
     // destructuring
     var person = { name: "S", age: 35 };
     let {name, age} = person;       // let name = "S"; let age = 35;
-    function display({name, age}) {}
+
+    var name = "Tallac"; var elevation = 9738;
+    var print = function() { console.log(`Mt. ${this.name} is ${this.elevation} feet tall`); }
+    var funHike = { name, elevation, print };
+    funHike.print()     // Mt. Tallac is 9738 feet tall
 }
 function objPrivateFields() {
     // simple module pattern
@@ -943,6 +1003,21 @@ function spreadOperator() {
 }
 function promise() {
     // time independent state, async flow control, immutable once resolved
+    {   // simple real-world example
+        const getFakeMembers = count => new Promise((resolves, rejects) => {
+            const api = `https://api.randomuser.me/?nat=US&results=${count}`;
+            const request = new XMLHttpRequest();
+            request.open('GET', api);
+            request.onload = () => 
+               (request.status === 200) ? resolves(JSON.parse(request.response).results) : reject(Error(request.statusText));
+            request.onerror = (err) => rejects(err);
+            request.send();
+        });
+        getFakeMembers(5).then(
+            members => console.log(members),
+            err => console.error(new Error("cannot load members from randomuser.me"))
+        );
+    }
     {   // simple promise
         let promise = new Promise(function(resolve, reject) {
             // promise body, logic here execute immediately, save result in var and check in next line
@@ -1161,14 +1236,17 @@ function module() {
     // must work with http2.0 protocol
     var name = "S";
     function getAge(){ return 35; }
-    export default {name, getAge};
+    export {name, getAge};
+    export default name;    // only one type
 
-    import person from './modules';
+    import person from "./modules";
     person.name; person.getAge();
 
     export var name = "S";
     export function getAge(){ return 35; }
-    import {name, getAge} from './module';
+    import {name, getAge} from "./module";
+    import {name as n, getAge as g} from "./module";
+
 
     import * as foo from "./modules";
 }
