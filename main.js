@@ -587,6 +587,22 @@ function object() {
             writable: true
         }
     });
+    // add getter/setter to object
+    function convert(obj) {
+        Object.keys(obj).forEach(key => {
+            let internalVal = obj[key];
+            Object.defineProperty(obj, key, {
+                get() {
+                    console.log(`getting key "${key}": ${internalValue}`);
+                    return internalVal;
+                },
+                set(newValue) {
+                    console.log(`setting key "${key}" to: ${newValue}`);
+                    internalValue = newValue;
+                }
+            });
+        });
+    }
     delete obj.key;                 // delete "value" by targeting its 'key' from obj
 
     // internal methods
@@ -1195,28 +1211,58 @@ function generator() {
     }
 }
 function class() {
-    class Human {
-        constructor(name, age) {
-            this.name = name;
-            this.age = age;
+    {   // simple example
+        class Human {
+            constructor(name, age) {
+                this.name = name;
+                this.age = age;
+            }
+            dataFormatter() {
+                return this.name + this.age;
+            }
+            get data(){
+                return this.dataFormatter();
+            }
+            set data(name){
+                this.name = name;
+            }
         }
-        dataFormatter() {
-            return this.name + this.age;
+        class Men extends Human {
+            constructor(name, age, id){
+                super(name, age);
+                this.id = id;
+            }
         }
-        get data(){
-            return this.dataFormatter();
+        var person = new Men("S", 35, 123);
+    }
+    {   // dependency tracking
+        window.Dep = class Dep {
+            constructor() {
+                this.subscribers = new Set();
+            }
+            depend() {
+                if (activeUpdate) {
+                    this.subscribers.add(activeUpdate);
+                }
+            }
+            notify() {
+                this.subscribers.forEach(sub => sub());
+            }
+        };
+        let activeUpdate;
+        function autorun(update) {
+            //
+            function wrappedUpdate() {
+                activeUpdate = wrappedUpdate;
+                update();
+                activeUpdate = null;
+            }
+            wrappedUpdate();
         }
-        set data(name){
-            this.name = name;
+        function update() {
+            // 
         }
     }
-    class Men extends Human {
-        constructor(name, age, id){
-            super(name, age);
-            this.id = id;
-        }
-    }
-    var person = new Men("S", 35, 123);
 }
 function exeption() {
     throw new Error(reason);
