@@ -1011,22 +1011,30 @@ function iterator() {
     for (let div of divs) console.log(div.id);
 }
 function spreadOperator() {
+    // array
     var nums = [1,2]; var chars = ["a", "b"];
     console.log(...nums);       // the same as console.log(arr[0] + " " + arr[1]);
     function nameless() { return [1,2]; }
     var num = [0, ...nameless()];       // array concatenation
     var concat = [...nums, ...chars];
+
+    // object
+    var obj1 = { foo: 'bar', x: 42 };
+    var obj2 = { foo: 'baz', y: 13 };
+    var clonedObj = { ...obj1 };    // Object { foo: "bar", x: 42 }
+    var mergedObj = { ...obj1, ...obj2 };   // Object { foo: "baz", x: 42, y: 13 }
 }
 function promise() {
     // time independent state, async flow control, immutable once resolved
     {   // simple real-world example
-        const getFakeMembers = count => new Promise((resolves, rejects) => {
+        const getFakeMembers = count => new Promise((resolve, reject) => {
             const api = `https://api.randomuser.me/?nat=US&results=${count}`;
             const request = new XMLHttpRequest();
-            request.open('GET', api);
-            request.onload = () => 
-               (request.status === 200) ? resolves(JSON.parse(request.response).results) : reject(Error(request.statusText));
-            request.onerror = (err) => rejects(err);
+            request.open("GET", api);
+            request.onload = () => (request.status === 200) ?
+                resolve(JSON.parse(request.response).results) :
+                reject(Error(request.statusText));
+            request.onerror = (err) => reject(err);
             request.send();
         });
         getFakeMembers(5).then(
@@ -1302,4 +1310,60 @@ function observables() {
         // 
     }
 }
-// 8.1.1.
+function loop() {
+    var box = document.getElementById("box"),
+        fpsDisplay = document.getElementById("fpsDisplay"),
+        boxPos = 10,
+        boxVelocity = 0.08,
+        limit = 300,
+        lastFrameTimeMs = 0,
+        maxFPS = 60,
+        delta = 0,
+        timestep = 1000 / 60,
+        fps = 60,
+        framesThisSecond = 0,
+        lastFpsUpdate = 0;
+
+    function update(stemp) {
+        boxPos += boxVelocity * stemp;
+        if (boxPos >= limit || boxPos <= 0) boxVelocity = -boxVelocity;
+    }
+    function draw() {
+        box.style.left = boxPos + "px";
+        fpsDisplay.textContent = Math.round(fps) + " FPS";
+    }
+    function panic() {
+        delta = 0;
+    }
+
+    function mainLoop(timestamp) {
+        if (timestamp < lastFrameTimeMs + (1000 / maxFPS)) {
+            requestAnimationFrame(mainLoop);
+            return;
+        }
+        delta += timestamp - lastFrameTimeMs;
+        lastFrameTimeMs = timestamp;
+
+        if (timestamp > lastFpsUpdate + 1000) {
+            fps = 0.25 * framesThisSecond + 0.75 * fps;
+            lastFpsUpdate = timestamp;
+            framesThisSecond = 0;
+        }
+        framesThisSecond++;
+
+        var numUpdateSteps = 0;
+        while (delta >= timestep) {
+            update(timestep);
+            delta -= timestep;
+            if (++numUpdateSteps >= 240) {
+                panic();
+                break;
+            }
+        }
+        draw();
+        requestAnimationFrame(mainLoop);
+    }
+
+    requestAnimationFrame(mainLoop);
+}
+/* 8.1.1.
