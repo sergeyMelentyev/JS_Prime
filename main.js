@@ -322,44 +322,6 @@ function recursion() {
     deepPick("type", dan);                      // "person"
     deepPick("data.info.fullname.first", dan);  // "Dan"
 }
-function patterns() {
-    {   // get required key-value from object
-        // pass object and get new obj with only required key-value pares
-        function pick(obj, ...keys) {
-            let result = Object.create(null);
-            for (let i = 0, len = keys.length; i < len; i++)
-                result[keys[i]] = obj[keys[i]];
-            return result;
-        }
-    }
-    {   // functional patterns
-        // composition pattern
-        const compose = (a, b) => (c) => a(b(c));
-        const cookAndEat = compose(eat, cook);
-
-        // partial application pattern
-        const mapWith = (fn) => (array) => map(array, fn);  // apply func to each elem of an arr
-        const squareAll = mapWith((n) => n * n);
-        squareAll([1, 2, 3])            // [1, 4, 9]
-
-        // "combinator" higher-order pure func that take only func as args and return a func
-        const addOne = (number) => number + 1;
-        const doubleOf = (number) => number * 2;
-        const doubleOfAddOne = (number) => doubleOf(addOne(number));    // function compose combinator
-
-        const not = (fn) => (x) => !fn(x);
-        const something = (x) => x != null;
-        const nothing = not(something);                                 // function decorator
-
-        // currying
-        const userLogs = userName => message => 
-            console.log(`${userName} -> ${message}`);
-        const log = userLogs("grandpa23");
-        getFakeMembers(20).then(        // grandpa23 -> successfully loaded 20 members
-            members => log(`successfully loaded ${members.length} members`)
-        )
-    } 
-}
 function thisPointer() {
     // function form of invocation
     functionName(args);
@@ -571,11 +533,22 @@ function object() {
 
     // create/delete data properties
     let obj = Object.create(Object.prototype);
+    // value props
     Object.defineProperty(obj, "key", {
         value: "",                  // default "undefined"
-        writable: true,             // default false
-        enumerable: true,           // default false
-        configurable: true          // default false
+        writable: true,             // default false, read only
+        enumerable: true,           // default false, show up in inumeration
+        configurable: true          // default false, delete it or change to accessor prop
+    });
+    //accessor props
+    Object.defineProperty(obj, "name", {
+        get: function() {
+            return this.name.toUpperCase();
+        },
+        set: function(value) {
+            this.name = value;
+        },
+        configurable: false
     });
     Object.defineProperties(obj, {
         "keyOne": {
@@ -616,6 +589,9 @@ function object() {
     Object.construct(); // (a List of any, Object)→Object; Creates an obj. Invoked via "new" or "super" operators
         // first arg is a list of args, second arg is an obj to which "new" operator was initially applied
         // obj that implement this method are called constructors
+    Object.preventExtensions(obj);  // prevent new props from assigne to the obj, throw exeption
+    Object.seal(obj);  // prevent extentions and makes every prop as non-configurable, vals of present props can still be changed
+    Object.freeze(obj); // prevent extentions and makes every prop read only and non-configurable
 
     // computed prop name
     var suffix  = " name";
@@ -1054,6 +1030,25 @@ function promise() {
             // async error area
         });
     }
+    {   // error handling
+        var p = new Promise(function(resolve, reject) {
+            foo.bar();  // not defined, error is thrown
+            resolve(42);    // never gets here
+        });
+        p.then(
+            function fulfilled() {
+                // never gets here
+            },
+            function rejected(err) {
+                // this line will work
+            });
+
+        // always end promise chain with .catch();
+        var p = Promise.resolve(42);
+        p.then(function(msg) {
+            msg.toLowerCase();  // error
+        }.catch(handleErrors));     // only rejection callback
+    }
     {   // chained promises with propagation data down the chain
         function getData(data){
             return new Promise(function(resolve, reject) {
@@ -1310,7 +1305,7 @@ function observables() {
         // 
     }
 }
-function loop() {
+function animeLoop() {
     var box = document.getElementById("box"),
         fpsDisplay = document.getElementById("fpsDisplay"),
         boxPos = 10,
@@ -1365,5 +1360,52 @@ function loop() {
     }
 
     requestAnimationFrame(mainLoop);
+}
+function patterns() {
+    {   // get required key-value from object
+        // pass object and get new obj with only required key-value pares
+        function pick(obj, ...keys) {
+            let result = Object.create(null);
+            for (let i = 0, len = keys.length; i < len; i++)
+                result[keys[i]] = obj[keys[i]];
+            return result;
+        }
+    }
+    {   // copy object and add new prototype
+        function replace_proto(object, prototype) {
+            var result = Object.create(prototype);
+            object.getOwnProperyNames(object).forEach(function (key) {
+                Object.defineProperty(result, key, Object.getOwnPropertyDescriptor(object, key));
+            });
+            return result;
+        }
+    }
+    {   // functional patterns
+        // composition pattern
+        const compose = (a, b) => (c) => a(b(c));
+        const cookAndEat = compose(eat, cook);
+
+        // partial application pattern
+        const mapWith = (fn) => (array) => map(array, fn);  // apply func to each elem of an arr
+        const squareAll = mapWith((n) => n * n);
+        squareAll([1, 2, 3])            // [1, 4, 9]
+
+        // "combinator" higher-order pure func that take only func as args and return a func
+        const addOne = (number) => number + 1;
+        const doubleOf = (number) => number * 2;
+        const doubleOfAddOne = (number) => doubleOf(addOne(number));    // function compose combinator
+
+        const not = (fn) => (x) => !fn(x);
+        const something = (x) => x != null;
+        const nothing = not(something);                                 // function decorator
+
+        // currying
+        const userLogs = userName => message => 
+            console.log(`${userName} -> ${message}`);
+        const log = userLogs("grandpa23");
+        getFakeMembers(20).then(        // grandpa23 -> successfully loaded 20 members
+            members => log(`successfully loaded ${members.length} members`)
+        )
+    } 
 }
 /* 8.1.1.
