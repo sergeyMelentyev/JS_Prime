@@ -12,39 +12,7 @@ function basic() {
     // two undefined declarations will be hoisted
     let name = undefined, last = undefined name = 0
     }
-function coercion() {
-    // from string to number
-    function intToNum(str) {
-        var val = parseInt(str, 10) // "10px" = 10, stops when not valud val reached
-        return isNaN(value) ? 0 : value
-    }
-    val = Number(str)
-    val = +str
-    val = str - 0
-    val = str - "0"
-    val = str / 1
 
-    // from number to string
-    str = num.toString()
-    str = String(num)
-    str = num + ""
-
-    // to boolean
-    var bool = Boolean(str)
-    bool = !!str
-    bool = str ? true : false
-
-    var date = Date.parse("Sun, 22 Dec 2017 08:00:00 GMT")
-
-    // from array to string
-    [].toString() = ""
-    [1,2,3].toString() = "1,2,3"
-    [null,undefined].toString() = ","
-
-    // from object to string
-    {}.toString() = "[object Object]"
-    {a:1}.toString() = "[object Object]"
-    }
 function primitiveVal() {
     // primitive vals are stored directly in the variable object
     var a = "a"    // var contains primitive val, val is copied into that var
@@ -87,9 +55,9 @@ function primitiveWrapper() {
     var foo = new String("foo")
     typeof foo     // "object" keys = [0,1,2] vals = ['f','o','o']
 
-    var a = "Ser" var c = a.charAt(0) console.log(c) // 'S'
+    var a = "Ser"; var c = a.charAt(0); console.log(c)  // 'S'
     // behind the scenes
-    var a = "Ser" var t = new String(a) var c = t.charAt(0) t = null console.log(c)    // 'S'
+    var a = "Ser"; var t = new String(a); var c = t.charAt(0); t = null console.log(c)    // 'S'
 
     // string => immutable type, represents a single 16-bit unit of UTF-16 text
     String.prototype.yourMethodName = function() { return /* logic here */ }    // add custom methods
@@ -107,10 +75,6 @@ function primitiveWrapper() {
     let count = 10,             // template literal substitution === string concatenation
         price = 0.25,
         message = `${count} items cost ${(count * price).toFixed(2)}.`
-    }
-function regExp() {
-    var nums = /\d+/g
-    var nums = new RegExp("\\d+", "g")
     }
 function symbol() {
     // unique and immutable non-String Object property key
@@ -130,6 +94,40 @@ function symbol() {
     // get symbols
     let symbols = Object.getOwnPropertySymbols(person) // array for-of symbols
     Symbol.keyFor(uid)
+    }
+
+function coercion() {
+    // from string to number
+    function intToNum(str) {
+        var val = parseInt(str, 10) // "10px" = 10, stops when not valud val reached
+        return isNaN(value) ? 0 : value
+    }
+    val = Number(str)
+    val = +str
+    val = str - 0
+    val = str - "0"
+    val = str / 1
+
+    // from number to string
+    str = num.toString()
+    str = String(num)
+    str = num + ""
+
+    // to boolean
+    var bool = Boolean(str)
+    bool = !!str
+    bool = str ? true : false
+
+    var date = Date.parse("Sun, 22 Dec 2017 08:00:00 GMT")
+
+    // from array to string
+    [].toString() = ""
+    [1,2,3].toString() = "1,2,3"
+    [null,undefined].toString() = ","
+
+    // from object to string
+    {}.toString() = "[object Object]"
+    {a:1}.toString() = "[object Object]"
     }
 function compareAndCheck() {
     // regular comparison
@@ -172,6 +170,11 @@ function compareAndCheck() {
     // function
     Function.isCallable(funcName)  // true
     funcName instanceof Function   // true
+    }
+
+function regExp() {
+    var nums = /\d+/g
+    var nums = new RegExp("\\d+", "g")
     }
 
 function scope() {
@@ -287,6 +290,7 @@ function this() {
         var baz = new Foo(2)
     }
     }
+
 function func() {
     // first class obj, inherit from Function.prototype
     // member of Object type, may be invoked as a subroutine
@@ -314,7 +318,6 @@ function func() {
         return total
     }
 
-
     // pure func = contain NO free vars, only binded vars (passed in as an args)
     ((z) => z)(1)              // environment { z: 1, '..': global }
     ((x) => (y) => x)(1)(2)
@@ -324,7 +327,7 @@ function func() {
     // rest param, contains all params passed after "obj", must be only one rest param and it must be last
     function pick(obj, ...keys) {
         let result = Object.create(null)
-        for (let i = 0, len = keys.length i < len i++)
+        for (let i = 0, len = keys.length i < len i++) 
             result[keys[i]] = obj[keys[i]]
         return result
     }
@@ -356,90 +359,78 @@ function func() {
     var lordify = ({firstname}) => { console.log(`${firstname} of Canterbury`) }
     lordify(regularPerson) }
 function arrowFunc() {
-        // fat arrow (arrow func)
-        // no "this" binding, "this" is just a var name, lexical scope rules are applied
-        // "this" inhereted from enclosing scope by looking up scope chain
-        // don’t have args obj, args remain accessible due to scope chain resolution of args identifier
-        // call(), apply(), bind() will not affect "this" binding
-        var name = (x) => ++x              // function name(x) { return ++x }
-        var name = (x) => { return ++x }  // for multi line body use braces and explicit return
-        
-        row(3)     // [3,6,9,12,15] fat arrow will bind arguments[0] to passed value "3"
-        let row = function () { return mapWith( column => column * arguments[0], [1, 2, 3, 4, 5] ) }
-        row(3)     // [1,4,9,16,25] reg func will bind arguments[0] to val from iterable array
-        let row = function () { return mapWith(
-        function (column) { return column * arguments[0] }, [1, 2, 3, 4, 5] ) } }
+    // fat arrow (arrow func)
+    // no "this" binding, "this" is just a var name, lexical scope rules are applied
+    // "this" inhereted from enclosing scope by looking up scope chain
+    // don’t have args obj, args remain accessible due to scope chain resolution of args identifier
+    // call(), apply(), bind() will not affect "this" binding
+    var name = (x) => ++x              // function name(x) { return ++x }
+    var name = (x) => { return ++x }  // for multi line body use braces and explicit return
+    
+    row(3)     // [3,6,9,12,15] fat arrow will bind arguments[0] to passed value "3"
+    let row = function () { return mapWith( column => column * arguments[0], [1, 2, 3] ) }
+    row(3)     // [1,4,9,16,25] reg func will bind arguments[0] to val from iterable array
+    let row = function () { return mapWith( function (column) { return column * arguments[0] }, [1, 2, 3] ) }
+    }
 function closure() {
-        // closure is characteristic of func that allows to access its lexical scope while executing outside of it
-        // closures contain free vars that is not bound within the func
-        // after "outerOne" func applied to args its vars is not saved on the stack as usual, but in HEAP
-            // that is why can be accessed by inner func after its execution
-        let letters = (function(){
-            const arr = ["a","b","c","d"]
-            return function(i) { return arr[i] }
-        }())
-        letters(0) }
+    // characteristic of func that allows access its lexical scope while executing outside of it
+    // closures contain free vars that is not bound within the func
+    // after func applied to args its vars is not saved on the stack as usual, but in HEAP
+        // that is why can be accessed by inner func after its execution
+    let letters = (function(){
+        const arr = ["a","b","c","d"]
+        return function(i) { return arr[i] }
+    }())
+    letters(0)
+    }
 function recursion() {
-        // recursive func with tail call optimization, current stack frame is cleared and reused
-        // no access to vars in the current stack frame (func is not a closure)
-        // func making the tail call has no further work to do after the tail call returns
-        // result of the tail call is returned as the func value
-        
-        countdown(10, value => console.log(value))
-        const countdown = (value, fn) => {
-            fn(value)
-            return (value > 0) ? countdown(value-1, fn) : value
-        }
+    // recursive func with tail call optimization, current stack frame is cleared and reused
+    // no access to vars in the current stack frame (func is not a closure)
+    // func making the tail call has no further work to do after the tail call returns
+    // result of the tail call is returned as the func value
+    
+    countdown(10, value => console.log(value))
+    const countdown = (value, fn) => {
+        fn(value)
+        return (value > 0) ? countdown(value-1, fn) : value
+    }
 
-        // iterate deeply into an object to retrieve a nested value
-        var dan = {
-            type: "person",
-            data: {
-              gender: "male",
-              info: {
-                id: 22,
-                fullname: {
-                  first: "Dan",
-                  last: "Deacon"
-                }
-              }
+    // iterate deeply into an object to retrieve a nested value
+    var dan = {
+        type: "person",
+        data: {
+          gender: "male",
+          info: {
+            id: 22,
+            fullname: {
+              first: "Dan",
+              last: "Deacon"
             }
           }
-        const deepPick = (fields, object={}) => { 
-           const [first, ...remaining] = fields.split(".")
-           return (remaining.length) ?
-               deepPick(remaining.join("."), object[first]) :
-               object[first]
         }
-        deepPick("type", dan)                      // "person"
-        deepPick("data.info.fullname.first", dan) }
+      }
+    const deepPick = (fields, object={}) => { 
+       const [first, ...remaining] = fields.split(".")
+       return (remaining.length) ?
+           deepPick(remaining.join("."), object[first]) : object[first]
+    }
+    deepPick("type", dan)   // "person"
+    deepPick("data.info.fullname.first", dan)
+    }
 
 function object() {
-    // value may be represented as data (primitive, obj, func obj) or by pair of accessor funcs
+    // obj can have own props (directly contained) or inherited (props of obj prototype)
     let obj = {
-        key: value  // property, part of an obj that associates key (string/symbol) and value
-        name: method // func that is val of prop, when called the obj is passed to the func as its "this" val
+        key: value,     // key (string/symbol) and value
+        name: method    // method, when called the "obj" is passed to the func as its "this" val
     }
 
-    // own property
-        // property that is directly contained by its object
-    // inherited property
-        // property of an obj that is not an own property but is a property of the object’s prototype
-
-    // getter and setter
-    var obj = {
-        get a() { return this._a_ },
-        set a(val) { this._a_ = val }
-    }
-
-    // create new object
+    // object creation
     var obj = {}                   // literal syntax
     var obj = new Object()         // constructed syntax
     var obj = Object.create(null)  // obj with a null prototype, no inherited props
-    var obj = Object.create(Foo)   // the same as "new Foo()"
+    var obj = Object.create(Foo)   // the same as: var obj = new Foo()
 
-    // create/delete data properties
-    let obj = Object.create(Object.prototype)
     // data props
     Object.defineProperty(obj, "key", {
         value: "",                  // default "undefined"
@@ -447,6 +438,11 @@ function object() {
         enumerable: true,           // default false, show up in inumeration
         configurable: true          // default false, delete it or change to accessor prop
     })
+    Object.defineProperties(obj, {
+        "keyOne": { value: "", writable: true },
+        "keyTwo": { value: "", writable: true }
+    })
+
     // accessor props
     Object.defineProperty(obj, "name", {
         get: function() {
@@ -457,16 +453,13 @@ function object() {
         },
         configurable: false
     })
-    Object.defineProperties(obj, {
-        "keyOne": {
-            value: "",
-            writable: true
-        },
-        "keyTwo": {
-            value: "",
-            writable: true
-        }
-    })
+
+    // computed props
+    var suffix  = " name"
+    var person = {
+        ["first" + suffix]: "Sergey"
+    }
+
     // add getter/setter to object
     function convert(obj) {
         Object.keys(obj).forEach(key => {
@@ -483,28 +476,24 @@ function object() {
             })
         })
     }
-    delete obj.key                 // delete "value" by targeting its 'key' from obj
 
-    // internal methods
+    // remove "val" by targeting its "key"
+    delete obj.key
+    delete obj.method
+
+    // internal methods for objects
     Object.getPrototypeOf(target) // determine obj that provides inherited props for this obj
     Object.setPrototypeOf(target,proto) // associate obj with another obj that provides inherited props
     Object.getOwnPropertyNames(target) // get array of all properties
+    Object.preventExtensions(obj)  // prevent new props from assigne to the obj, throw exeption
+    Object.seal(obj)  // prevent extention, make props non-configurable, vals of present props can be changed
+    Object.freeze(obj) // prevent extention, make every prop read only and non-configurable
     
     // internal methods for function objects
-    Object.call() // (any, a List of any)→any Executes code associated with this obj.
-        // args are "this" val and list containing the args passed to the func by a call expression
-    Object.construct() // (a List of any, Object)→Object Creates an obj. Invoked via "new" or "super" operators
+    Object.call()   // execute code associated with this obj, args are "this" and list of args passed to func
+    Object.construct()  // creates an obj, invoked via "new" or "super" operators
         // first arg is a list of args, second arg is an obj to which "new" operator was initially applied
         // obj that implement this method are called constructors
-    Object.preventExtensions(obj)  // prevent new props from assigne to the obj, throw exeption
-    Object.seal(obj)  // prevent extentions and makes every prop as non-configurable, vals of present props can still be changed
-    Object.freeze(obj) // prevent extentions and makes every prop read only and non-configurable
-
-    // computed prop name
-    var suffix  = " name"
-    var person = {
-        ["first" + suffix]: "Sergey"
-    }
 
     // duplicating objects
     var newObj = JSON.parse( JSON.stringify( someObj ) )   // deep copy
@@ -517,7 +506,8 @@ function object() {
         emit: function() { },
         on: function() { }
     }
-    var myObject = {} Object.assign(myObject, EventTarget.prototype, thirdObjIfNeeded)
+    var myObject = {}
+    Object.assign(myObject, EventTarget.prototype, thirdObjIfNeeded)
     myObject.emit()
 
     // property enumeration, numeric keys in ascending, string keys in the order in which they were added
@@ -536,12 +526,16 @@ function object() {
     var person = { name: "S", age: 35 }
     let {name, age} = person       // let name = "S" let age = 35
 
-    var name = "Tallac" var elevation = 9738
+    var name = "Tallac"
+    var elevation = 9738
     var print = function() { console.log(`Mt. ${this.name} is ${this.elevation} feet tall`) }
     var funHike = { name, elevation, print }
     funHike.print()     // Mt. Tallac is 9738 feet tall
     }
 function constructor() {
+    // func with constructor call use "new" in order to construct an obj
+    // arbitrary labeled obj will be created, "Person.prototype" will point to that obj
+    // "obj.constructor" will point back to "Person"
     function Person(name, last) {
         this.name = name
         Object.defineProperty(this, "last", {
@@ -552,190 +546,113 @@ function constructor() {
         })
         this.method = function() { retutn this.name }  // will be present in each instanse
     }
+    // js engine does the following
+    function Person() { }
+    Person.prototype = Object.create(Object.prototype, {
+        constructor: {
+            configurable: true,
+            enumerable: true,
+            value: Person,
+            writable: true
+        }
+    })
+
     var me = new Person("Sergey", "Melentyev")   // create an object instance
     me instanceof Person    // true
     me.constructor === Person   // points back to constructor func, can be overwritten
     }
 function prototype() {
-    // almost every func has .prototype prop that is shared among all obj instances
-    function Person() { }
-    Person.prototype.methodName = function() { }
-    // instance obj have prop [[Prototype]], a pointer to the prototype obj that instance is using
+    // func has .prototype prop that is shared among all obj instances
+    // func .prototype prop is created with .constructor prop equal to the func itself
+    // Object.prototype == top-end of every normal [[Prototype]] chain
+    function Person(name) { this.name = name }
+    Person.prototype.method = function() { this.name }  // method will be shared among instances
+    Person.prototype.favs = [] // reference val, all instances will point to the same array
+
+    // the same as above two lines, but .constructor prop will be lost!
+    Person.prototype = { method: function() { this.name }, favs: [] }
     var me = new Person()
-    var proto = Object.getPrototypeOf(me)
-    proto === Person.prototype  // true
-    
-
-
-
-
-
-    // [[Get]] operation in first step check if obj itself has requested prop
-    // [[Get]] operation follow [[Prototype]] link of the obj if cannot find requested obj prop directly
-    // Object.prototype === top-end of every normal [[Prototype]] chain
+    me instanceof Person        // true
+    me.constructor === Person   // false
+    me.constructor === Object   // true
+    Person.prototype = { constructor: Person, method: function() { this.name }, favs: [] }
+    me instanceof Person        // true
+    me.constructor === Person   // true
+    me.constructor === Object   // false
 
     obj.foo = "bar"
-    // normal data accessor prop named "foo" is found higher on the [[Prototype]] chain,
+    // if data accessor prop named "foo" is found higher on the [[Prototype]] chain,
         // and it's NOT writable:false, new prop "foo" is added directly to "obj", resulting in a shadowed prop
     // "foo" is found on the [[Prototype]] chain, but it IS writable:false, error will be thrown,
-        // both setting of that existing prop as well as creation of shadowed prop on "obj" are disallowed
+        // both setting that existing prop as well as creation of shadowed prop on "obj" are disallowed
     // "foo" is found on the [[Prototype]] chain and it's a setter, then the setter will always be called
         // no "foo" will be added to "obj"
     // have to use "Object.defineProperty()" for second and third cases in order to add "foo" to "obj"
 
-    // prototypal inheritance
-    function Foo() { }
-    let x = new Foo()        // "x" get [[Prototype]] link to the obj that "Foo.prototype" is pointing at
-    Object.getPrototypeOf(x) === Foo.prototype   // true
+    // instance obj have prop [[Prototype]], a pointer to the prototype obj that instance is using
+    var me = new Person()
+    var proto = Object.getPrototypeOf(me)
+    proto === Person.prototype  // true
+    Person.prototype.isPrototypeOf(me); // true
 
-    Object.setPrototypeOf(a, b)        // prototype is b
-    let c = Object.create(b)           // prototype is b
-    a.getGreeting() b.getGreeting() c.getGreeting()
-    Foo.prototype.isPrototypeOf(x)     // in the entire [[Prototype]] chain of "x", does "Foo.prototype" ever appear
+    var obj = { }
+    obj.toString()  // > "[object Object]" method comes from the proto chain
+    obj.toString = function() { return "[object Custom]" }  // > "[object Custom]" prop shadowing
 
-    // function with constructor call, use "new" in order to construct an obj
-    // arbitrary labeled obj will be created, "Human.prototype" will point to that obj
-    // "obj.constructor" will point back to "Human"
-    function Human(arg) { this.name = arg }
-
-    // put props directly on arbitrary labeled obj, will be referenced by all objs
-    Human.prototype.propName = ""      
-    Human.prototype.methodName = function() { return this.name }
-    var men = new Human("S")
-    var female = new Human("O")
-    men.propValue = ""         // put property directly on "men" obj
-
-    // public non-enumerable property ".constructor", extremely unreliable
-    Human.prototype.constructor === Human  // true
-    men.constructor === Human      // true, "men" does not have that prop, will walk up the
-        // prototype chain via private [[Prototype]] link to the arbitrary labeled obj
-        // that has ".constructor" prop pointing to the "Human" func
-    men.constructor === female.constructor     // true, both points to the "Human" func
-    men.__proto__ === Human.prototype      // true, "men" does not have that func,
-        // will walk up the prototype chain via private [[Prototype]] link to the arbitrary
-        // labeled obj that does not have that func, will walk up to the system
-        // arbitrary labeled obj and call that func. It will return internal prototype
-        // linkage [[Prototype]] of called obj, in this case "men"
+    // add build-in object prototypes
+    Array.prototype.sum = function() { return this.reduce(function(prev,cur) { return prev + current }) }
+    [1,2,3].sum()
+    String.prototype.firstUpper = function() { return this.charAt(0).toUpperCase() }
+    "ser".firstUpper()
 
     // enumerate via prototype chain
     for (let i in obj)     // any prop of "obj" that can be reached via chain will be enumerated
     let i = ("key" in obj) // check the entire chain of the obj
+    }
+function inheritance() {
+    // called prototype chaining or prototypal inheritance
+    var obj = {}    // its [[Prototype]] set to Object.prototype
 
-    // 
-    function Animal(voice) { this.voice = voice || "default" }
-    Animal.prototype.teeth = "10"
-    Animal.prototype.speak = function () { console.log(this.voice) }
+    // inherited methods from Object.prototype
+    obj.hasOwnProperty()    // determines if own prop with given name exists
+    obj.propertyIsEnumerable()
+    obj.isPrototypeOf() // if "obj" is the prototype of another
+    obj.valueOf()   // re-define this method if "obj" is intended to be used with operators
+    obj.toString()  // string representation of the "obj"
 
-    function Cat(name) {
-        Animal.call(this, "not default")   // call "Animal" constructor with args
-        this.name = name
-    }
-    Cat.prototype = Object.create(Animal.prototype)    // assign "Animal" as a prototype for "Cat"
-    Cat.prototype.constructor = Cat
-    }
-function behaviorDelegation() {
-    var Foo = {
-        init: function(who) { this.me = who },
-        identify: function() { return ("I am " + this.me) }
-    }
-    var Bar = Object.create(Foo)
-    Bar.speak = function () { console.log("Hello, " + this.identify() + ".") }
-    var bam = Object.create(Bar)
-    bam.init("S")
-    bam.speak()
-
-    // widget examaple
-    var Widget = {
-        init: function(width,height) {
-            this.width = width || 50
-            this.height = height || 50
-            this.$elem = null
-        },
-        insert: function($where) {
-            if (this.$elem)
-                this.$elem.css({width: this.width+"px", height: this.height+"px"}).appendTo($where)
-        }
-    }
-    var Button = Object.create(Widget)
-    Button.setup = function(width, height, label) {
-        this.init(width, height)
-        this.label = label || "Default"
-        this.$elem = $("<button>").text(this.label)
-    }
-    Button.build = function($where) {
-        this.insert($where)
-        this.$elem.click(this.onClick.bind(this))
-    }
-    Button.onClick = function(evt) { console.log(this.label + "' clicked!") }
-    $(document).ready(function() {
-        var $body = $(document.body)
-        var btn1 = Object.create(Button)
-        btn1.setup(125, 30, "Hello")
-        var btn2 = Object.create(Button)
-        btn2.setup(150, 40, "World")
-        btn1.build($body)
-        btn2.build($body)
+    // object inheritance
+    var book = { title: "title" }
+    var message = "Book = " + book      // "Book = [object Object]"
+    var book = { title: "title", toString: function() { return this.title } }
+    var message = "Book = " + book      // "Book = title"
+    // "me" inherits from "person" all props and methods, also defines an own props
+    var person = { name: "S", say: function() { return this.name } }
+    var me = Object.create(person)     // explicitly specify [[Prototype]]
+    var me = Object.create(person, {   // ... and optionally add object property descriptor
+        age: { value: 35, configurable: true, enumerable: true, writable: true }
     })
 
-    // auth example
-    var LoginController = {
-        errors: [],
-        getUser: function() { return document.getElementById( "login_username" ).value },
-        getPassword: function() { return document.getElementById( "login_password" ).value },
-        validateEntry: function(user,pw) {
-            user = user || this.getUser()
-            pw = pw || this.getPassword()
-            if (!(user && pw)) return this.failure( "Please enter a username & password!" )
-            else if (pw.length < 5) return this.failure( "Password must be 5+ characters!" )
-            return true
-        },
-        showDialog: function(title,msg) { /* display success message to user in dialog */ },
-        failure: function(err) { this.errors.push( err ) this.showDialog( "Login invalid: " + err ) }
+    // constructor inheritance
+    function SuperClass(length,width) {
+        this.length = length
+        this.width = width
     }
-
-    var AuthController = Object.create( LoginController )
-    AuthController.errors = []
-    AuthController.checkAuth = function() {
-        var user = this.getUser()
-        var pw = this.getPassword()
-        if (this.validateEntry(user, pw)) {
-            this.server("/check-auth", {
-                user: user,
-                pw: pw
-            }).then(this.accepted.bind(this)).fail(this.rejected.bind(this))
+    SuperClass.prototype.getArea = function() {
+        return this.length * this.width
+    }
+    function SubClass(size) {
+        this.length = size
+        this.width = size
+    }
+    // this way "SuperClass" constructor is never called
+    SubClass.prototype = Object.create(SuperClass.prototype, {
+        constructor: {
+            configurable: true,
+            enumerable: true,
+            value: SubClass,
+            writable: true
         }
-    }
-    AuthController.server = function(url, data) {return $.ajax({url: url, data: data})}
-    AuthController.accepted = function() {this.showDialog("Success", "Authenticated!")}
-    AuthController.rejected = function(err) {this.failure("Auth Failed: " + err)}
-    }
-function functionalInheritance() {
-    function nameOne(id) {
-        return {
-            toString: function() { return "nameOne " + id }
-        }
-    }
-    function nameTwo(id) {
-        let that = nameOne(id)
-        that.test = function(testId) {
-            return testId === id
-        }
-        return that
-    }
-    }
-function classesFreeOriented() {
-    function constructor(spec) {
-        let 
-            {member} = spec,
-            {other} = other_constructor(spec),
-            method = function() {
-                // member, other, method, spec
-            }
-        return Object.freeze({
-            method,
-            other
-        })
-    }
+    })
     }
 
 function array() {
@@ -921,7 +838,6 @@ function setAndMap() {
         key2 = {},
     map = new WeakMap([[key1, "Hello"], [key2, 42]])
     }
-
 function iterator() {
     // default iterator
     let values = [1, 2, 3]
@@ -1293,6 +1209,7 @@ function observables() {
         // 
     }
     }
+
 function animeLoop() {
     var box = document.getElementById("box"),
         fpsDisplay = document.getElementById("fpsDisplay"),
@@ -1350,6 +1267,110 @@ function animeLoop() {
     requestAnimationFrame(mainLoop)
     }
 function patterns() {
+    {   // functional inheritance
+        function nameOne(id) {
+            return {
+                toString: function() { return "nameOne " + id }
+            }
+        }
+        function nameTwo(id) {
+            let that = nameOne(id)
+            that.test = function(testId) {
+                return testId === id
+            }
+            return that
+        }
+    }
+    {   // classesFreeOriented
+        function constructor(spec) {
+            let 
+                {member} = spec,
+                {other} = other_constructor(spec),
+                method = function() {
+                    // member, other, method, spec
+                }
+            return Object.freeze({
+                method,
+                other
+            })
+        }
+    }
+    {   // behavior delegation
+        var Foo = {
+            init: function(who) { this.me = who },
+            identify: function() { return ("I am " + this.me) }
+        }
+        var Bar = Object.create(Foo)
+        Bar.speak = function () { console.log("Hello, " + this.identify() + ".") }
+        var bam = Object.create(Bar)
+        bam.init("S")
+        bam.speak()
+
+        // widget examaple
+        var Widget = {
+            init: function(width,height) {
+                this.width = width || 50
+                this.height = height || 50
+                this.$elem = null
+            },
+            insert: function($where) {
+                if (this.$elem)
+                    this.$elem.css({width: this.width+"px", height: this.height+"px"}).appendTo($where)
+            }
+        }
+        var Button = Object.create(Widget)
+        Button.setup = function(width, height, label) {
+            this.init(width, height)
+            this.label = label || "Default"
+            this.$elem = $("<button>").text(this.label)
+        }
+        Button.build = function($where) {
+            this.insert($where)
+            this.$elem.click(this.onClick.bind(this))
+        }
+        Button.onClick = function(evt) { console.log(this.label + "' clicked!") }
+        $(document).ready(function() {
+            var $body = $(document.body)
+            var btn1 = Object.create(Button)
+            btn1.setup(125, 30, "Hello")
+            var btn2 = Object.create(Button)
+            btn2.setup(150, 40, "World")
+            btn1.build($body)
+            btn2.build($body)
+        })
+
+        // auth example
+        var LoginController = {
+            errors: [],
+            getUser: function() { return document.getElementById( "login_username" ).value },
+            getPassword: function() { return document.getElementById( "login_password" ).value },
+            validateEntry: function(user,pw) {
+                user = user || this.getUser()
+                pw = pw || this.getPassword()
+                if (!(user && pw)) return this.failure( "Please enter a username & password!" )
+                else if (pw.length < 5) return this.failure( "Password must be 5+ characters!" )
+                return true
+            },
+            showDialog: function(title,msg) { /* display success message to user in dialog */ },
+            failure: function(err) { this.errors.push( err ) this.showDialog( "Login invalid: " + err ) }
+        }
+
+        var AuthController = Object.create( LoginController )
+        AuthController.errors = []
+        AuthController.checkAuth = function() {
+            var user = this.getUser()
+            var pw = this.getPassword()
+            if (this.validateEntry(user, pw)) {
+                this.server("/check-auth", {
+                    user: user,
+                    pw: pw
+                }).then(this.accepted.bind(this)).fail(this.rejected.bind(this))
+            }
+        }
+        AuthController.server = function(url, data) {return $.ajax({url: url, data: data})}
+        AuthController.accepted = function() {this.showDialog("Success", "Authenticated!")}
+        AuthController.rejected = function(err) {this.failure("Auth Failed: " + err)}
+    }
     {   // get required key-value from object
         // pass object and get new obj with only required key-value pares
         function pick(obj, ...keys) {
