@@ -64,6 +64,7 @@ function primitiveWrapper() {
     msg.charAt(0)              // get char at given index
     msg.indexOf("a")           // .lastIndexOf("a") find the actual position, return index
     msg.startsWith("a")        // .endsWith("a") .includes("a") search the whole 'msg', return boolean
+    msg.includes("world")      // if string contains a required substring
     msg.split(",")             // split string by commas, return an array
     msg.substr(x,y)            // start index, length
     msg.slice(x,y)             // start index, end index
@@ -610,7 +611,7 @@ function prototype() {
     let i = ("key" in obj) // check the entire chain of the obj
     }
 function inheritance() {
-    // called prototype chaining or prototypal inheritance
+    // prototype chaining or prototypal inheritance
     var obj = {}    // its [[Prototype]] set to Object.prototype
 
     // inherited methods from Object.prototype
@@ -625,7 +626,7 @@ function inheritance() {
     var message = "Book = " + book      // "Book = [object Object]"
     var book = { title: "title", toString: function() { return this.title } }
     var message = "Book = " + book      // "Book = title"
-    // "me" inherits from "person" all props and methods, also defines an own props
+    // "me" inherits from "person" all props and methods, also define own props
     var person = { name: "S", say: function() { return this.name } }
     var me = Object.create(person)     // explicitly specify [[Prototype]]
     var me = Object.create(person, {   // ... and optionally add object property descriptor
@@ -633,28 +634,31 @@ function inheritance() {
     })
 
     // constructor inheritance
-    function SuperClass(length,width) {
-        this.length = length
-        this.width = width
-    }
-    SuperClass.prototype.getArea = function() {
-        return this.length * this.width
-    }
-    function SubClass(size) {
-        this.length = size
-        this.width = size
-    }
+    function SuperClass(length,width) { this.length = length; this.width = width }
+    SuperClass.prototype.getArea = function() { return this.length * this.width }
+    function SubClass(size) { this.length = size; this.width = size }
     // this way "SuperClass" constructor is never called
     SubClass.prototype = Object.create(SuperClass.prototype, {
         constructor: {
-            configurable: true,
-            enumerable: true,
-            value: SubClass,
-            writable: true
+            configurable: true, enumerable: true, value: SubClass, writable: true
         }
     })
+    // this way "SuperClass" constructor is called
+    function SuperClass(length,width) { this.length = length; this.width = width }
+    SuperClass.prototype.getArea = function() { return this.length * this.width }
+    SuperClass.prototype.toString = function() { return " " }
+    function SubClass(size) { SuperClass.call(this, size, size) }
+    SubClass.prototype = Object.create(SuperClass.prototype, {
+        constructor: {
+            configurable: true, enumerable: true, value: SubClass, writable: true
+        }
+    })
+    // this way "SuperClass" method is called
+    SubClass.prototype.toString = function() {
+        var text = SuperClass.prototype.toString.call(this)
+        return "add overloading logic here if nessesery"
     }
-
+    }
 function array() {
     // inherits from Object, indexes are converted to strings and used as names for retrieving vals
     // constructor
@@ -1300,11 +1304,9 @@ function patterns() {
             init: function(who) { this.me = who },
             identify: function() { return ("I am " + this.me) }
         }
-        var Bar = Object.create(Foo)
-        Bar.speak = function () { console.log("Hello, " + this.identify() + ".") }
-        var bam = Object.create(Bar)
-        bam.init("S")
-        bam.speak()
+        var bar = Object.create(Foo)
+        bar.speak = function () { console.log("Hello, " + this.identify() + ".") }
+        var bam = Object.create(bar)
 
         // widget examaple
         var Widget = {
@@ -1416,7 +1418,7 @@ function patterns() {
             members => log(`successfully loaded ${members.length} members`)
         )
     }
-    {   // simple module pattern, ptivate fields
+    {   // simple module pattern, private fields
         var foo = (function() {
             var publicAPI = {
                 bar: function() {
@@ -1428,7 +1430,6 @@ function patterns() {
             }
             return publicAPI
         })()
-        foo.bar()          // "logic"
 
         // ES5 implementation
         var Person = (function() {
