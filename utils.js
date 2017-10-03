@@ -121,14 +121,284 @@ function designPatterns() {
         pubsub.publish("example", "Hello, World!");
         pubsub.unsubscribe(subscription);
     }
-}
+    }
+function animeLoop() {
+    var box = document.getElementById("box"),
+        fpsDisplay = document.getElementById("fpsDisplay"),
+        boxPos = 10,
+        boxVelocity = 0.08,
+        limit = 300,
+        lastFrameTimeMs = 0,
+        maxFPS = 60,
+        delta = 0,
+        timestep = 1000 / 60,
+        fps = 60,
+        framesThisSecond = 0,
+        lastFpsUpdate = 0
+
+    function update(stemp) {
+        boxPos += boxVelocity * stemp
+        if (boxPos >= limit || boxPos <= 0) boxVelocity = -boxVelocity
+    }
+    function draw() {
+        box.style.left = boxPos + "px"
+        fpsDisplay.textContent = Math.round(fps) + " FPS"
+    }
+    function panic() {
+        delta = 0
+    }
+
+    function mainLoop(timestamp) {
+        if (timestamp < lastFrameTimeMs + (1000 / maxFPS)) {
+            requestAnimationFrame(mainLoop)
+            return
+        }
+        delta += timestamp - lastFrameTimeMs
+        lastFrameTimeMs = timestamp
+
+        if (timestamp > lastFpsUpdate + 1000) {
+            fps = 0.25 * framesThisSecond + 0.75 * fps
+            lastFpsUpdate = timestamp
+            framesThisSecond = 0
+        }
+        framesThisSecond++
+
+        var numUpdateSteps = 0
+        while (delta >= timestep) {
+            update(timestep)
+            delta -= timestep
+            if (++numUpdateSteps >= 240) {
+                panic()
+                break
+            }
+        }
+        draw()
+        requestAnimationFrame(mainLoop)
+    }
+
+    requestAnimationFrame(mainLoop)
+    }
+function patterns() {
+    {   // functional inheritance
+        function nameOne(id) {
+            return {
+                toString: function() { return "nameOne " + id }
+            }
+        }
+        function nameTwo(id) {
+            let that = nameOne(id)
+            that.test = function(testId) {
+                return testId === id
+            }
+            return that
+        }
+    }
+    {   // classesFreeOriented
+        function constructor(spec) {
+            let 
+                {member} = spec,
+                {other} = other_constructor(spec),
+                method = function() {
+                    // member, other, method, spec
+                }
+            return Object.freeze({
+                method,
+                other
+            })
+        }
+    }
+    {   // behavior delegation
+        var Foo = {
+            init: function(who) { this.me = who },
+            identify: function() { return ("I am " + this.me) }
+        }
+        var bar = Object.create(Foo)
+        bar.speak = function () { console.log("Hello, " + this.identify() + ".") }
+        var bam = Object.create(bar)
+
+        // widget examaple
+        var Widget = {
+            init: function(width,height) {
+                this.width = width || 50
+                this.height = height || 50
+                this.$elem = null
+            },
+            insert: function($where) {
+                if (this.$elem)
+                    this.$elem.css({width: this.width+"px", height: this.height+"px"}).appendTo($where)
+            }
+        }
+        var Button = Object.create(Widget)
+        Button.setup = function(width, height, label) {
+            this.init(width, height)
+            this.label = label || "Default"
+            this.$elem = $("<button>").text(this.label)
+        }
+        Button.build = function($where) {
+            this.insert($where)
+            this.$elem.click(this.onClick.bind(this))
+        }
+        Button.onClick = function(evt) { console.log(this.label + "' clicked!") }
+        $(document).ready(function() {
+            var $body = $(document.body)
+            var btn1 = Object.create(Button)
+            btn1.setup(125, 30, "Hello")
+            var btn2 = Object.create(Button)
+            btn2.setup(150, 40, "World")
+            btn1.build($body)
+            btn2.build($body)
+        })
+
+        // auth example
+        var LoginController = {
+            errors: [],
+            getUser: function() { return document.getElementById( "login_username" ).value },
+            getPassword: function() { return document.getElementById( "login_password" ).value },
+            validateEntry: function(user,pw) {
+                user = user || this.getUser()
+                pw = pw || this.getPassword()
+                if (!(user && pw)) return this.failure( "Please enter a username & password!" )
+                else if (pw.length < 5) return this.failure( "Password must be 5+ characters!" )
+                return true
+            },
+            showDialog: function(title,msg) { /* display success message to user in dialog */ },
+            failure: function(err) { this.errors.push( err ) this.showDialog( "Login invalid: " + err ) }
+        }
+
+        var AuthController = Object.create( LoginController )
+        AuthController.errors = []
+        AuthController.checkAuth = function() {
+            var user = this.getUser()
+            var pw = this.getPassword()
+            if (this.validateEntry(user, pw)) {
+                this.server("/check-auth", {
+                    user: user,
+                    pw: pw
+                }).then(this.accepted.bind(this)).fail(this.rejected.bind(this))
+            }
+        }
+        AuthController.server = function(url, data) {return $.ajax({url: url, data: data})}
+        AuthController.accepted = function() {this.showDialog("Success", "Authenticated!")}
+        AuthController.rejected = function(err) {this.failure("Auth Failed: " + err)}
+    }
+    {   // get required key-value from object
+        // pass object and get new obj with only required key-value pares
+        function pick(obj, ...keys) {
+            let result = Object.create(null)
+            for (let i = 0, len = keys.length i < len i++)
+                result[keys[i]] = obj[keys[i]]
+            return result
+        }
+    }
+    {   // copy object and add new prototype
+        function replace_proto(object, prototype) {
+            var result = Object.create(prototype)
+            object.getOwnProperyNames(object).forEach(function (key) {
+                Object.defineProperty(result, key, Object.getOwnPropertyDescriptor(object, key))
+            })
+            return result
+        }
+    }
+    {   // functional patterns
+        // composition pattern
+        const compose = (a, b) => (c) => a(b(c))
+        const cookAndEat = compose(eat, cook)
+
+        // partial application pattern
+        const mapWith = (fn) => (array) => map(array, fn)  // apply func to each elem of an arr
+        const squareAll = mapWith((n) => n * n)
+        squareAll([1, 2, 3])            // [1, 4, 9]
+
+        // "combinator" higher-order pure func that take only func as args and return a func
+        const addOne = (number) => number + 1
+        const doubleOf = (number) => number * 2
+        const doubleOfAddOne = (number) => doubleOf(addOne(number))    // function compose combinator
+
+        const not = (fn) => (x) => !fn(x)
+        const something = (x) => x != null
+        const nothing = not(something)                                 // function decorator
+
+        // currying
+        const userLogs = userName => message => 
+            console.log(`${userName} -> ${message}`)
+        const log = userLogs("grandpa23")
+        getFakeMembers(20).then(        // grandpa23 -> successfully loaded 20 members
+            members => log(`successfully loaded ${members.length} members`)
+        )
+    }
+    {   // simple module pattern, private fields
+        var foo = (function() {
+            var publicAPI = {
+                bar: function() {
+                    publicAPI.baz()
+                },
+                baz: function() {
+                    console.log("logic")
+                }
+            }
+            return publicAPI
+        })()
+
+        // ES5 implementation
+        var Person = (function() {
+            var privateData = {},
+                privateId = 0
+            function Person(name) {
+                Object.defineProperty(this, "_id", {
+                    value: privateId++
+                })
+                privateData[this._id] = {
+                    name: name
+                }
+            }
+            Person.prototype.getName = function() {
+                return privateData[this._id].name
+            }
+            return Person
+        }())
+        // ES6 implementation
+        let Person = (function() {
+            let privateData = new WeakMap()
+            function Person(name) {
+                privateData.set(this, {
+                    name: name
+                })
+            }
+            Person.prototype.getName = function() {
+                return privateData.get(this).name
+            }
+            return Person
+        }())
+        // private field and exploit
+        function vector() {
+            let array = []
+            return {
+                get: function get(i) {
+                    return array[i]        // cure "return array[+i]"
+                },
+                store: function store(i,v) {
+                    array[i] = v           // cure "array[+i] = v"
+                },
+                append: function append(v) {
+                    array.push(v)          // cure "array[array.length] = v"
+                }
+            }
+        }
+        let exploit
+        const myVector = vector()
+        myVector.store("push", function () {
+            exploit = this
+        })
+        myVector.append()      // now "exploit" === "array" and can be manipulated
+    }
+    }
 function sort() {
     // argumets must be provided, if not behavior will be different
     arr.sort(a,b) {
         return a > b ? 1 : -1;      // negative if "a" should be before "b", positive if "b" should be before "a"
         return 0;                   // two elements are equal
     }
-}
+    }
 function persistence() {
     {   // cookie
         document.cookie = "nameOfCookie=value";     // "name=value" format to define cookie obj
@@ -290,7 +560,7 @@ function persistence() {
             request.onerror = function(e) { console.log("Error"); };
         }
     }
-}
+    }
 function webWorker() {
     {   // check for support
         isWorkersAvailable() {
@@ -330,10 +600,10 @@ function webWorker() {
             var curTime = new Date();
             $('#result').append( curTime + " ) " + e.data + "<br/>");
             var source = e.data[0].source;
-            if (typeof source != "undefined" ) {
+            if (typeof source !== "undefined" ) {
                 var tweets = document.createElement("ul");
                 for (var i=0; i < 10; i++) {
-                    if (typeof e.data[i] != "undefined" && e.data[i].text != "undefined") {
+                    if (typeof e.data[i] !== "undefined" && e.data[i].text !== "undefined") {
                         var tweetTextItem = document.createElement("li");
                         var tweetText = document.createTextNode(e.data[i].text + " | " +
                                         e.data[i].source  + " (" +
@@ -387,7 +657,7 @@ function webWorker() {
         }
         readTweets();   // start worker
     }
-}
+    }
 function request() {
     {   // XMLHttpRequest
         var xhr = new XMLHttpRequest();
@@ -421,11 +691,11 @@ function request() {
         ws.onclose = function() { /* closing callback, connection ended */ };
         ws.onmessage = function(data) { /* receiving data callback */ };
     }
-}
+    }
 function testing() {
     // QUnit module testing
     // JSCheck case testing
-}
+    }
 function utils() {
     {   // compare floating point numbers
         if (!Number.EPSILON) Number.EPSILON = Math.pow(2, -52);
@@ -445,7 +715,7 @@ function utils() {
             // handle next task
         }
     }
-}
+    }
 function babelGulpWebpack() {
     // babel (transpile) + gulp (automate) + webpack (check dependencies and concatenate in static asset)
     dev_folder:> npm init
@@ -490,4 +760,4 @@ function babelGulpWebpack() {
     // vue templates
     dev_folder:> npm install -g vue-cli
     dev_folder:> npm install vue-router
-}
+    }
