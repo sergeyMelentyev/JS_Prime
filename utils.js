@@ -179,6 +179,18 @@ function animeLoop() {
     requestAnimationFrame(mainLoop)
     }
 function patterns() {
+    {   // from object to array of objects
+        const schools = { "Yorktown": 10, "Washington & Lee": 2, "Wakefield": 5 }
+        const schools = Object.keys(schools).map(key => ({ name: key, wins: schools[key] }) )
+    }
+    {   // from array of objects to object, reduce array to a single value  
+        const colors = [ { id: "1", title: "red", rating: 2 }, { id: "2", title: "blue", rating: 1 } ]
+        const r = colors.reduce( (hash, {id, title, rating}) => { hash[id] = {title, rating}; return hash }, {} )
+    }
+    {   // from array of same value to an array of distinct values
+        const colors = ["red", "red", "green", "blue", "green"]
+        const distinctColors = colors.reduce( (distinct, color) => (distinct.indexOf(color) !== -1) ? distinct : [...distinct, color], [] )
+    }
     {   // functional inheritance
         function nameOne(id) {
             return {
