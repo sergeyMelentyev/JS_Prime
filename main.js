@@ -57,7 +57,7 @@ function primitiveWrapper() {
 
     var a = "Ser"; var c = a.charAt(0); console.log(c)  // 'S'
     // behind the scenes
-    var a = "Ser"; var t = new String(a); var c = t.charAt(0); t = null console.log(c)    // 'S'
+    var a = "Ser"; var t = new String(a); var c = t.charAt(0); t = null; console.log(c)    // 'S'
 
     // string => immutable type, represents a single 16-bit unit of UTF-16 text
     String.prototype.yourMethodName = function() { return /* logic here */ }    // add custom methods
@@ -659,71 +659,48 @@ function inheritance() {
         return "add overloading logic here if nessesery"
     }
     }
-function array() {
-    // inherits from Object, indexes are converted to strings and used as names for retrieving vals
-    // constructor
-    let items = new Array(2)       // items.length = 2 items[0] === undefined
-    let items = new Array(1, 2)    // items.length = 2 items[0] === 1
-    let items = Array.of(1, 2)     // items.length = 2 items[0] === 1
+
+function arrayObject() {
+    // inherits from Object, indexes are converted to strs and used as names for retrieving vals
+    let items = new Array(2)                        // items.length = 2 items[0] === undefined
+    let items = new Array(1, 2)                     // items.length = 2 items[0] === 1
+    let items = Array.of(1, 2)                      // items.length = 2 items[0] === 1
     function makeArray() { return Array.prototype.slice.call(arguments) }
-    function makeArray() { let args = Array.from(arguments) return args }
-    
-    // passing array as arg
-    func(array)                // passing array by reference
-    func(array.slice())        // passing array by value
+    function makeArray() { let args = Array.from(arguments); return args }
 
-    // removing values
-    let arr = ['a','b','c']
-    delete arr[1]                      // => ['a',undefined,'c']
-    arr.splice(1,1)                    // => ['a','c']    slow operation
-    arr.splice(arr.indexOf('a'), 1)    // => ['a','c']    slow operation
+    // mutator methods
+    var newLengthNumber = arr.push("")              // add to the end
+    var newLengthNumber = arr.unshift("")           // add to the front
+    var lastElementValue = arr.pop()                // delete last elem
+    var firstElementValue = arr.shift()             // delete first elem
+    var removedItem = arr.splice(index, 1)          // remove by index pos, slow operation
+    arr.reverse()                                   // reverse an arr in place
+    arr.sort(function (a, b) { if (a < b) return -1; if (a > b) return 1; return 0 })
 
-    // methods
-    arr.push(5)                // add to the end, return value will show new length
-    arr.unshift(5)             // add to the front
-    arr.pop()                  // remove the last one element
-    arr.shift()                // remove the fist one element
-    ["a","b","c"].join(" ")    // "a b c" build a string from arr
-    var peaks = ["", ""] var [last] = peaks.reverse()    // get last, with side effect
-    var peaks = ["", ""] var [last] = [...peaks].reverse() // get last, no side effect
+    // accessor nonmutator methods
+    var arr = oldArr.concat(val1[, val2[, arrN]])   // merge two or more arrs or vals
+    arr.includes(searchElem[, fromIndex])           // ES7, return bool
+    arr.indexOf(searchElem[, fromIndex])            // returns first index at which elem can be found
+    arr.lastIndexOf(searchElem[, fromIndex])
+    arr.join([, separator])                         // join all elems of an arr, specify str to separate each pair
+    var arr = oldArr.slice([, begin], [, end])      // return shallow copy of a portion of an arr into new array 
 
-    // MAP - FOREACH - FILTER - EVERY
-    var schools = [ "Yorktown", "Washington & Lee", "Wakefield" ]
-    var ages = [21,18,42,40]
-    function predicate(item, index, array) {}
+    // iteration nonmutator methods
+    var iter = a.entries(); iterator.next()             // var a = ['a', 'b'] => { value: [ 0, 'a' ], done: false }
+    var iter = a.keys(); iter.next()                    // var a = ['a', 'b'] => { value: 0, done: false }
+    var bool = a.every(function(val,i,arr){}[, this])   // test each elem, if find falsy return false, otherwise true
+    var arr = a.filter(function(val,i,arr){}[, this])   // new arr with elems that pass test
+    var val = a.find(function(val,i,arr){}[, this])     // return val of first elem that pass test or undefined
+    var i = a.findIndex(function(val,i,arr){}[, this])  // return index of first elem that pass test or -1
+    a.forEach(function(val,i,arr){}[, this])            // return undefined, not chainable, cannot break (only exception)
+    var arr = a.map(function(val, i, arr){}[, this])    // return result of callback func
+    arr.reduce(function(val, i, arr){}[, initialVal])   // accumulates callback return val to reduce it to a single val
+    var bool = a.some(function(val, i, arr){}[, this])  // true if callback return truthy val for any element, otherwise false
 
-    var m = schools.map(school => `${school} High`) // no side effect, apply func arg to each elem, from arr of strs to arr of strs
-    var f = schools.filter(school => school[0] === "W") // no side effect, predicate must return bool
-    var r = ages.reduce( (max, value) => (value > max) ? value : max, 0 )      // reduce array to a single value
-
-    // from array of strings to array of objects
-    var m = schools.map(school => ({ name: school }))
-
-    // from array of objects to object, reduce array to a single value
-    const colors = [ { id: "1", title: "red", rating: 2 }, { id: "2", title: "blue", rating: 1 } ]
-    const r = colors.reduce(
-        (hash, {id, title, rating}) => {
-            hash[id] = {title, rating}
-            return hash
-        }, {}
-    )
-
-    // from array of same value to an array of distinct values
-    const colors = ["red", "red", "green", "blue", "green"]
-    const distinctColors = colors.reduce(
-        (distinct, color) => 
-            (distinct.indexOf(color) !== -1) ? 
-                distinct : 
-                [...distinct, color],
-        []
-    )
-
-    // from object to array of objects
-    const schools = { "Yorktown": 10, "Washington & Lee": 2, "Wakefield": 5 }
-    const schools = Object.keys(schools).map(key => ({ name: key, wins: schools[key] }) )
-
-    arr.forEach(predicateForEach)    // will change initial array, can not break out while iteration
-    arr.every(predicateForEach)    // can be break out while iteration
+    // copy and passing as argument
+    var shallowCopy = fruits.slice()
+    func(array)                                     // passing array by reference
+    func(array.slice())                             // passing array by value
 
     // iteration over array
     for (let i in arr) {}     // iterate over array index, not values
@@ -733,47 +710,48 @@ function array() {
     // destructuring
     let colors = [ "red", "green", "blue" ]
     let [ firstColor, secondColor ] = colors       // "red", "green"
-    let [ , firstColor, secondColor ] = colors }
-    function arrayBuffer() {
-        // typed array, allow storage and manipulation of eight different numeric types
-        Signed 8-bit integer (int8), Unsigned 8-bit integer (uint8)
-        Signed 16-bit integer (int16), Unsigned 16-bit integer (uint16)
-        Signed 32-bit integer (int32), Unsigned 32-bit integer (uint32)
-        32-bit float (float32), 64-bit float (float64)
-
-        // array buffer represent memory location
-        let buffer = new ArrayBuffer(10)       // allocate 10 bytes (8 bits X 10)
-        let size = buffer.byteLength           // return 10 bytes
-        let buffer2 = buffer.slice(4, 6)       // return 2 bytes
-        let view = new DataView(buffer)        // 'view' obj has access to all 10 bytes
-        let view2 = new DataView(buffer, 5, 2) // access to bytes 5 and 6
-        view.byteLength view.byteOffset       // 10 0
-
-        let buffer = new ArrayBuffer(2)
-        let view = new DataView(buffer)
-        view.getInt8(byteOffset, littleEndian)      // read an int8 starting at byteOffset
-        view.setInt8(byteOffset, value, littleEndian)   // write an int8 starting at byteOffset
-        view.getUint8(byteOffset, littleEndian)     // read an uint8 starting at byteOffset
-        view.setUint8(byteOffset, value, littleEndian)  // write an uint8 starting at byteOffset
-
-        // constructors
-        name            Size (bytes)
-        Int8Array           1
-        Uint8Array          1
-        Uint8ClampedArray   1
-        Int16Array          2
-        Uint16Array         2
-        Int32Array          4
-        Uint32Array         4
-        Float32Array        4
-        Float64Array        8
-        let init = new Int8Array(5)    //  pass number to constructor = number of elems, not bytes
-        let buffer = new ArrayBuffer(5) let init = new Int8Array(buffer)
-        init.BYTES_PER_ELEMENT     // 1 byte each element
+    let [ , firstColor, secondColor ] = colors
     }
-    function sharedArrayBuffer() {
-        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects
-        Atomics.add()
+function arrayBuffer() {
+    // typed array, allow storage and manipulation of eight different numeric types
+    Signed 8-bit integer (int8), Unsigned 8-bit integer (uint8)
+    Signed 16-bit integer (int16), Unsigned 16-bit integer (uint16)
+    Signed 32-bit integer (int32), Unsigned 32-bit integer (uint32)
+    32-bit float (float32), 64-bit float (float64)
+
+    // array buffer represent memory location
+    let buffer = new ArrayBuffer(10)       // allocate 10 bytes (8 bits X 10)
+    let size = buffer.byteLength           // return 10 bytes
+    let buffer2 = buffer.slice(4, 6)       // return 2 bytes
+    let view = new DataView(buffer)        // 'view' obj has access to all 10 bytes
+    let view2 = new DataView(buffer, 5, 2) // access to bytes 5 and 6
+    view.byteLength view.byteOffset       // 10 0
+
+    let buffer = new ArrayBuffer(2)
+    let view = new DataView(buffer)
+    view.getInt8(byteOffset, littleEndian)      // read an int8 starting at byteOffset
+    view.setInt8(byteOffset, value, littleEndian)   // write an int8 starting at byteOffset
+    view.getUint8(byteOffset, littleEndian)     // read an uint8 starting at byteOffset
+    view.setUint8(byteOffset, value, littleEndian)  // write an uint8 starting at byteOffset
+
+    // constructors
+    name            Size (bytes)
+    Int8Array           1
+    Uint8Array          1
+    Uint8ClampedArray   1
+    Int16Array          2
+    Uint16Array         2
+    Int32Array          4
+    Uint32Array         4
+    Float32Array        4
+    Float64Array        8
+    let init = new Int8Array(5)    //  pass number to constructor = number of elems, not bytes
+    let buffer = new ArrayBuffer(5) let init = new Int8Array(buffer)
+    init.BYTES_PER_ELEMENT     // 1 byte each element
+    }
+function sharedArrayBuffer() {
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects
+    Atomics.add()
     }
 function setAndMap() {
     // set is an ordered collection of unique items, cannot be directly accessed by index
