@@ -26,6 +26,10 @@ function primitiveVal() {
     typeof "foo"       // "string"
     typeof symbol      // "symbol"
 
+    typeof ["a"]       // "object"
+    typeof {a:1}       // "object"
+    typeof funcName     // "function", callable object type
+
     // false vals
     false; null; undefined; ""; 0; NaN;
     // any other values are truthy, including all objects
@@ -44,35 +48,34 @@ function referenceVal() {
     let y = []
     name(y)            // ref to arr will be passed, not address of let, that contain ref to arr
     console.log(y)     // => empty array
-
-    // identify type
-    typeof ["a"]       // "object"
-    typeof {a:1}       // "object"
-    typeof funcName     // "function", callable object type
     }
 function primitiveWrapper() {
     // new String, new Number, new Boolean are reference type
-    var foo = new String("foo")
-    typeof foo     // "object" keys = [0,1,2] vals = ['f','o','o']
-
-    var a = "Ser"; var c = a.charAt(0); console.log(c)  // 'S'
-    // behind the scenes
-    var a = "Ser"; var t = new String(a); var c = t.charAt(0); t = null; console.log(c)    // 'S'
-
     // string => immutable type, represents a single 16-bit unit of UTF-16 text
+    var foo = new String("foo"); typeof foo;    // "object" keys = [0,1,2] vals = ['f','o','o']
+
+    // behind the scenes
+    var a = "Ser"; var c = a.charAt(0); console.log(c)
+    var a = "Ser"; var t = new String(a); var c = t.charAt(0); t = null; console.log(c)
+
     String.prototype.yourMethodName = function() { return /* logic here */ }    // add custom methods
-    msg.charAt(0)              // get char at given index
-    msg.indexOf("a")           // .lastIndexOf("a") find the actual position, return index
-    msg.startsWith("a")        // .endsWith("a") .includes("a") search the whole 'msg', return boolean
-    msg.includes("world")      // if string contains a required substring
-    msg.split(",")             // split string by commas, return an array
-    msg.substr(x,y)            // start index, length
-    msg.slice(x,y)             // start index, end index
-    msg.trim()                 // delete trailing and ending spaces
+    str.startsWith(searchString[, position])    // boolean
+    str.endsWith(searchString[, length])        // boolean
+    str.includes(searchString[, position])      // boolean
+    
+    str.trim()                                  // remove whitespace from both ends
+    str.substr(start, [length])                 // string    
+    str.replace(substr, newSubstr)              // nonmutator, function can be passed
+    str.slice(beginIndex[, endIndex])           // nonmutator, new str containing extracted section of str
+    str.split([separator[, limit]])             // splits str into an array of strs, using separator
+
+    str.charAt(index)                           // string
+    str.indexOf(searchValue[, fromIndex])       // first occurrence of specified val or -1
+    str.lastIndexOf(searchValue[, fromIndex])   // last occurrence of specified val or -1
 
     // template literal
     let message = `Multiline
-        string`                // indentation is counting in 'message.length'
+        string`                 // indentation is counting in 'message.length'
     let count = 10,             // template literal substitution === string concatenation
         price = 0.25,
         message = `${count} items cost ${(count * price).toFixed(2)}.`
@@ -753,6 +756,15 @@ function sharedArrayBuffer() {
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects
     Atomics.add()
     }
+function map() {
+    // holds key-value pairs
+    // constructor
+    new Map([iterable])
+
+    }
+function set() {
+    //
+    }
 function setAndMap() {
     // set is an ordered collection of unique items, cannot be directly accessed by index
     var set = new Set() set.size()     // accept any iterable obj
@@ -882,6 +894,10 @@ function spreadOperator() {
     var obj2 = { foo: 'baz', y: 13 }
     var clonedObj = { ...obj1 }    // Object { foo: "bar", x: 42 }
     var mergedObj = { ...obj1, ...obj2 }   // Object { foo: "baz", x: 42, y: 13 }
+    }
+function json() {
+    JSON.parse(text[, reviver])                 // parse JSON string, construct JS value
+    JSON.stringify(value[, replacer[, space]])  // convert JS value to JSON string
     }
 
 function promise() {
