@@ -757,80 +757,59 @@ function sharedArrayBuffer() {
     Atomics.add()
     }
 function map() {
-    // holds key-value pairs
-    // constructor
+    // holds key-value pairs, keys can be any val, func, obj, or primitive
     new Map([iterable])
+    var map = new Map([["name", "Sergey"], ["age", 35]])   // map initialization
 
+    myMap.size              // => number of key/val pairs in map obj
+    myMap.set(key, val)     // => add or update
+    myMap.get(key)          // => specified element or undefined if not present
+    myMap.has(key)          // => boolean, whether elem with specified key exist or not
+
+    myMap.clear()           // remove all key/val pairs
+    myMap.delete(key)       // remove specified elem, return boolean if element is exist or not
+    
+    myMap.keys()            // => new Iterator obj that contain keys for each elem in insertion order
+    myMap.values()          // => new Iterator obj that contain vals for each elem in insertion order
+    myMap.entries()         // => new Iterator obj that contain key/val for each elem in insertion order
+
+    // iterate
+    for (var [key, val] of myMap) {}
+    for (var [key, val] of myMap.entries()) {}
+    for (var key of myMap.keys()) {}
+    for (var key of myMap.values()) {}
+    myMap.forEach(function(val,key,map){}[, this])  // execute callback once per each key/val, => undefined
+
+    // weakmap does`t put strong reference on obj, does`t prevent garbage collection
+    // every key must be an obj
     }
 function set() {
-    //
-    }
-function setAndMap() {
     // set is an ordered collection of unique items, cannot be directly accessed by index
-    var set = new Set() set.size()     // accept any iterable obj
-    set.add(1) set.has(1) set.clear() set.delete(1)   // add, check, clear all, delete one
-
-    let set = new Set([1, 2, 3, 4, 5, 5, 5, 5])    // from array to set
-    let array = [...set]       // from set to array with spread operator
+    new Set([iterable])
+    var set = new Set([1, 2, 3, 4, 5, 5, 5, 5])     // from arr to set
+    var array = [...set]                            // from set to arr with spread operator
     function eliminateDuplicates(items) { return [...new Set(items)] }
 
-    // array difference
-    arrOne.filter( i => { return arrTwo.indexOf(i) === -1 })   // [].filter(predicate)
-    Array.prototype.diff = function (a) { return this.filter(i => a.indexOf(i) === -1) }  // [].diff([])
+    mySet.size              // => number of elems
+    mySet.add(val)          // appends to the end
+    mySet.has(val)          // => boolean, whether elem with specified val exist or not
+    
+    mySet.clear()           // removes all, => undefined
+    mySet.delete(value)     // removes specified elem, => boolen if element is exist or not
 
-    // iterate over set
-    for (let n of set) {}     // for-of iterate over a set
+    mySet.values()          // => new Iterator obj that contain vals for each elem in insertion order
+    mySet.entries()         // => new Iterator obj that contain an array of [val, val] for each element in insertion order
 
-    let set = new Set([1, 2])
-    let processor = {
-        output(value, key, owner) {
-            console.log(value + " " + key + " " + owner)
-        },
-        process(dataSet) {      // the same as below
-            dataSet.forEach(function(value, key, owner) {
-                this.output(value, key, owner)
-            }, this)
-        },
-        process(dataSet) {      // the same as above
-            dataSet.forEach((value, key, owner) => {
-                this.output(value, key, owner)
-            })
-        }
-    }
-    processor.process(set)
+    // iterate
+    for (let item of mySet) {}
+    for (let item of mySet.keys()) {}
+    for (let [key, value] of mySet.entries()) {}
+
+    mySet.forEach(function(val,key,set){}[, this])  // execute callback once per each val, => undefined
 
     // weak set, only store weak obj ref and CANNOT store primitive vals
     // weak ref does`t prevent garbage collection
     let set = new WeakSet()    // not iterable, cannot be used in for-of loop and forEach()
-
-    // map is ordered list of key-value pairs, both can have any type
-    var userSkills = new Map()
-    userSkills.set(key, ["vals"])      // .get(), .has(), .delete(), .clear(), size()
-
-    let map = new Map([["name", "Sergey"], ["age", 35]])   // map initialization
-    let processor = {
-        output(value, key, owner) {
-            console.log(value + " " + key + " " + owner)
-        },
-        process(dataSet) {      // the same as below
-            dataSet.forEach(function(value, key, owner) {
-                this.output(value, key, owner)
-            }, this)
-        },
-        process(dataSet) {      // the same as above
-            dataSet.forEach((value, key, owner) => {
-                this.output(value, key, owner)
-            })
-        }
-    }
-    processor.process(map)
-
-    // weakmap does`t put strong reference on obj, does`t prevent garbage collection
-    // every key must be an obj
-    let map = new WeakMap()
-    let key1 = {},
-        key2 = {},
-    map = new WeakMap([[key1, "Hello"], [key2, 42]])
     }
 function iterator() {
     // default iterator
