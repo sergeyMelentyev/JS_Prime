@@ -179,9 +179,42 @@ function animeLoop() {
     requestAnimationFrame(mainLoop)
     }
 function patterns() {
+    {   // isSuperset
+        Set.prototype.isSuperset = function(subset) {
+            for (var elem of subset) {
+                if (!this.has(elem)) return false
+            }
+            return true
+        }
+    }
+    {   // union 
+        Set.prototype.union = function(setB) {
+            var union = new Set(this)
+            for (var elem of setB) union.add(elem)
+            return union
+        }
+    }
+    {   // intersection
+        Set.prototype.intersection = function(setB) {
+            var intersection = new Set()
+            for (var elem of setB) {
+                if (this.has(elem)) intersection.add(elem)
+            }
+            return intersection
+        }
+    }
     {   // from object to array of objects
         const schools = { "Yorktown": 10, "Washington & Lee": 2, "Wakefield": 5 }
         const schools = Object.keys(schools).map(key => ({ name: key, wins: schools[key] }) )
+    }
+    {   // difference
+        Set.prototype.difference = function(setB) {
+            var difference = new Set(this);
+            for (var elem of setB) {
+                difference.delete(elem);
+            }
+            return difference;
+        }
     }
     {   // from array of objects to object, reduce array to a single value  
         const colors = [ { id: "1", title: "red", rating: 2 }, { id: "2", title: "blue", rating: 1 } ]
