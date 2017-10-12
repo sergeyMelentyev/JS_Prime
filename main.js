@@ -154,9 +154,10 @@ function compareAndCheck() {
 
     // object
     var href = (window && window.location && window.location.href) || null
-    obj instanceof Object  // "true"
-    var bool = ("key" in obj)      // check if property is exist, including [[Prototype]] link
-    obj.hasOwnProperty("key")      // check if property is exist only in that object
+    obj instanceof Object           // "true"
+    Object.is(value1, value2)       // determines whether two vals are the same value
+    var bool = ("key" in obj)       // check if property is exist, including [[Prototype]] link
+    obj.hasOwnProperty("key")       // check if property is exist only in that object
     obj instanceof Foo // in prototype chain of "obj" does "obj" arbitrarily pointed to by Foo.prototype appear
     Foo.prototype.isPrototypeOf(obj) // in the entire prototype chain of "obj", does Foo.prototype ever appear
     objOne.isPrototypeOf(objTwo)
@@ -518,13 +519,13 @@ function object() {
     var obj = { b: 1, a: 1, 1: 1, 0: 1 }
     Object.getOwnPropertyNames(obj).join("")   // 01ba
 
-    // iterate over object, unspecified enumeration order
+    // iterate over object, unspecified enumeration order, also in prototype chain
     for (let key in obj) {
-        if (obj.hasOwnProperty(key)) {
-            // "key" will show all keys, "obj[key]" all values, including proto chain
-        }
+        if (obj.hasOwnProperty(key)) // "key" will show all keys, "obj[key]" all values, including proto chain
     }
-    Object.keys(obj)   // get array of keys, unspecified enumeration order, not including proto chain
+    Object.entries(obj)     // => arr of enumerable prop [key, value] pairs, not including proto chain
+    Object.keys(obj)        // => arr of keys, unspecified enumeration order, not including proto chain
+    Object.values(obj)      // => arr of vals, unspecified enumeration order, not including proto chain
 
     // destructuring
     var person = { name: "S", age: 35 }
@@ -909,6 +910,10 @@ function promise() {
             // async error area
         })
     }
+    {   // promise wrapper for old func
+        const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+        wait(10000).then(() => saySomething("10 seconds")).catch(failureCallback);
+    }
     {   // error handling
         var p = new Promise(function(resolve, reject) {
             foo.bar()  // not defined, error is thrown
@@ -1035,6 +1040,15 @@ function promise() {
                 successFuncName,
                 errorFunctionName
             )
+    }
+    {   // execute arr of promises sequentially
+        function executeSequentially(promiseFactories) {
+          var result = Promise.resolve();
+          promiseFactories.forEach(function (promiseFactory) {
+            result = result.then(promiseFactory);
+          });
+          return result;
+        }
     }
     }
 function generator() {
