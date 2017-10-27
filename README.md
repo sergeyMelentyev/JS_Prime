@@ -1,3 +1,7 @@
+-== СБОРКА ПРОЕКТА ==-
+https://habrahabr.ru/company/mailru/blog/340922/
+
+
 -== API ==-
 
 http://w3c.github.io/html/single-page.html#introduction
