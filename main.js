@@ -1,4 +1,4 @@
-function basic() {
+function basics() {
     (1 + 1, 2 + 2)     // => 4
     void 0     // always evaluates to undefined        
     return  // always use braces on the right or compiler will add ";" after "return" statement
@@ -10,7 +10,7 @@ function basic() {
     // initialization order
     let name = 0, last // will be split into two parts
     // two undefined declarations will be hoisted
-    let name = undefined, last = undefined name = 0
+    let name = undefined; let last = undefined; name = 0
     }
 
 function primitiveVal() {
@@ -36,12 +36,12 @@ function primitiveVal() {
 
     // number => double-precision 64-bit binary
     // set of all nums, NaN value, positive/negative infinity, positive/negative zero
-    NaN === "if failed in number coercion or math operation"
+    NaN === "failed in number coercion or math operation"
     }
 function referenceVal() {
     // reference vals are store as pointer in the variable object
-    var obj = new Object()    // assign a pointer to the var
-    var a = obj  // get a copy of the pointer to the same obj in mem
+    var obj = new Object()    // assign a pointer to the obj
+    var a = obj  // get a copy of the pointer to the same obj in memory
     obj = null     // dereference for garbage collection
 
     function name(x) { x = null }
@@ -143,10 +143,10 @@ function compareAndCheck() {
     "undeclared" === "variable has not been declared for now"
 
     // number
-    Number.isInteger(val)      // "true"
+    Number.isInteger(val)          // "true"
 
     // string
-    Number.isNaN(msg.charAt(0))       // check if char at given index is not a number
+    Number.isNaN(msg.charAt(0))    // check if char at given index is not a number
 
     // NaN or -0
     Object.is(NaN, NaN)            // true, vals are equivalent if same type and same val
@@ -155,12 +155,13 @@ function compareAndCheck() {
     // object
     var href = (window && window.location && window.location.href) || null
     obj instanceof Object           // "true"
-    Object.is(value1, value2)       // determines whether two vals are the same value
+    Object.is(value1, value2)       // determines whether two vals are the same type and same value
+    
     var bool = ("key" in obj)       // check if property is exist, including [[Prototype]] link
     obj.hasOwnProperty("key")       // check if property is exist only in that object
-    obj instanceof Foo // in prototype chain of "obj" does "obj" arbitrarily pointed to by Foo.prototype appear
-    Foo.prototype.isPrototypeOf(obj) // in the entire prototype chain of "obj", does Foo.prototype ever appear
-    objOne.isPrototypeOf(objTwo)
+    
+    obj instanceof Foo              // in prototype chain does "obj" arbitrarily pointed to by Foo.prototype appear
+    objOne.isPrototypeOf(objTwo)    // in the entire prototype chain of "obj", does Foo.prototype ever appear
     Object.getPrototypeOf(obj) === Foo.prototype
 
     // check if obj is iterable
@@ -299,7 +300,9 @@ function this() {
 function func() {
     // first class obj, inherit from Function.prototype
     // member of Object type, may be invoked as a subroutine
-    // have internal prop [[Call]], that distinguishes func from obj
+    // internal prop [[Call]], distinguishes func from obj, used if func is called without "new"
+    // internal prop [[Construct]], used if func is called with "new", empty obj created (named instance),
+        // func body is executed with "this" set to the instance
     
     function a() {}         // func declaration, hoisted
     var a = function() {}   // func expression, not hoisted, return an instance of func obj that can be invoked
@@ -365,17 +368,21 @@ function func() {
     lordify(regularPerson) }
 function arrowFunc() {
     // fat arrow (arrow func)
+    // no internal [[Construct]] method, cannot be called with "new" keyword
     // no "this" binding, "this" is just a var name, lexical scope rules are applied
     // "this" inhereted from enclosing scope by looking up scope chain
     // don’t have args obj, args remain accessible due to scope chain resolution of args identifier
-    // call(), apply(), bind() will not affect "this" binding
-    var name = (x) => ++x              // function name(x) { return ++x }
-    var name = (x) => { return ++x }  // for multi line body use braces and explicit return
+    // call(), apply(), bind() will NOT affect "this" binding
+
+    var name = (x) => ++                // function name(x) { return ++x }
+    var name = (x) => { return ++x }    // for multi line body use braces and explicit return
+    var getTempItem = id => ({ id: id, name: "Temp" })  // returned obj literal must be wrapped inside parentheses
     
-    row(3)     // [3,6,9,12,15] fat arrow will bind arguments[0] to passed value "3"
     let row = function () { return mapWith( column => column * arguments[0], [1, 2, 3] ) }
-    row(3)     // [1,4,9,16,25] reg func will bind arguments[0] to val from iterable array
+    row(3)     // [3,6,9] fat arrow will bind arguments[0] to passed value "3"
+
     let row = function () { return mapWith( function (column) { return column * arguments[0] }, [1, 2, 3] ) }
+    row(3)     // [1,4,9] reg func will bind arguments[0] to val from iterable array
     }
 function closure() {
     // characteristic of func that allows access its lexical scope while executing outside of it
@@ -486,7 +493,7 @@ function object() {
     delete obj.key
     delete obj.method
 
-    // internal methods for objects
+    // internal methods for objs
     Object.getPrototypeOf(target) // determine obj that provides inherited props for this obj
     Object.setPrototypeOf(target,proto) // associate obj with another obj that provides inherited props
     Object.getOwnPropertyNames(target) // get array of all properties
@@ -494,15 +501,15 @@ function object() {
     Object.seal(obj)  // prevent extention, make props non-configurable, vals of present props can be changed
     Object.freeze(obj) // prevent extention, make every prop read only and non-configurable
     
-    // internal methods for function objects
+    // internal methods for func objs
     Object.call()   // execute code associated with this obj, args are "this" and list of args passed to func
     Object.construct()  // creates an obj, invoked via "new" or "super" operators
         // first arg is a list of args, second arg is an obj to which "new" operator was initially applied
         // obj that implement this method are called constructors
 
-    // duplicating objects
-    var newObj = JSON.parse( JSON.stringify( someObj ) )   // deep copy
-    var newObj = Object.assign( {}, someObj )              // shallow copy
+    // duplicating objs
+    var newObj = JSON.parse(JSON.stringify( someObj ))   // deep copy
+    var newObj = Object.assign({}, someObj)              // shallow copy
 
     // mixing objs props and methods, shallow copy, receiver - supplier - supplier - ...
     function EventTarget() { }
@@ -520,9 +527,8 @@ function object() {
     Object.getOwnPropertyNames(obj).join("")   // 01ba
 
     // iterate over object, unspecified enumeration order, also in prototype chain
-    for (let key in obj) {
+    for (let key in obj)
         if (obj.hasOwnProperty(key)) // "key" will show all keys, "obj[key]" all values, including proto chain
-    }
     Object.entries(obj)     // => arr of enumerable prop [key, value] pairs, not including proto chain
     Object.keys(obj)        // => arr of keys, unspecified enumeration order, not including proto chain
     Object.values(obj)      // => arr of vals, unspecified enumeration order, not including proto chain
@@ -531,8 +537,7 @@ function object() {
     var person = { name: "S", age: 35 }
     let {name, age} = person       // let name = "S" let age = 35
 
-    var name = "Tallac"
-    var elevation = 9738
+    var name = "Tallac"; var elevation = 9738
     var print = function() { console.log(`Mt. ${this.name} is ${this.elevation} feet tall`) }
     var funHike = { name, elevation, print }
     funHike.print()     // Mt. Tallac is 9738 feet tall
@@ -565,6 +570,14 @@ function constructor() {
     var me = new Person("Sergey", "Melentyev")   // create an object instance
     me instanceof Person    // true
     me.constructor === Person   // points back to constructor func, can be overwritten
+
+    // check whether a func was called with "new" keyword
+    function Person(name) {
+        if (this instanceof Person) this.name = name                // will not work with .call() or .apply()
+        if (typeof new.target !== "undefined") this.name = name     // ES6
+        if (typeof new.target === Person) this.name = name          // check specific constructor
+        else throw new Error("You must use new with Person.")
+    }
     }
 function prototype() {
     // func has .prototype prop that is shared among all obj instances
@@ -572,7 +585,7 @@ function prototype() {
     // Object.prototype == top-end of every normal [[Prototype]] chain
     function Person(name) { this.name = name }
     Person.prototype.method = function() { this.name }  // method will be shared among instances
-    Person.prototype.favs = [] // reference val, all instances will point to the same array
+    Person.prototype.favs = []              // ref val, all instances will point to the same array
 
     // the same as above two lines, but .constructor prop will be lost!
     Person.prototype = { method: function() { this.name }, favs: [] }
@@ -597,11 +610,20 @@ function prototype() {
     // instance obj have prop [[Prototype]], a pointer to the prototype obj that instance is using
     var me = new Person()
     var proto = Object.getPrototypeOf(me)
-    proto === Person.prototype  // true
-    Person.prototype.isPrototypeOf(me); // true
+    proto === Person.prototype                  // true
+    Person.prototype.isPrototypeOf(me)          // true
+    
+    Object.setPrototypeOf(target, supplier)     // change the prototype of any obj
 
-    var obj = { }
-    obj.toString()  // > "[object Object]" method comes from the proto chain
+    // "super" is a pointer to the current obj prototype
+    var person = { getGreeting() { return "Hello" } }
+    var man = { getGreeting() { return super.getGreeting() + ", hi!" } }                                    // ES6
+    var man = { getGreeting() { return Object.getPrototypeOf(this).getGreeting.call(this) + ", hi!" } }     // ES5
+    Object.setPrototypeOf(man, person)
+
+
+    var obj = {}
+    obj.toString()                  // > "[object Object]" method comes from the proto chain
     obj.toString = function() { return "[object Custom]" }  // > "[object Custom]" prop shadowing
 
     // add build-in object prototypes
@@ -669,6 +691,7 @@ function arrayObject() {
     let items = new Array(2)                        // items.length = 2 items[0] === undefined
     let items = new Array(1, 2)                     // items.length = 2 items[0] === 1
     let items = Array.of(1, 2)                      // items.length = 2 items[0] === 1
+    var makeArray = Array.apply(null, { length: 5 }).map(() => "logic here")
     function makeArray() { return Array.prototype.slice.call(arguments) }
     function makeArray() { let args = Array.from(arguments); return args }
 
@@ -863,15 +886,14 @@ function iterator() {
     }
 function spreadOperator() {
     // array
-    var nums = [1,2] var chars = ["a", "b"]
+    var nums = [1,2]; var chars = ["a", "b"]
     console.log(...nums)       // the same as console.log(arr[0] + " " + arr[1])
     function nameless() { return [1,2] }
     var num = [0, ...nameless()]       // array concatenation
     var concat = [...nums, ...chars]
 
     // object
-    var obj1 = { foo: 'bar', x: 42 }
-    var obj2 = { foo: 'baz', y: 13 }
+    var obj1 = { foo: 'bar', x: 42 }; var obj2 = { foo: 'baz', y: 13 }
     var clonedObj = { ...obj1 }    // Object { foo: "bar", x: 42 }
     var mergedObj = { ...obj1, ...obj2 }   // Object { foo: "baz", x: 42, y: 13 }
     }
