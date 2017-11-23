@@ -81,19 +81,23 @@ function primitiveWrapper() {
         message = `${count} items cost ${(count * price).toFixed(2)}.`
     }
 function symbol() {
-    // unique and immutable non-String Object property key
-    // each symbol val holds an associated val called [[Description]] that is "undefined" or string val
+    // nonenumerable properties that can’t be accessed without referencing the symbol
+    // unique and immutable non-String obj prop key
     Symbol.hasInstance // if constructor obj recogniz an obj as one of the constructor instances (instanceof)
     Symbol.iterator    // returns the default iterator for an object (for-of)
-    let firstName = Symbol("first name")
-    let person = {
-        [firstName]: "Sergey"       // computed object literal property
-    }
+    
+    var firstName = Symbol("description")       // symbol hold val [[Description]] that "undefined" or string
+    var person = { [firstName]: "Sergey" }      // computed object literal prop
 
     // global symbol registry, method search global symbol registry for key "uid"
     // if finds, returns the existing. If not, new symbol is created and registered
-    let uid = Symbol.for("uid")
-    let object = {} object[uid] = "12345"
+    var uid = Symbol.for("uid")
+    var object = {}; object[uid] = "12345"
+
+    var person = {}; var name = Symbol("first name")
+    Object.defineProperties(person, {
+        [name]: { value: "Sergey", writable: false }
+    })
 
     // get symbols
     let symbols = Object.getOwnPropertySymbols(person) // array for-of symbols
@@ -431,6 +435,7 @@ function recursion() {
     }
 
 function object() {
+    // object props must be strings or symbols
     // obj can have own props (directly contained) or inherited (props of obj prototype)
     let obj = {
         key: value,     // key (string/symbol) and value
@@ -534,8 +539,14 @@ function object() {
     Object.values(obj)      // => arr of vals, unspecified enumeration order, not including proto chain
 
     // destructuring
-    var person = { name: "S", age: 35 }
-    let {name, age} = person       // let name = "S" let age = 35
+    var person = {name: "S", age: 35}
+    var {name, age} = person       // var name = "S"; var age = 35
+    var {name, age, admin = true} = person    // ("S", 35, true) or ("S", 35, underfined) if no default val provided
+    var {name: fullName, age: fullAge } = person    // assign to a different name
+    var {name: fullName, age: fullAge = 36 } = person    // default val
+
+    var person = { admin: { name: "name" } }
+    var { admin: { name }} = person         // nested object
 
     var name = "Tallac"; var elevation = 9738
     var print = function() { console.log(`Mt. ${this.name} is ${this.elevation} feet tall`) }
@@ -728,16 +739,18 @@ function arrayObject() {
     var shallowCopy = fruits.slice()
     func(array)                                     // passing array by reference
     func(array.slice())                             // passing array by value
+    var colors = ["red","green"]; var [...clonedColors] = colors;  // copy vals
 
     // iteration over array
     for (let i in arr) {}     // iterate over array index, not values
     for (let i of arr) {}     // calls next() on an iterable each time the loop executes
-    let iterator = arr[Symbol.iterator]()   // iterator.next() => "{ value: 1, done: false }"
+    var iterator = arr[Symbol.iterator]()   // iterator.next() => "{ value: 1, done: false }"
 
     // destructuring
-    let colors = [ "red", "green", "blue" ]
-    let [ firstColor, secondColor ] = colors       // "red", "green"
-    let [ , firstColor, secondColor ] = colors
+    var colors = [ "red", "green", "blue" ]
+    var [ firstColor, secondColor ] = colors        // firstColor = "red"; secondColor = "green"
+    var [ , , thirdColor ] = colors      // thirdColor = "blue"
+    var [firstColor, secondColor = "white"] = colors    // default value
     }
 function arrayBuffer() {
     // typed array, allow storage and manipulation of eight different numeric types
@@ -781,7 +794,7 @@ function sharedArrayBuffer() {
     Atomics.add()
     }
 function map() {
-    // holds key-value pairs, keys can be any val, func, obj, or primitive
+    // holds key-value pairs, keys can be any val (checks with Object.is()), func, obj, or primitive
     new Map([iterable])
     var map = new Map([["name", "Sergey"], ["age", 35]])   // map initialization
 
@@ -806,9 +819,19 @@ function map() {
 
     // weakmap does`t put strong reference on obj, does`t prevent garbage collection
     // every key must be an obj
+    var Person = (function() {
+        let privateData = new WeakMap()
+        function Person(name) {
+            privateData.set(this, { name: name })
+        }
+        Person.prototype.getName = function() {
+            return privateData.get(this).name
+        };
+        return Person
+    }())
     }
 function set() {
-    // set is an ordered collection of unique items, cannot be directly accessed by index
+    // set is an ordered collection of unique items (checks with Object.is()), cannot be directly accessed by index
     new Set([iterable])
     var set = new Set([1, 2, 3, 4, 5, 5, 5, 5])     // from arr to set
     var array = [...set]                            // from set to arr with spread operator
@@ -884,6 +907,7 @@ function iterator() {
     var divs = document.getElementsByTagName("div")
     for (let div of divs) console.log(div.id)
     }
+
 function spreadOperator() {
     // array
     var nums = [1,2]; var chars = ["a", "b"]
