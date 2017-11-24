@@ -867,36 +867,6 @@ function iterator() {
     let values = [1, 2, 3]     // calls next() on an iterable each time the loop executes
     for (let num of values)
 
-    // generator function
-    function *createIterator(items) {
-        for (let i = 0 i < items.length i++) yield items[i]
-    }
-    let iterator = createIterator([1, 2, 3])   // iterator.next() => "{ value: 1, done: false }"
-
-    // generator function expression
-    let createIterator = function *(items) {
-        for (let i = 0 i < items.length i++) yield items[i]
-    }
-    let iterator = createIterator([1, 2, 3])   // iterator.next() => "{ value: 1, done: false }"
-
-    // generator object method
-    var o = {
-        *createIterator(items) {
-            for (let i = 0 i < items.length i++) yield items[i]
-        }
-    }
-    let iterator = o.createIterator([1, 2, 3]) // iterator.next() => "{ value: 1, done: false }"
-
-    // iterable object
-    let collection = {
-        items: [],
-        *[Symbol.iterator]() {
-            for (let item of this.items) yield item
-        }
-    }
-    collection.items.push(1) collection.items.push(2) collection.items.push(3)
-    for (let x of collection)  // 1, 2, 3   
-
     // default collection iterators
     let anyCollection = [1, 2, 3]
     for (let entry of anyCollection.entries()) // returns an iterator whose values are a key-value pair
@@ -1115,8 +1085,35 @@ function generator() {
         var result = iterator.next()    // { value: "data", done: false }
         result = iterator.next(3)   // { value: 6, done: true }
     }
-    {   //
-        //
+    {   // generator function
+        function *createIterator(items) {
+            for (let i = 0 i < items.length i++) yield items[i]
+        }
+        let iterator = createIterator([1, 2, 3])   // iterator.next() => "{ value: 1, done: false }"
+
+        // generator function expression
+        let createIterator = function *(items) {
+            for (let i = 0 i < items.length i++) yield items[i]
+        }
+        let iterator = createIterator([1, 2, 3])   // iterator.next() => "{ value: 1, done: false }"
+
+        // generator object method
+        var o = {
+            *createIterator(items) {
+                for (let i = 0 i < items.length i++) yield items[i]
+            }
+        }
+        let iterator = o.createIterator([1, 2, 3]) // iterator.next() => "{ value: 1, done: false }"
+
+        // iterable object
+        let collection = {
+            items: [],
+            *[Symbol.iterator]() {
+                for (let item of this.items) yield item
+            }
+        }
+        collection.items.push(1) collection.items.push(2) collection.items.push(3)
+        for (let x of collection)  // 1, 2, 3   
     }
     }
 
