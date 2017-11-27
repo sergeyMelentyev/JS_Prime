@@ -858,25 +858,6 @@ function set() {
     // weak ref does`t prevent garbage collection
     let set = new WeakSet()    // not iterable, cannot be used in for-of loop and forEach()
     }
-function iterator() {
-    // default iterator
-    let values = [1, 2, 3]
-    let iterator = values[Symbol.iterator]()   // iterator.next() => "{ value: 1, done: false }"
-
-    // for-of loop
-    let values = [1, 2, 3]     // calls next() on an iterable each time the loop executes
-    for (let num of values)
-
-    // default collection iterators
-    let anyCollection = [1, 2, 3]
-    for (let entry of anyCollection.entries()) // returns an iterator whose values are a key-value pair
-    for (let entry of anyCollection.values()) // returns an iterator whose vals are vals of the collection
-    for (let entry of anyCollection.keys()) // returns an iterator whose vals are keys contained in the collection
-
-    // nodeList iterator
-    var divs = document.getElementsByTagName("div")
-    for (let div of divs) console.log(div.id)
-    }
 
 function spreadOperator() {
     // array
@@ -896,6 +877,81 @@ function json() {
     JSON.stringify(value[, replacer[, space]])  // convert JS value to JSON string
     }
 
+function iterator() {
+    // Symbol.iterator symbol specifies a func that returns an iterator for arrs, sets, and maps
+    let values = [1, 2, 3]
+    let iterator = values[Symbol.iterator]()   // iterator.next() => "{ value: 1, done: false }"
+
+    // for-of loop
+    let values = [1, 2, 3]     // calls next() on an iterable each time the loop executes
+    for (let num of values)
+
+    // default collection iterators
+    let anyCollection = [1, 2, 3]
+    for (let entry of anyCollection.entries()) // returns an iterator whose values are a key-value pair
+    for (let entry of anyCollection.values()) // returns an iterator whose vals are vals of the collection
+    for (let entry of anyCollection.keys()) // returns an iterator whose vals are keys contained in the collection
+
+    // nodeList iterator calls next() on an iterable
+    var divs = document.getElementsByTagName("div")
+    for (let div of divs) console.log(div.id)
+    }
+function generator() {
+    {   // input and output
+        function *foo(x,y) { return x * y }
+        var iterator = foo(2,3) // generator func call produces iterator, no code execution
+        var result = iterator.next()    // { value: 6, done: true }
+    }
+    {   // message in
+        function *foo(x) { var y = x * (yield); return y }
+        var iterator = foo(2)   // produce iterator, no code execution
+        iterator.next() // pause at y = 2 * (yield) and request value for yield expression
+        var result = iterator.next(3)   // { value: 6, done: true }
+    }
+    {   // message out
+        function *foo(x) { var y = x * (yield "data"); return y }
+        var iterator = foo(2)   // produce iterator, no code execution
+        var result = iterator.next()    // { value: "data", done: false }
+        result = iterator.next(3)   // { value: 6, done: true }
+    }
+    {   // generator function
+        function *createIterator(items) {
+            for (let i = 0 i < items.length i++) yield items[i]
+        }
+        let iterator = createIterator([1, 2, 3])   // iterator.next() => "{ value: 1, done: false }"
+
+        // generator function expression
+        let createIterator = function *(items) {
+            for (let i = 0 i < items.length i++) yield items[i]
+        }
+        let iterator = createIterator([1, 2, 3])   // iterator.next() => "{ value: 1, done: false }"
+
+        // generator object method
+        var o = {
+            *createIterator(items) {
+                for (let i = 0 i < items.length i++) yield items[i]
+            }
+        }
+        let iterator = o.createIterator([1, 2, 3]) // iterator.next() => "{ value: 1, done: false }"
+
+        // iterable object
+        let collection = {
+            items: [],
+            *[Symbol.iterator]() { for (let item of this.items) yield item }
+        }
+        collection.items.push(1); for (let x of collection)  // 1, 2, 3   
+    }
+    // combined genarators
+    function *firstIterator() { yield 1; yield 2 }
+    function *secondIterator() { yield "red"; yield "green" }
+    function *combinedIterator() { yield *firstIterator(); yield *secondIterator(); yield true }
+    var iterator = combinedIterator()
+    iterator.next()     // { value: 1, done: false }
+    iterator.next()     // { value: 2, done: false }
+    iterator.next()     // { value: "red", done: false }
+    iterator.next()     // { value: "green", done: false }
+    iterator.next()     // { value: true, done: false }
+    }
 function promise() {
     // time independent state, async flow control, immutable once resolved
     {   // simple real-world example
@@ -1065,55 +1121,6 @@ function promise() {
           });
           return result;
         }
-    }
-    }
-function generator() {
-    {   // input and output
-        function *foo(x,y) { return x * y }
-        var iterator = foo(2,3) // generator func call produces iterator, no code execution
-        var result = iterator.next()    // { value: 6, done: true }
-    }
-    {   // message in
-        function *foo(x) { var y = x * (yield); return y }
-        var iterator = foo(2)   // produce iterator, no code execution
-        iterator.next() // pause at y = 2 * (yield) and request value for yield expression
-        var result = iterator.next(3)   // { value: 6, done: true }
-    }
-    {   // message out
-        function *foo(x) { var y = x * (yield "data"); return y }
-        var iterator = foo(2)   // produce iterator, no code execution
-        var result = iterator.next()    // { value: "data", done: false }
-        result = iterator.next(3)   // { value: 6, done: true }
-    }
-    {   // generator function
-        function *createIterator(items) {
-            for (let i = 0 i < items.length i++) yield items[i]
-        }
-        let iterator = createIterator([1, 2, 3])   // iterator.next() => "{ value: 1, done: false }"
-
-        // generator function expression
-        let createIterator = function *(items) {
-            for (let i = 0 i < items.length i++) yield items[i]
-        }
-        let iterator = createIterator([1, 2, 3])   // iterator.next() => "{ value: 1, done: false }"
-
-        // generator object method
-        var o = {
-            *createIterator(items) {
-                for (let i = 0 i < items.length i++) yield items[i]
-            }
-        }
-        let iterator = o.createIterator([1, 2, 3]) // iterator.next() => "{ value: 1, done: false }"
-
-        // iterable object
-        let collection = {
-            items: [],
-            *[Symbol.iterator]() {
-                for (let item of this.items) yield item
-            }
-        }
-        collection.items.push(1) collection.items.push(2) collection.items.push(3)
-        for (let x of collection)  // 1, 2, 3   
     }
     }
 
