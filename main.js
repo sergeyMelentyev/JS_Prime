@@ -430,8 +430,8 @@ function recursion() {
        return (remaining.length) ?
            deepPick(remaining.join("."), object[first]) : object[first]
     }
-    deepPick("type", dan)   // "person"
-    deepPick("data.info.fullname.first", dan)
+    deepPick("type", dan)                       // "person"
+    deepPick("data.info.fullname.first", dan)   // "Dan"
     }
 
 function object() {
@@ -727,7 +727,7 @@ function arrayObject() {
     var iter = a.entries(); iterator.next()             // var a = ['a', 'b'] => { value: [ 0, 'a' ], done: false }
     var iter = a.keys(); iter.next()                    // var a = ['a', 'b'] => { value: 0, done: false }
     var bool = a.every(function(val,i,arr){}[, this])   // test each elem, if find falsy return false, otherwise true
-    var arr = a.filter(function(val,i,arr){}[, this])   // new arr with elems that pass test
+    var arr = a.filter(function(val,i,arr){}[, this])   // new arr with elems that pass test with predicate
     var val = a.find(function(val,i,arr){}[, this])     // return val of first elem that pass test or undefined
     var i = a.findIndex(function(val,i,arr){}[, this])  // return index of first elem that pass test or -1
     a.forEach(function(val,i,arr){}[, this])            // return undefined, not chainable, cannot break (only exception)
@@ -735,8 +735,31 @@ function arrayObject() {
     arr.reduce(function(val, i, arr){}[, initialVal])   // accumulates callback return val to reduce it to a single val
     var bool = a.some(function(val, i, arr){}[, this])  // true if callback return truthy val for any element, otherwise false
 
+    // arr.reduce() max value example
+    const ages = [21,18,42,40,64,63,34]
+    const max = ages.reduce((max, age) => {
+        if (age > max) return age
+        else return max
+    }, 0)   // 21 > 0 = true; 18 > 21 = false; 42 > 21 = true; 40 > 42 = false; 64 > 42 = true; maxAge 64
+
+    // arr.reduce() from array to object
+    const colors = [
+        { id: '-xekare', title: "rad red", rating: 3 },
+        { id: '-jbwsof', title: "big blue", rating: 2 }
+    ]
+    const hashColors = colors.reduce((hash, {id, title, rating}) => {
+        hash[id] = {title, rating}
+        return hash
+    }, {})
+
+    // arr.reduce() array of unique items
+    const colors = ["red", "red", "green", "blue", "green"]
+    const distinctColors = colors.reduce((distinct, color) =>
+        (distinct.indexOf(color) !== -1) ? distinct : [...distinct, color]
+    , [])   // ["red", "green", "blue"]
+
     // copy and passing as argument
-    var shallowCopy = fruits.slice()
+    var shallowCopy = arrName.slice()
     func(array)                                     // passing array by reference
     func(array.slice())                             // passing array by value
     var colors = ["red","green"]; var [...clonedColors] = colors;  // copy vals
