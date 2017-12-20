@@ -23,6 +23,11 @@ https://www.ecma-international.org/ecma-262/8.0/index.html
 https://jsperf.com/
 
 
+-== GRAMMAR ==-
+
+http://2ality.com/index.html
+
+
 -== GENERATORS ==-
 
 https://davidwalsh.name/es6-generators
