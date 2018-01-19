@@ -514,7 +514,7 @@ function object() {
 
     // duplicating objs
     var newObj = JSON.parse(JSON.stringify( someObj ))   // deep copy
-    var newObj = Object.assign({}, someObj)              // shallow copy
+    var newObj = Object.assign({}, ids)              // shallow copy
 
     // mixing objs props and methods, shallow copy, receiver - supplier - supplier - ...
     function EventTarget() { }
@@ -760,8 +760,9 @@ function arrayObject() {
 
     // copy and passing as argument
     var shallowCopy = arrName.slice()
-    func(array)                                     // passing array by reference
-    func(array.slice())                             // passing array by value
+    var shallowCopy = Array.from(Object.create(arrName))
+    func(array)                                         // passing array by reference
+    func(array.slice())                                 // passing array by value
     var colors = ["red","green"]; var [...clonedColors] = colors;  // copy vals
 
     // iteration over array
@@ -1211,9 +1212,9 @@ function exeption() {
     }
 
     try {
-        methodOne()
-    } catch (e) {
-        mathodTwo(e)
+        if (!ids) throw new Error("No products ids provided.")
+    } catch (err) {
+        console.log(err.stack)
     }
     }
 function module() {
@@ -1239,6 +1240,17 @@ function observables() {
     {   // 
         // 
     }
+    }
+
+function composition() {
+    // apply several function calls in a chain
+    const nextCharFromNumberStr = (str) =>
+        [str]
+        .map(s => s.trim())
+        .map(s => parseInt(s))
+        .map(s => s + 1)
+        .map(s => String.fromCharCode(s))
+    const result = nextCharFromNumberStr("  64 ")   // => 'A'
     }
 
 /* 8.1.1.
