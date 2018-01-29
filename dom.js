@@ -193,6 +193,9 @@ function loading() {
     }
     }
 function css() {
+    html { box-sizing: border-box }
+    *, *:before, *:after { box-sizing: inherit }
+
     align-items             // "y" axis position, if parent = height, items will stretch to fit
     align-items: stretch    // initial value
     align-self              // target single item
