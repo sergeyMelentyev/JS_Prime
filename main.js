@@ -11,6 +11,9 @@ function basics() {
     let name = 0, last // will be split into two parts
     // two undefined declarations will be hoisted
     let name = undefined; let last = undefined; name = 0
+
+    // synchronous js paradigm
+    memory/variable environment; execution context; call stack;
     }
 
 function primitiveVal() {
@@ -188,7 +191,7 @@ function regExp() {
     }
 
 function scope() {
-    // only lexical scope is present in js 
+    // only lexical scope is present in js
 
     // jit compiler at first pass will look for any formal var/func declaration,
         // will go both global and func scope
@@ -221,13 +224,13 @@ function scope() {
     // function declaration
     function name() {}                  // will expands to...
     var name = function name() {}
-    var name
-    name = undefined
+    var name; name = undefined
     name = function name() {}
 
     // engine will remove block-scoping after executing
     var projectEntryData
-    { let projectId
+    { 
+        let projectId
         projectId = Math.round(Math.random()*1E4)
         projectEntryData = { id: projectId, description: "description" }
     }
@@ -307,6 +310,7 @@ function func() {
     // internal prop [[Call]], distinguishes func from obj, used if func is called without "new"
     // internal prop [[Construct]], used if func is called with "new", empty obj created (named instance),
         // func body is executed with "this" set to the instance
+    // internal prop [[Scope]] reference local Variable Environment in which it has been defined (lexical scope)
     
     function a() {}         // func declaration, hoisted
     var a = function() {}   // func expression, not hoisted, return an instance of func obj that can be invoked
@@ -315,10 +319,10 @@ function func() {
 
     // after func applied to args (invoked), new environment created
     // it is a dict that maps vars to vals by name
-    functionName(args)                     // function form of invocation
-    objectName.methodName(args)            // method form of invocation
-    objectName["methodName"](args)         // method form of invocation
-    new FunctionName(args)                 // constructor form of invocation
+    functionName(args)                      // function form of invocation
+    objectName.methodName(args)             // method form of invocation
+    objectName["methodName"](args)          // method form of invocation
+    new FunctionName(args)                  // constructor form of invocation
     functionName.apply(objectName, [args])  // apply form of invocation
 
     // "arguments" obj, can be rebind with new value withing func body
@@ -761,6 +765,7 @@ function arrayObject() {
     // copy and passing as argument
     var shallowCopy = arrName.slice()
     var shallowCopy = Array.from(Object.create(arrName))
+    var deepCopy = JSON.parse(JSON.stringify(arrName))
     func(array)                                         // passing array by reference
     func(array.slice())                                 // passing array by value
     var colors = ["red","green"]; var [...clonedColors] = colors;  // copy vals
