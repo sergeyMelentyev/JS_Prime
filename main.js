@@ -1,4 +1,7 @@
 function basics() {
+    // js paradigm
+    memory/variable environment; global/local execution context; call stack; callback queue; event looop
+
     (1 + 1, 2 + 2)     // => 4
     void 0     // always evaluates to undefined        
     return  // always use braces on the right or compiler will add ";" after "return" statement
@@ -11,9 +14,6 @@ function basics() {
     let name = 0, last // will be split into two parts
     // two undefined declarations will be hoisted
     let name = undefined; let last = undefined; name = 0
-
-    // synchronous js paradigm
-    memory/variable environment; execution context; call stack;
     }
 
 function primitiveVal() {
@@ -241,7 +241,7 @@ function this() {
     // "this" pointer will be set to global obj, will bind to "underfined" in strict mode
 
     // method form of invocation
-    obj.methodName(args) obj["methodName"](args)
+    obj.methodName(args); obj["methodName"](args)
     // "this" pointer will be set to "obj", the obj containing the "methodName"
 
     // constructor form of invocation
@@ -595,6 +595,36 @@ function constructor() {
     }
     }
 function prototype() {
+    // nature of prototype chain
+    function userCreator(name, score) {
+        var user = Object.create(userFunctionScore) // inherit methods from "userFunctionScore" obj
+        user.name = name
+        user.score = score
+        return user
+    }
+    var userFunctionScore = { increment: function() {this.score++} }
+    var newUser = userCreator("Sergey", 1)
+    newUser = {
+        name: "Sergey",
+        score: 1,
+        __proto__: userFunctionScore
+    }
+
+    // the same as above
+    function userCreator(name, score) {
+        this.name = name
+        this.score = score
+    }
+    userCreator.prototype.increment = function() {this.score++}
+    userCreator = {
+        prototype: {
+            increment: function() {this.score++}
+        }
+    }
+    var newUser = new userCreator("Sergey", 1)
+    
+
+
     // func has .prototype prop that is shared among all obj instances
     // func .prototype prop is created with .constructor prop equal to the func itself
     // Object.prototype == top-end of every normal [[Prototype]] chain
