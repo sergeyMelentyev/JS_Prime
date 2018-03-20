@@ -193,8 +193,7 @@ function regExp() {
 function scope() {
     // only lexical scope is present in js
 
-    // jit compiler at first pass will look for any formal var/func declaration,
-        // will go both global and func scope
+    // jit compiler at first pass will look for any formal var/func declaration
 
     // global environment outer reference is null, also includes global obj that is a value of 
         // global environment "this" binding
@@ -460,8 +459,8 @@ function object() {
         configurable: true          // default false, delete it or change to accessor prop
     })
     Object.defineProperties(obj, {
-        "keyOne": { value: "", writable: true },
-        "keyTwo": { value: "", writable: true }
+        "keyOne": { value: "", writable: true, enumerable: true, configurable: true },
+        "keyTwo": { value: "", writable: true, enumerable: true, configurable: true }
     })
 
     // accessor props
@@ -1013,173 +1012,89 @@ function generator() {
     }
 function promise() {
     // time independent state, async flow control, immutable once resolved
-    {   // simple real-world example
-        const getFakeMembers = count => new Promise((resolve, reject) => {
-            const api = `https://api.randomuser.me/?nat=US&results=${count}`
-            const request = new XMLHttpRequest()
-            request.open("GET", api)
-            request.onload = () => (request.status === 200) ?
-                resolve(JSON.parse(request.response).results) :
-                reject(Error(request.statusText))
-            request.onerror = (err) => reject(err)
-            request.send()
+    const getFakeMembers = count => new Promise((resolve, reject) => {
+        const api = `https://api.randomuser.me/?nat=US&results=${count}`
+        const request = new XMLHttpRequest()
+        request.open("GET", api)
+        request.onload = () => (request.status === 200) ?
+            resolve(JSON.parse(request.response).results) :
+            reject(Error(request.statusText))
+        request.onerror = (err) => reject(err)
+        request.send()
+    })
+    getFakeMembers(5).then(
+        members => console.log(members),
+        err => console.error(new Error("cannot load members from randomuser.me"))
+    )
+
+    // load an image
+    loadImage("name.png")
+        .then(img => document.body.appendChild(img))
+        .catch(e =>  console.log(e))
+    function loadImage(url) {
+        return new Promise(function resolver(resolve, reject) {
+            var img = new Image(); img.src = url
+            img.onload = function() {resolve(img)}
+            img.onerror = function(e) {reject(e)}
+            });
+    }
+
+    // error handling
+    var p = new Promise(function(resolve, reject) {
+        foo.bar()                           // not defined, error is thrown
+        resolve(42)                         // never gets here
+    }).then(
+        function fulfilled() {
+            // never gets here
+        },
+        function rejected(err) {
+            // this line will work
         })
-        getFakeMembers(5).then(
-            members => console.log(members),
-            err => console.error(new Error("cannot load members from randomuser.me"))
+
+    // method .resolve()
+    let promise = Promise.resolve(35)       // accept arg and return promise in the fulfilled state
+    promise.then(val => console.log(val))   // async operation
+
+    // returning promise in chain
+    let p1 = new Promise(function(resolve, reject) { resolve(35) })
+    let p2 = new Promise(function(resolve, reject) { resolve(36) })
+    p1.then(function(value) {
+        console.log(value)                  // 35
+        return p2
+    }).then(function(value) {
+        console.log(value)                  // 36
+    })
+
+    // method .all() resolves only when every promise in the iterable is resolved
+    let p1 = new Promise (function (resolve, reject) { resolve(34) })
+    let p2 = new Promise (function (resolve, reject) { resolve(35) })
+    let p3 = new Promise (function (resolve, reject) { resolve(36) })
+    let p4 = Promise.all([p1, p2, p3])                  // iterable argument of promises to monitor
+    p4.then(arrOfVals => console.log(arrOfVals[0]))     // vals are stored in order promises were passed
+
+
+    // methods .race(), resolves as soon as any first promise is resolved, not longer the 3000ms
+    let p1 = Promise.resolve(42)
+    let p2 = new Promise (function(resolve, reject) { resolve(43) })
+    let p3 = new Promise (function(resolve, reject) { resolve(44) })
+    let p0 = new Promise (function(_,reject) {
+        setTimeout(function() {
+            reject("Timeout, reject all")
+        }, 3000)
+    })
+    let p4 = Promise.race([p1, p2, p3, p0])             // result ignores the other promises
+        .then(
+            successFuncName,
+            errorFunctionName
         )
-    }
-    {   // simple promise
-        let promise = new Promise(function(resolve, reject) {
-            // promise body, logic here execute immediately, save result in var and check in next line
-            if (condition) resolve(data)
-            else reject(err)
-        })
-        promise.then(function (data) {
-            // async data area
-        }, function (err) {
-            // async error area
-        })
-    }
-    {   // promise wrapper for old func
-        const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
-        wait(10000).then(() => saySomething("10 seconds")).catch(failureCallback);
-    }
-    {   // error handling
-        var p = new Promise(function(resolve, reject) {
-            foo.bar()  // not defined, error is thrown
-            resolve(42)    // never gets here
-        })
-        p.then(
-            function fulfilled() {
-                // never gets here
-            },
-            function rejected(err) {
-                // this line will work
-            })
 
-        // always end promise chain with .catch()
-        var p = Promise.resolve(42)
-        p.then(function(msg) {
-            msg.toLowerCase()  // error
-        }.catch(handleErrors))     // only rejection callback
-    }
-    {   // chained promises with propagation data down the chain
-        function getData(data){
-            return new Promise(function(resolve, reject) {
-                setTimeout(function() {
-                    resolve(data)
-                }, 1000)
-            })
-        }
-        let x
-        function print(data) { console.log(data) return data }
-        getData(10)
-            .then(print)                // num 10 will be printed and fall down the chain
-            .then(function(num) {       // "num" === 10
-                x = 1 + num
-                return getData(30)
-            })
-            .then(print)                // num 30 will be printed and fall down the chain
-            .then(function(num) {       // "num" === 30
-                let y = 1 + num
-                return getData("Meaning of life: " + (x + y))
-            })
-            .then(function(answer) {    // "answer" === "Meaning of life: 42"
-                console.log(answer)
-            })
-    }
-    {   // compose arbitrary lenth list of urls and chained call .then()
-        const urls = ["urlOne", "urlToo", "urlThree"]
-        function getFile(file) {
-            return new Promise(function(resolve, reject) {
-                fakeAjax(file,resolve)
-            })
-        }
-
-        urls.map(getFile).reduce(function combine(chain,pr) {
-            return chain.then(function() {
-                return pr
-            }).then(print)
-        }, Promise.resolve())
-            .then(function(){
-                print("complete")
-            })
-
-        // the same as abive but without .map() and .reduce()
-        Promise.resolve()
-            .then(function() {
-                return p1
-            })
-            .then(print)
-            .then(function() {
-                return p2
-            })
-            .then(print)
-            .then(function() {
-                return p3
-            })
-            .then(print)
-    }
-    {   // method .resolve()
-        let promise = Promise.resolve(35)  // accept arg and return promise in the fulfilled state
-        promise.then(function(val) {
-            console.log(val)       // async operation
-        })
-    }
-    {   // returning vals in chain
-        let p1 = Promise.resolve(35)
-        p1.then(function(value) {
-            return value + 1
-        }).then(function(value) {
-            console.log(value)     // 36
-        })
-    }
-    {   // returning promise in chain
-        let p1 = new Promise(function(resolve, reject) { resolve(35) })
-        let p2 = new Promise(function(resolve, reject) { resolve(36) })
-        p1.then(function(value) {
-            console.log(value)     // 35
-            return p2
-        }).then(function(value) {
-            console.log(value)     // 36
-        })
-    }
-    {   // method .all(), resolves only when every promise in the iterable is resolved
-        let p1 = new Promise (function (resolve, reject) { resolve(34) })
-        let p2 = new Promise (function (resolve, reject) { resolve(35) })
-        let p3 = new Promise (function (resolve, reject) { resolve(36) })
-
-        let p4 = Promise.all([p1, p2, p3])     // iterable argument of promises to monitor
-
-        p4.then(function (arrOfVals) {
-            console.log(arrOfVals[0])      // vals are stored in order promises were passed
-        })
-    }
-    {   // methods .race(), resolves as soon as any first promise is resolved, not longer the 3000ms
-        let p1 = Promise.resolve(42)
-        let p2 = new Promise (function(resolve, reject) { resolve(43) })
-        let p3 = new Promise (function(resolve, reject) { resolve(44) })
-        let p0 = new Promise (function(_,reject) {
-            setTimeout(function() {
-                reject("Timeout, reject all")
-            }, 3000)
-        })
-
-        let p4 = Promise.race([p1, p2, p3, p0])     // result ignores the other promises
-            .then(
-                successFuncName,
-                errorFunctionName
-            )
-    }
-    {   // execute arr of promises sequentially
-        function executeSequentially(promiseFactories) {
-          var result = Promise.resolve();
-          promiseFactories.forEach(function (promiseFactory) {
-            result = result.then(promiseFactory);
-          });
-          return result;
-        }
+    // execute arr of promises sequentially
+    function executeSequentially(promiseFactories) {
+      var result = Promise.resolve();
+      promiseFactories.forEach(function (promiseFactory) {
+        result = result.then(promiseFactory);
+      });
+      return result;
     }
     }
 
@@ -1207,34 +1122,6 @@ function class() {
             }
         }
         var person = new Men("S", 35, 123)
-    }
-    {   // dependency tracking
-        window.Dep = class Dep {
-            constructor() {
-                this.subscribers = new Set()
-            }
-            depend() {
-                if (activeUpdate) {
-                    this.subscribers.add(activeUpdate)
-                }
-            }
-            notify() {
-                this.subscribers.forEach(sub => sub())
-            }
-        }
-        let activeUpdate
-        function autorun(update) {
-            //
-            function wrappedUpdate() {
-                activeUpdate = wrappedUpdate
-                update()
-                activeUpdate = null
-            }
-            wrappedUpdate()
-        }
-        function update() {
-            // 
-        }
     }
     }
 
@@ -1288,4 +1175,23 @@ function composition() {
     const result = nextCharFromNumberStr("  64 ")   // => 'A'
     }
 
-/* 8.1.1.
+function ES6() {
+    // variables declarations
+    const/let
+    
+    // restrict scope of var to block using const/let
+    { 
+        let tmp = ""
+    }
+
+    // template literal
+    var str = `(${x}, ${y})`
+
+    // arrow functions
+    var func = (x) => console.log(x)
+
+    // destructuring
+    const [, year, month, day] = /^(\d\d\d\d)-(\d\d)-(\d\d)$/.exec('2999-12-31')
+    
+    // 
+    }
