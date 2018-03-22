@@ -1,25 +1,18 @@
 function basics() {
     // js paradigm
     memory/variable environment; global/local execution context; call stack; callback queue; event looop
-
-    (1 + 1, 2 + 2)     // => 4
-    void 0     // always evaluates to undefined        
-    return  // always use braces on the right or compiler will add ";" after "return" statement
-    {
-        key: "value"
-    }
-    x += 1 // instead of x++
+    (1 + 1, 2 + 2)          // => 4    
         
     // initialization order
-    let name = 0, last // will be split into two parts
+    let name = 0, last      // will be split into two parts
     // two undefined declarations will be hoisted
     let name = undefined; let last = undefined; name = 0
     }
 
 function primitiveVal() {
     // primitive vals are stored directly in the variable object
-    var a = "a"    // var contains primitive val, val is copied into that var
-    var b = a  // each var gets its own copy of data, changes in "a" will not affect "b"
+    var a = "a"         // var contains primitive val, val is copied into that var
+    var b = a           // each var gets its own copy of data, changes in "a" will not affect "b"
 
     // identify type
     typeof null        // "object", empty obj pointer
@@ -35,27 +28,26 @@ function primitiveVal() {
 
     // false vals
     false; null; undefined; ""; 0; NaN;
-    // any other values are truthy, including all objects
 
     // number => double-precision 64-bit binary
-    // set of all nums, NaN value, positive/negative infinity, positive/negative zero
     NaN === "failed in number coercion or math operation"
     }
 function referenceVal() {
-    // reference vals are store as pointer in the variable object
-    var obj = new Object()    // assign a pointer to the obj
-    var a = obj  // get a copy of the pointer to the same obj in memory
-    obj = null     // dereference for garbage collection
+    // reference vals are stored as pointers in the variable object
+    var obj = new Object()          // assign a pointer to the obj
+    var a = obj                     // get a copy of the pointer to the same obj in memory
+    obj = null                      // dereference for garbage collection
 
     function name(x) { x = null }
-    let y = []
-    name(y)            // ref to arr will be passed, not address of let, that contain ref to arr
-    console.log(y)     // => empty array
+    let y = new Array()
+    name(y)                         // ref to arr will be passed, not address of arr
+    console.log(y)                  // => empty array
     }
-function primitiveWrapper() {
+
+function string() {
     // new String, new Number, new Boolean are reference type
     // string => immutable type, represents a single 16-bit unit of UTF-16 text
-    var foo = new String("foo"); typeof foo;    // "object" keys = [0,1,2] vals = ['f','o','o']
+    var foo = new String("foo"); typeof foo    // "object"; keys = [0,1,2]; vals = ['f','o','o']
 
     // behind the scenes
     var a = "Ser"; var c = a.charAt(0); console.log(c)
@@ -163,10 +155,8 @@ function compareAndCheck() {
     var href = (window && window.location && window.location.href) || null
     obj instanceof Object           // "true"
     Object.is(value1, value2)       // determines whether two vals are the same type and same value
-    
     var bool = ("key" in obj)       // check if property is exist, including [[Prototype]] link
     obj.hasOwnProperty("key")       // check if property is exist only in that object
-    
     obj instanceof Foo              // in prototype chain does "obj" arbitrarily pointed to by Foo.prototype appear
     objOne.isPrototypeOf(objTwo)    // in the entire prototype chain of "obj", does Foo.prototype ever appear
     Object.getPrototypeOf(obj) === Foo.prototype
@@ -1011,7 +1001,7 @@ function generator() {
     iterator.next()     // { value: true, done: false }
     }
 function promise() {
-    // time independent state, async flow control, immutable once resolved
+    // states: pending, fulfilled, rejected, immutable once resolved
     const getFakeMembers = count => new Promise((resolve, reject) => {
         const api = `https://api.randomuser.me/?nat=US&results=${count}`
         const request = new XMLHttpRequest()
@@ -1039,17 +1029,19 @@ function promise() {
             });
     }
 
-    // error handling
+    // error handling, always use "throw Error(val)" error obj
+    Promise.reject(Error('bad news'))
+        .then(function step2() { console.log('This is never run') })
+        .then(function step3() { console.log('This is also never run') })
+        .catch(function (error) { console.log('Something failed along the way')
+    })
+
     var p = new Promise(function(resolve, reject) {
         foo.bar()                           // not defined, error is thrown
         resolve(42)                         // never gets here
     }).then(
-        function fulfilled() {
-            // never gets here
-        },
-        function rejected(err) {
-            // this line will work
-        })
+        function fulfilled() { console.log('This is never run')},
+        function rejected(err) { console.log('This will work')})
 
     // method .resolve()
     let promise = Promise.resolve(35)       // accept arg and return promise in the fulfilled state
@@ -1096,6 +1088,34 @@ function promise() {
       });
       return result;
     }
+
+    // conditional logic
+    var user = {
+        authenticated: false,
+        login() { console.log("returns promise for login request, set authenticated to true") }
+    }
+    function showMainMenu() {
+        var p = (!user.authenticated) ? user.login() : Promise.resolve()
+        return p.then(function () { console.log("code to display main menu")})
+    }
+
+    // parallel execution
+    var accounts = ['Checking Account', 'Travel Rewards Card', 'Big Box Retail Card']
+    accounts.forEach(function (account) {
+        ajax(account.url)
+            .then(function (balance) { console.log(account + ' Balance: ' + balance) })
+    })
+
+    var requests = accounts.map(function (account) { return ajax(account.url) })    
+    Promise.all(requests)
+        .then(function (balances) {
+            console.log('All ' + balances.length + ' balances are up to date')
+        })
+        .catch(function (error) {
+            console.log('An error occurred while retrieving balance information')
+            console.log(error);
+        })
+
     }
 
 function class() {
@@ -1192,6 +1212,6 @@ function ES6() {
 
     // destructuring
     const [, year, month, day] = /^(\d\d\d\d)-(\d\d)-(\d\d)$/.exec('2999-12-31')
-    
+
     // 
     }
