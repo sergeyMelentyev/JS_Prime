@@ -237,11 +237,6 @@ function this() {
     new FunctionName(args)
     // "this" pointer will be set to new obj that will be returned
 
-    // apply form of invocation
-    functionName.apply(obj, [arrOfArgs])
-    functionName.call(obj, argOne, argTwo)  // call the [[Call]] internal method of a func obj
-        // "this" pointer will be explicitly set to "obj"
-
     // "this" pointer the same as "context" object
     var obj = { name: "Sergey" }
     function foo() { return this.name.toUpperCase() }
@@ -250,47 +245,30 @@ function this() {
     function foo(context) { return context.name.toUpperCase() }
     foo(obj)
 
-    {   // implicit binding
-        function foo() { console.log(this.a) }
-        var bar = { a: "bar object", b: foo }
-        bar.b()    // "bar object"
-    }
-    {   // change "this" context with .call() method with func invocation, explicit binding
-        // first param = val to which "this" should be equal
-        // subsequent params = params that should be passed into the func
-        function hello(arg) { console.log(arg + " " + this.name) }
-        var person = { name: "Sergey" }
-        hello.call(person, "arg");
-    }
-    {   // change "this" context with .apply() method with func invocation, explicit binding
-        // except only two params, "this" and an array- like obj of params to pass to the func
-        function hello(args) { console.log(args + " " + this.name) }
-        var person = { name: "Sergey" }
-        hello.apply(person, ["args"]);
-    }
-    {   // change "this" context with .bind() method without func invocation, explicit binding
-        // first param = val to which "this" should be equal
-        // subsequent params = params that should be permanently set in the new func
-        function hello(arg) { console.log(arg + " " + this.name) }
-        var person = { name: "Sergey" }
-        hello.bind(person)
-        hello("arg")
-        // the same as above but in one line
-        hello.bind(person, "arg")
-    }
-    {   // context optional parameter .forEach() method
-        function foo(el) { console.log( el, this.id ) }
-        let obj = { id: "awesome" }
-        [1, 2, 3].forEach(foo, obj)
-    }
-    {   // new binding, function constructor call
-        // new empty obj is created
-        // this new obj is [[Prototype]] linked to another obj
-        // pass that obj in as a "this" context
-        // return that "this"
-        function Foo(a) { this.a = a }
-        var baz = new Foo(2)
-    }
+    // change "this" context with .call() method WITH func invocation
+    // call [[Call]] internal method, "this" pointer will be explicitly set to "obj"
+    functionName.call(obj, argOne, argTwo)  
+    
+    // change "this" context with .apply() method WITH func invocation, explicit binding
+    functionName.apply(obj, [arrOfArgs]) 
+
+    // change "this" context with .bind() method WITHOUT func invocation, explicit binding
+    // will return new func with hard binded context
+    var newFn = functionName.bind(obj, argOne, argTwo); newFn()
+    functionName.bind(obj, argOne, argTwo); newFn() // the same as above
+
+    // context optional parameter .forEach() method
+    function foo(el) { console.log( el, this.id ) }
+    let obj = { id: "awesome" }
+    [1, 2, 3].forEach(foo, obj)
+
+    // new binding, function constructor call
+    // new empty obj is created
+    // this new obj is [[Prototype]] linked to another obj
+    // pass that obj in as a "this" context
+    // return that "this"
+    function Foo(a) { this.a = a }
+    var baz = new Foo(2)
     }
 
 function func() {
