@@ -307,7 +307,7 @@ function func() {
     ((x) => (y) => x)(1)       // environment {x: 1, ...}, called "I combinator" or "Identity function"
     ((y) => x)(2)              // environment is {y: 2, '..': {x: 1, ...}}, called "K combinator" or "Kestrel"
 
-    // rest param, contains all params passed after "obj", must be only one rest param and it must be last
+    // rest param, array contains all params passed after "obj", must be only one rest param and it must be last
     function pick(obj, ...keys) {
         let result = Object.create(null)
         for (let i = 0, len = keys.length i < len i++) 
@@ -773,9 +773,9 @@ function arrayObject() {
     var iterator = arr[Symbol.iterator]()   // iterator.next() => "{ value: 1, done: false }"
 
     // destructuring
-    var colors = [ "red", "green", "blue" ]
-    var [ firstColor, secondColor ] = colors        // firstColor = "red"; secondColor = "green"
-    var [ , , thirdColor ] = colors      // thirdColor = "blue"
+    var colors = ["red", "green", "blue"]
+    var [firstColor, secondColor ] = colors        // firstColor = "red"; secondColor = "green"
+    var [,,thirdColor] = colors      // thirdColor = "blue"
     var [firstColor, secondColor = "white"] = colors    // default value
     }
 function arrayBuffer() {
@@ -923,6 +923,20 @@ function iterator() {
     for (let div of divs) console.log(div.id)
     }
 function generator() {
+    function ajax(endPoint) {
+        fetch(endPoint)
+            .then(res => res.json())
+            .then(data => apiGen.next(data))
+    }
+    function *userRepo(user, repoNumber) {
+        let userData = yield ajax(`https://api.github.com/users/${user}`)
+        let repos = yield ajax(userData.repos_url)
+        console.log(repos[repoNumber].name)
+    }
+    let apiGen = userRepo("sergeyMelentyev", 1)
+    apiGen.next()
+
+
     {   // input and output
         function *foo(x,y) { return x * y }
         var iterator = foo(2,3) // generator func call produces iterator, no code execution
@@ -1095,6 +1109,15 @@ function promise() {
         })
 
     }
+function asyncAwait() {
+    async function getRepo(name, number) {
+        let response = await fetch(`https://api.github.com/users/${user}`)
+        let data = await response.json()
+        let reposResponse = await fetch(data.repos_url)
+        let reposData = await reposResponse.json()
+    }
+    getRepo("sergeyMelentyev", 1)
+}
 
 function class() {
     {   // simple example
@@ -1151,7 +1174,6 @@ function module() {
     export function getAge(){ return 35 }
     import {name, getAge} from "./module"
     import {name as n, getAge as g} from "./module"
-
 
     import * as foo from "./modules"
     }
