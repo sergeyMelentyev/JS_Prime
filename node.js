@@ -2,7 +2,7 @@ function global() {
 	global;						// global object
 	process;					// shell environment, "process.env" get environment data
 	// ivent stack == event loop
-}
+	}
 function jsonServerIterateOverFolders(){
 	// iterate over content of folder, filter out any files (not folders), return arr of folders names 
 	const http = require("http"),
@@ -43,7 +43,7 @@ function jsonServerIterateOverFolders(){
 	}
 	const server = http.createServer(handleIncomingRequest);
 	server.listen(8080);
-}
+	}
 function debug() {
 	// :> node debug name.js	// help, list(10), setBreakpoint(line), repl
-}
+	}
