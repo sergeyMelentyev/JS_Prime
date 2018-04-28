@@ -704,38 +704,33 @@ function webWorker() {
     }
     }
 function request() {
-    {   // XMLHttpRequest
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function () {      // provide a callback to the event
-            if ((xhr.readyState === 4) && (xhr.status === 200)) {
-                document.body.innerHTML += '<div>' + xhr.responseText + '</div>';
-            }
+    // XMLHttpRequest
+    var xhr = new XMLHttpRequest()
+    xhr.onreadystatechange = function () {      // provide a callback to the event
+        if ((xhr.readyState === 4) && (xhr.status === 200))
+            document.body.innerHTML += '<div>' + xhr.responseText + '</div>'
+    }
+    xhr.open("GET", "page.html", true);         // method, url, asynchronous
+    xhr.send("")
 
-        };
-        xhr.open("GET", "page.html", true);     // method, url, asynchronous
-        xhr.send("");
-    }
-    {   // jQuery.ajax
-        $.ajax({
-            url: "url",
-            context: document.body
-        }).done(function() {
+    // jQuery.ajax
+    $.ajax({ url: "url", context: document.body })
+        .done(function() {
             // logic here
-        });
-    }
-    {   // fetch webapi
-        fetch("url", {
-            method: "GET"
-        }).then(response => response.json()).then(data => console.log(data));
-    }
-    {   // webSocket
-        // browser send GET request, if server response success, TCP connection stay open
-        // each side can send data without headers and metadata
-        var ws = new WebSocket("ws://site.com/demo");
-        ws.onopen = function() { /* success callback, connection established */ };
-        ws.onclose = function() { /* closing callback, connection ended */ };
-        ws.onmessage = function(data) { /* receiving data callback */ };
-    }
+        })
+
+    // fetch webapi
+    fetch("url", { method: "GET" })
+        .then(response => response.json())
+        .then(data => console.log(data))
+
+    // webSocket
+    // browser send GET request, if server response success, TCP connection stay open
+    // each side can send data without headers and metadata
+    var ws = new WebSocket("ws://site.com/demo")
+    ws.onopen = function() { /* success callback, connection established */ }
+    ws.onclose = function() { /* closing callback, connection ended */ }
+    ws.onmessage = function(data) { /* receiving data callback */ }
     }
 function testing() {
     // QUnit module testing
@@ -759,6 +754,14 @@ function utils() {
         if (doSomething()) {
             // handle next task
         }
+    }
+    {   // documentation
+         /**
+           * Method definition
+           *
+           * @param {String} name - param definition
+           * @returns {Number} return value definition
+           */
     }
     }
 function babelGulpWebpack() {
