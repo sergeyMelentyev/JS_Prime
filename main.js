@@ -43,7 +43,6 @@ function referenceVal() {
     name(y)                         // ref to arr will be passed, not address of arr
     console.log(y)                  // => empty array
     }
-
 function string() {
     // new String, new Number, new Boolean are reference type
     // string => immutable type, represents a single 16-bit unit of UTF-16 text
@@ -54,6 +53,7 @@ function string() {
     var a = "Ser"; var t = new String(a); var c = t.charAt(0); t = null; console.log(c)
 
     String.prototype.yourMethodName = function() { return /* logic here */ }    // add custom methods
+    sre.length                                  // str length
     str.startsWith(searchString[, position])    // boolean
     str.endsWith(searchString[, length])        // boolean
     str.includes(searchString[, position])      // boolean
@@ -590,8 +590,6 @@ function prototype() {
     }
     var newUser = new userCreator("Sergey", 1)
     
-
-
     // func has .prototype prop that is shared among all obj instances
     // func .prototype prop is created with .constructor prop equal to the func itself
     // Object.prototype == top-end of every normal [[Prototype]] chain
@@ -1110,14 +1108,15 @@ function promise() {
 
     }
 function asyncAwait() {
-    async function getRepo(name, number) {
+    async function getRepo(name) {
         let response = await fetch(`https://api.github.com/users/${user}`)
         let data = await response.json()
-        let reposResponse = await fetch(data.repos_url)
-        let reposData = await reposResponse.json()
     }
-    getRepo("sergeyMelentyev", 1)
-}
+    let getRepo = async (name) => {
+        let response = await fetch(`https://api.github.com/users/${user}`)
+        let data = await response.json()
+    }
+    }
 
 function class() {
     {   // simple example
