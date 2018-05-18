@@ -1,4 +1,4 @@
-function basics() {
+basics => {
     // js paradigm
     memory/variable environment; global/local execution context; call stack; callback queue; event looop
     (1 + 1, 2 + 2)          // => 4    
@@ -9,30 +9,17 @@ function basics() {
     let name = undefined; let last = undefined; name = 0
     }
 
-function primitiveVal() {
+primitiveVal => {
     // primitive vals are stored directly in the variable object
     var a = "a"         // var contains primitive val, val is copied into that var
     var b = a           // each var gets its own copy of data, changes in "a" will not affect "b"
 
-    // identify type
-    typeof null        // "object", empty obj pointer
-    typeof undefined   // "undefined", always use it instead of "null"
-    typeof true        // "boolean"
-    typeof 123         // "number"
-    typeof "foo"       // "string"
-    typeof symbol      // "symbol"
-
-    typeof ["a"]       // "object"
-    typeof {a:1}       // "object"
-    typeof funcName     // "function", callable object type
-
-    // false vals
-    false; null; undefined; ""; 0; NaN;
+    (undefined, null, boolean, string, number, symbol) => "are primitive values" 
 
     // number => double-precision 64-bit binary
     NaN === "failed in number coercion or math operation"
     }
-function referenceVal() {
+referenceVal => {
     // reference vals are stored as pointers in the variable object
     var obj = new Object()          // assign a pointer to the obj
     var a = obj                     // get a copy of the pointer to the same obj in memory
@@ -41,10 +28,9 @@ function referenceVal() {
     function name(x) { x = null }
     let y = new Array()
     name(y)                         // ref to arr will be passed, not address of arr
-    console.log(y)                  // => empty array
+    console.log(y)                  // => array
     }
-function string() {
-    // new String, new Number, new Boolean are reference type
+string => {
     // string => immutable type, represents a single 16-bit unit of UTF-16 text
     var foo = new String("foo"); typeof foo    // "object"; keys = [0,1,2]; vals = ['f','o','o']
 
@@ -74,11 +60,21 @@ function string() {
     let count = 10,             // template literal substitution === string concatenation
         price = 0.25,
         message = `${count} items cost ${(count * price).toFixed(2)}.`
+    
+    tagFunction`Hello ${firstName} ${lastName}!`
+    // the same as
+    tagFunction(['Hello ', ' ', '!'], firstName, lastName)
+
+    // iterate over str
+    for (let char of "abc") console.log(char)
+
+    // spread
+    let chars = [..."abc"]      // create an array of chars
     }
-function symbol() {
+symbol => {
     // nonenumerable properties that can’t be accessed without referencing the symbol
     // unique and immutable non-String obj prop key
-    Symbol.hasInstance // if constructor obj recogniz an obj as one of the constructor instances (instanceof)
+    Symbol.hasInstance // if constructor obj recognize an obj as one of the constructor instances (instanceof)
     Symbol.iterator    // returns the default iterator for an object (for-of)
     
     var firstName = Symbol("description")       // symbol hold val [[Description]] that "undefined" or string
@@ -95,11 +91,11 @@ function symbol() {
     })
 
     // get symbols
-    let symbols = Object.getOwnPropertySymbols(person) // array for-of symbols
+    let symbols = Object.getOwnPropertySymbols(person)  // array for-of symbols
     Symbol.keyFor(uid)
     }
 
-function coercion() {
+coercio => {
     // from string to number
     function intToNum(str) {
         var val = parseInt(str, 10) // "10px" = 10, stops when not valud val reached
@@ -132,7 +128,21 @@ function coercion() {
     {}.toString() = "[object Object]"
     {a:1}.toString() = "[object Object]"
     }
-function compareAndCheck() {
+compareAndCheck => {
+    // identify type
+    typeof null        // "object", empty obj pointer
+    typeof undefined   // "undefined", always use it instead of "null"
+    typeof true        // "boolean"
+    typeof 123         // "number"
+    typeof "foo"       // "string"
+    typeof symbol      // "symbol"
+
+    typeof ["a"]       // "object"
+    typeof {a:1}       // "object"
+    typeof funcName     // "function", callable object type
+
+    // false vals
+    false; null; undefined; ""; 0; NaN;
     // regular comparison
     x < y      // return "true", "false" or "undefined" if any operand is NaN
     x == y     // numeric coercion, only for compare numbers with numbers, never with bools
@@ -175,12 +185,12 @@ function compareAndCheck() {
     funcName instanceof Function   // true
     }
 
-function regExp() {
+regExp => {
     var nums = /\d+/g
     var nums = new RegExp("\\d+", "g")
     }
 
-function scope() {
+scope => {
     // only lexical scope is present in js
 
     // jit compiler at first pass will look for any formal var/func declaration
@@ -224,7 +234,7 @@ function scope() {
         projectEntryData = { id: projectId, description: "description" }
     }
     }
-function this() {
+thisPointer => {
     // function form of invocation
     functionName(args)
     // "this" pointer will be set to global obj, will bind to "underfined" in strict mode
