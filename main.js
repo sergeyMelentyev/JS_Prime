@@ -215,11 +215,6 @@ scope => {
     foo = undefined        // initialization point
     foo = "bar"            // data assigned
 
-    let foo = "bar"        // will expands to...
-    let foo                // var hoisted and declared at the top of the module
-    ...                     // no initialization point
-    foo = "bar"            // initialization and assignment
-
     // function declaration
     function name() {}                  // will expands to...
     var name = function name() {}
@@ -281,7 +276,7 @@ thisPointer => {
     var baz = new Foo(2)
     }
 
-function func() {
+func => {
     // first class obj, inherit from Function.prototype
     // member of Object type, may be invoked as a subroutine
     // internal prop [[Call]], distinguishes func from obj, used if func is called without "new"
@@ -351,7 +346,7 @@ function func() {
     var regularPerson = { firstname: "Bill" }
     var lordify = ({firstname}) => { console.log(`${firstname} of Canterbury`) }
     lordify(regularPerson) }
-function arrowFunc() {
+arrowFunc => {
     // fat arrow (arrow func)
     // no internal [[Construct]] method, cannot be called with "new" keyword
     // no "this" binding, "this" is just a var name, lexical scope rules are applied
@@ -369,7 +364,7 @@ function arrowFunc() {
     let row = function () { return mapWith( function (column) { return column * arguments[0] }, [1, 2, 3] ) }
     row(3)     // [1,4,9] reg func will bind arguments[0] to val from iterable array
     }
-function closure() {
+closure => {
     // characteristic of func that allows access its lexical scope while executing outside of it
     // closures contain free vars that is not bound within the func
     // after func applied to args its vars is not saved on the stack as usual, but in HEAP
@@ -380,7 +375,7 @@ function closure() {
     }())
     letters(0)
     }
-function recursion() {
+recursion => {
     // recursive func with tail call optimization, current stack frame is cleared and reused
     // no access to vars in the current stack frame (func is not a closure)
     // func making the tail call has no further work to do after the tail call returns
@@ -415,7 +410,7 @@ function recursion() {
     deepPick("data.info.fullname.first", dan)   // "Dan"
     }
 
-function object() {
+object => {
     // object props must be strings or symbols
     // obj can have own props (directly contained) or inherited (props of obj prototype)
     let obj = {
@@ -533,8 +528,11 @@ function object() {
     var print = function() { console.log(`Mt. ${this.name} is ${this.elevation} feet tall`) }
     var funHike = { name, elevation, print }
     funHike.print()     // Mt. Tallac is 9738 feet tall
+    // several levels deep
+    const obj = {a: [{ foo: 123, bar: "abc" }, {}], b: true }
+    const { a: [{foo: f}] } = obj       // f = 123
     }
-function constructor() {
+constructorCall => {
     // func with constructor call use "new" in order to construct an obj
     // arbitrary labeled obj will be created, "Person.prototype" will point to that obj
     // "obj.constructor" will point back to "Person"
@@ -571,7 +569,7 @@ function constructor() {
         else throw new Error("You must use new with Person.")
     }
     }
-function prototype() {
+prototype => {
     // nature of prototype chain
     function userCreator(name, score) {
         var user = Object.create(userFunctionScore) // inherit methods from "userFunctionScore" obj
@@ -656,7 +654,7 @@ function prototype() {
     for (let i in obj)     // any prop of "obj" that can be reached via chain will be enumerated
     let i = ("key" in obj) // check the entire chain of the obj
     }
-function inheritance() {
+inheritance => {
     // prototype chaining or prototypal inheritance
     var obj = {}    // its [[Prototype]] set to Object.prototype
 
@@ -706,7 +704,7 @@ function inheritance() {
     }
     }
 
-function arrayObject() {
+arrayObject => {
     // inherits from Object, indexes are converted to strs and used as names for retrieving vals
     let items = new Array(2)                        // items.length = 2 items[0] === undefined
     let items = new Array(1, 2)                     // items.length = 2 items[0] === 1
@@ -785,8 +783,9 @@ function arrayObject() {
     var [firstColor, secondColor ] = colors        // firstColor = "red"; secondColor = "green"
     var [,,thirdColor] = colors      // thirdColor = "blue"
     var [firstColor, secondColor = "white"] = colors    // default value
+    var [x,...y] = "abc"    // rest operator x='a'; y=['b', 'c']
     }
-function arrayBuffer() {
+arrayBuffe =>r {
     // typed array, allow storage and manipulation of eight different numeric types
     Signed 8-bit integer (int8), Unsigned 8-bit integer (uint8)
     Signed 16-bit integer (int16), Unsigned 16-bit integer (uint16)
@@ -823,11 +822,11 @@ function arrayBuffer() {
     let buffer = new ArrayBuffer(5) let init = new Int8Array(buffer)
     init.BYTES_PER_ELEMENT     // 1 byte each element
     }
-function sharedArrayBuffer() {
+sharedArrayBuffer => {
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects
     Atomics.add()
     }
-function map() {
+map => {
     // holds key-value pairs, keys can be any val (checks with Object.is()), func, obj, or primitive
     new Map([iterable])
     var map = new Map([["name", "Sergey"], ["age", 35]])   // map initialization
@@ -864,7 +863,7 @@ function map() {
         return Person
     }())
     }
-function set() {
+set => {
     // set is an ordered collection of unique items (checks with Object.is()), cannot be directly accessed by index
     new Set([iterable])
     var set = new Set([1, 2, 3, 4, 5, 5, 5, 5])     // from arr to set
@@ -893,7 +892,7 @@ function set() {
     let set = new WeakSet()    // not iterable, cannot be used in for-of loop and forEach()
     }
 
-function spreadOperator() {
+spreadOperator => {
     // array
     var nums = [1,2]; var chars = ["a", "b"]
     console.log(...nums)       // the same as console.log(arr[0] + " " + arr[1])
@@ -906,12 +905,12 @@ function spreadOperator() {
     var clonedObj = { ...obj1 }    // Object { foo: "bar", x: 42 }
     var mergedObj = { ...obj1, ...obj2 }   // Object { foo: "baz", x: 42, y: 13 }
     }
-function json() {
+json => {
     JSON.parse(text[, reviver])                 // parse JSON string, construct JS value
     JSON.stringify(value[, replacer[, space]])  // convert JS value to JSON string
     }
 
-function iterator() {
+iterator => {
     // Symbol.iterator symbol specifies a func that returns an iterator for arrs, sets, and maps
     let values = [1, 2, 3]
     let iterator = values[Symbol.iterator]()   // iterator.next() => "{ value: 1, done: false }"
@@ -930,7 +929,7 @@ function iterator() {
     var divs = document.getElementsByTagName("div")
     for (let div of divs) console.log(div.id)
     }
-function generator() {
+generator => {
     function ajax(endPoint) {
         fetch(endPoint)
             .then(res => res.json())
@@ -1000,7 +999,7 @@ function generator() {
     iterator.next()     // { value: "green", done: false }
     iterator.next()     // { value: true, done: false }
     }
-function promise() {
+promise => {
     // states: pending, fulfilled, rejected, immutable once resolved
     const getFakeMembers = count => new Promise((resolve, reject) => {
         const api = `https://api.randomuser.me/?nat=US&results=${count}`
@@ -1117,7 +1116,7 @@ function promise() {
         })
 
     }
-function asyncAwait() {
+asyncAwait => {
     async function getRepo(name) {
         let response = await fetch(`https://api.github.com/users/${user}`)
         let data = await response.json()
@@ -1128,7 +1127,7 @@ function asyncAwait() {
     }
     }
 
-function class() {
+class => {
     {   // simple example
         class Human {
             constructor(name, age) {
@@ -1155,7 +1154,7 @@ function class() {
     }
     }
 
-function exeption() {
+exeption => {
     throw new Error(reason)
     
     throw {
@@ -1169,7 +1168,7 @@ function exeption() {
         console.log(err.stack)
     }
     }
-function module() {
+module => {
     // must work with http2.0 protocol
     var name = "S"
     function getAge(){ return 35 }
@@ -1186,14 +1185,14 @@ function module() {
 
     import * as foo from "./modules"
     }
-function observables() {
+observables => {
     // ES2017
     {   // 
         // 
     }
     }
 
-function composition() {
+composition => {
     // apply several function calls in a chain
     const nextCharFromNumberStr = (str) =>
         [str]
@@ -1202,25 +1201,4 @@ function composition() {
         .map(s => s + 1)
         .map(s => String.fromCharCode(s))
     const result = nextCharFromNumberStr("  64 ")   // => 'A'
-    }
-
-function ES6() {
-    // variables declarations
-    const/let
-    
-    // restrict scope of var to block using const/let
-    { 
-        let tmp = ""
-    }
-
-    // template literal
-    var str = `(${x}, ${y})`
-
-    // arrow functions
-    var func = (x) => console.log(x)
-
-    // destructuring
-    const [, year, month, day] = /^(\d\d\d\d)-(\d\d)-(\d\d)$/.exec('2999-12-31')
-
-    // 
     }
