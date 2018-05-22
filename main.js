@@ -345,7 +345,8 @@ func => {
     // destructuring
     var regularPerson = { firstname: "Bill" }
     var lordify = ({firstname}) => { console.log(`${firstname} of Canterbury`) }
-    lordify(regularPerson) }
+    lordify(regularPerson)
+    }
 arrowFunc => {
     // fat arrow (arrow func)
     // no internal [[Construct]] method, cannot be called with "new" keyword
@@ -784,8 +785,13 @@ arrayObject => {
     var [,,thirdColor] = colors      // thirdColor = "blue"
     var [firstColor, secondColor = "white"] = colors    // default value
     var [x,...y] = "abc"    // rest operator x='a'; y=['b', 'c']
+
+    const items = [ ["foo", 3], ["bar", 9] ]
+    items.forEach(([word, count]) => console.log(word+' '+count))
+    const items = [{ word:'foo', count:3 }, { word:'bar', count:9 }]
+    items.forEach(({word, count}) => console.log(word+' '+count))
     }
-arrayBuffe =>r {
+arrayBuffer => {
     // typed array, allow storage and manipulation of eight different numeric types
     Signed 8-bit integer (int8), Unsigned 8-bit integer (uint8)
     Signed 16-bit integer (int16), Unsigned 16-bit integer (uint16)
@@ -1169,21 +1175,17 @@ exeption => {
     }
     }
 module => {
-    // must work with http2.0 protocol
-    var name = "S"
-    function getAge(){ return 35 }
-    export {name, getAge}
-    export default name    // only one type
+    // multiple named exports
+    export const sqrt = Math.sqrt
+    export function square(x) { return x * x }
+    export function diag(x, y) { return sqrt(square(x) + square(y)) }
 
-    import person from "./modules"
-    person.name person.getAge()
+    import { square, diag } from "lib"      // import required methods
+    import * as lib from "lib"              // import complete module
 
-    export var name = "S"
-    export function getAge(){ return 35 }
-    import {name, getAge} from "./module"
-    import {name as n, getAge as g} from "./module"
-
-    import * as foo from "./modules"
+    // single default export
+    export default function () { ··· }      // no semicolon
+    import myFunc from "myFunc"
     }
 observables => {
     // ES2017
@@ -1202,3 +1204,4 @@ composition => {
         .map(s => String.fromCharCode(s))
     const result = nextCharFromNumberStr("  64 ")   // => 'A'
     }
+
