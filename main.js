@@ -354,6 +354,7 @@ arrowFunc => {
     // "this" inhereted from enclosing scope by looking up scope chain
     // don’t have args obj, args remain accessible due to scope chain resolution of args identifier
     // call(), apply(), bind() will NOT affect "this" binding
+    // () => ({ foo: 'bar' }) wrap obj in parenthesis in order to return it
 
     var name = (x) => ++                // function name(x) { return ++x }
     var name = (x) => { return ++x }    // for multi line body use braces and explicit return
@@ -491,7 +492,7 @@ object => {
 
     // duplicating objs
     var newObj = JSON.parse(JSON.stringify( someObj ))   // deep copy
-    var newObj = Object.assign({}, ids)              // shallow copy
+    var newObj = Object.assign({}, ids) // shallow copy, (target, source_1, source_2...), inherited props ignored 
 
     // mixing objs props and methods, shallow copy, receiver - supplier - supplier - ...
     function EventTarget() { }
@@ -654,6 +655,17 @@ prototype => {
     // enumerate via prototype chain
     for (let i in obj)     // any prop of "obj" that can be reached via chain will be enumerated
     let i = ("key" in obj) // check the entire chain of the obj
+
+    // add methods to the obj
+    Object.assign(SomeClass.prototype, {
+        someMethod() { ··· },
+        anotherMethod() { ··· }
+    })
+    // clone obj with same prototype as original
+    function clone(orig) {
+        const origProto = Object.getPrototypeOf(orig)
+        return Object.assign(Object.create(origProto), orig)
+    }
     }
 inheritance => {
     // prototype chaining or prototypal inheritance
@@ -709,7 +721,9 @@ arrayObject => {
     // inherits from Object, indexes are converted to strs and used as names for retrieving vals
     let items = new Array(2)                        // items.length = 2 items[0] === undefined
     let items = new Array(1, 2)                     // items.length = 2 items[0] === 1
-    let items = Array.of(1, 2)                      // items.length = 2 items[0] === 1
+    let items = Array.of(1, 2)                      // combine several vals into array
+    let items = Array.from(new Array(5), (x,i) => i*2)      // [ 0, 2, 4, 6, 8 ]
+    let items = Array.from({length: 2, 0: 'a', 1: 'b'})     // ["a","b"]
     var makeArray = Array.apply(null, { length: 5 }).map(() => "logic here")
     function makeArray() { return Array.prototype.slice.call(arguments) }
     function makeArray() { let args = Array.from(arguments); return args }
@@ -732,7 +746,7 @@ arrayObject => {
     var arr = oldArr.slice([, begin], [, end])      // return shallow copy of a portion of an arr into new array 
 
     // iteration nonmutator methods
-    var iter = a.entries(); iterator.next()             // var a = ['a', 'b'] => { value: [ 0, 'a' ], done: false }
+    var iter = a.entries()                              // var a = ['a', 'b'] => { value: [ 0, 'a' ], done: false }
     var iter = a.keys(); iter.next()                    // var a = ['a', 'b'] => { value: 0, done: false }
     var bool = a.every(function(val,i,arr){}[, this])   // test each elem, if find falsy return false, otherwise true
     var arr = a.filter(function(val,i,arr){}[, this])   // new arr with elems that pass test with predicate
@@ -857,7 +871,7 @@ map => {
     myMap.forEach(function(val,key,map){}[, this])  // execute callback once per each key/val, => undefined
 
     // weakmap does`t put strong reference on obj, does`t prevent garbage collection
-    // every key must be an obj
+    // every key must be a reference type
     var Person = (function() {
         let privateData = new WeakMap()
         function Person(name) {
@@ -898,6 +912,21 @@ set => {
     let set = new WeakSet()    // not iterable, cannot be used in for-of loop and forEach()
     }
 
+loops => {
+    // for-of loop over iterable data, can be used with break and continue
+    const iterable = ['a', 'b']
+    for (const x of iterable) console.log(x)
+    // with destructuring
+    const map = new Map().set(false, "no").set(true, "yes")
+    for (const [k,v] of map) console.log(`key = ${k}, value = ${v}`)
+
+    // using iterators’ contents in arrs
+    for (const [index, element] of ['a', 'b'].entries()) console.log(index, element)
+    }
+restOperator => {
+    // use instead of arguments inside function declaration
+    function foo (...arrContainerForAllPassedArgs) { ... }
+    }
 spreadOperator => {
     // array
     var nums = [1,2]; var chars = ["a", "b"]
@@ -936,6 +965,7 @@ iterator => {
     for (let div of divs) console.log(div.id)
     }
 generator => {
+    // suspend execution while retaining context
     function ajax(endPoint) {
         fetch(endPoint)
             .then(res => res.json())
@@ -949,51 +979,50 @@ generator => {
     let apiGen = userRepo("sergeyMelentyev", 1)
     apiGen.next()
 
+    // input and output
+    function *foo(x,y) { return x * y }
+    var iterator = foo(2,3) // generator func call produces iterator, no code execution
+    var result = iterator.next()    // { value: 6, done: true }
+    
+    // message in
+    function *foo(x) { var y = x * (yield); return y }
+    var iterator = foo(2)   // produce iterator, no code execution
+    iterator.next() // pause at y = 2 * (yield) and request value for yield expression
+    var result = iterator.next(3)   // { value: 6, done: true }
+    
+    // message out
+    function *foo(x) { var y = x * (yield "data"); return y }
+    var iterator = foo(2)   // produce iterator, no code execution
+    var result = iterator.next()    // { value: "data", done: false }
+    result = iterator.next(3)   // { value: 6, done: true }
 
-    {   // input and output
-        function *foo(x,y) { return x * y }
-        var iterator = foo(2,3) // generator func call produces iterator, no code execution
-        var result = iterator.next()    // { value: 6, done: true }
+    // generator function
+    function *createIterator(items) {
+        for (let i = 0; i < items.length; i++) yield items[i]
     }
-    {   // message in
-        function *foo(x) { var y = x * (yield); return y }
-        var iterator = foo(2)   // produce iterator, no code execution
-        iterator.next() // pause at y = 2 * (yield) and request value for yield expression
-        var result = iterator.next(3)   // { value: 6, done: true }
+    let iterator = createIterator([1, 2, 3])   // iterator.next() => "{ value: 1, done: false }"
+
+    // generator function expression
+    let createIterator = function *(items) {
+        for (let i = 0 i < items.length i++) yield items[i]
     }
-    {   // message out
-        function *foo(x) { var y = x * (yield "data"); return y }
-        var iterator = foo(2)   // produce iterator, no code execution
-        var result = iterator.next()    // { value: "data", done: false }
-        result = iterator.next(3)   // { value: 6, done: true }
-    }
-    {   // generator function
-        function *createIterator(items) {
+    let iterator = createIterator([1, 2, 3])   // iterator.next() => "{ value: 1, done: false }"
+
+    // generator object method
+    var o = {
+        *createIterator(items) {
             for (let i = 0 i < items.length i++) yield items[i]
         }
-        let iterator = createIterator([1, 2, 3])   // iterator.next() => "{ value: 1, done: false }"
-
-        // generator function expression
-        let createIterator = function *(items) {
-            for (let i = 0 i < items.length i++) yield items[i]
-        }
-        let iterator = createIterator([1, 2, 3])   // iterator.next() => "{ value: 1, done: false }"
-
-        // generator object method
-        var o = {
-            *createIterator(items) {
-                for (let i = 0 i < items.length i++) yield items[i]
-            }
-        }
-        let iterator = o.createIterator([1, 2, 3]) // iterator.next() => "{ value: 1, done: false }"
-
-        // iterable object
-        let collection = {
-            items: [],
-            *[Symbol.iterator]() { for (let item of this.items) yield item }
-        }
-        collection.items.push(1); for (let x of collection)  // 1, 2, 3   
     }
+    let iterator = o.createIterator([1, 2, 3]) // iterator.next() => "{ value: 1, done: false }"
+
+    // iterable object
+    let collection = {
+        items: [],
+        *[Symbol.iterator]() { for (let item of this.items) yield item }
+    }
+    collection.items.push(1); for (let x of collection)  // 1, 2, 3   
+
     // combined genarators
     function *firstIterator() { yield 1; yield 2 }
     function *secondIterator() { yield "red"; yield "green" }
@@ -1123,14 +1152,13 @@ promise => {
 
     }
 asyncAwait => {
+    let getRepo = async (name) => { ... }
     async function getRepo(name) {
         let response = await fetch(`https://api.github.com/users/${user}`)
         let data = await response.json()
+        return data
     }
-    let getRepo = async (name) => {
-        let response = await fetch(`https://api.github.com/users/${user}`)
-        let data = await response.json()
-    }
+    var promise = getRepo().then(...)
     }
 
 class => {
@@ -1158,6 +1186,45 @@ class => {
         }
         var person = new Men("S", 35, 123)
     }
+    }
+proxy => {
+    // determine behavior whenever the properties of a target object are accessed
+    var target = {}; var handler = {}
+    var proxy = new Proxy(target, handler)
+    proxy.a = 'b'; console.log(target.a)        // <- 'b'
+
+    // get trap
+    var target = {}
+    var handler = {
+      get (target, key) {
+        console.info(`Get on property "${key}"`)
+        return target[key]
+      }
+    }
+    var proxy = new Proxy(target, handler)
+    proxy.a = 'b'
+    proxy.a                                     // <- 'Get on property "a"'
+
+    // set trap
+    var target = {}
+    var handler = {
+      get (target, key) {
+        invariant(key, 'get')
+        return target[key]
+      },
+      set (target, key, value) {
+        invariant(key, 'set')
+        return true
+      }
+    }
+    function invariant (key, action) {
+      if (key[0] === '_') {
+        throw new Error(`Invalid attempt to ${action} private "${key}" property`)
+      }
+    }
+    var proxy = new Proxy(target, handler)
+    proxy.a = 'b'; console.log(proxy.a)     // <- 'b'
+    proxy._prop                 // <- Error: Invalid attempt to get private "_prop" property
     }
 
 exeption => {
@@ -1204,4 +1271,3 @@ composition => {
         .map(s => String.fromCharCode(s))
     const result = nextCharFromNumberStr("  64 ")   // => 'A'
     }
-
