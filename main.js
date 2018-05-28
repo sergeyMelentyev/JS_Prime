@@ -1162,30 +1162,28 @@ asyncAwait => {
     }
 
 class => {
-    {   // simple example
-        class Human {
-            constructor(name, age) {
-                this.name = name
-                this.age = age
-            }
-            dataFormatter() {
-                return this.name + this.age
-            }
-            get data(){
-                return this.dataFormatter()
-            }
-            set data(name){
-                this.name = name
-            }
+    class Human {
+        constructor(name, age) {
+            this.name = name
+            this.age = age
         }
-        class Men extends Human {
-            constructor(name, age, id){
-                super(name, age)
-                this.id = id
-            }
+        dataFormatter() {
+            return this.name + this.age
         }
-        var person = new Men("S", 35, 123)
+        get data(){
+            return this.dataFormatter()
+        }
+        set data(name){
+            this.name = name
+        }
     }
+    class Men extends Human {
+        constructor(name, age, id){
+            super(name, age)
+            this.id = id
+        }
+    }
+    var person = new Men("S", 35, 123)
     }
 proxy => {
     // determine behavior whenever the properties of a target object are accessed
