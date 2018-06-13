@@ -1272,5 +1272,27 @@ composition => {
     const result = nextCharFromNumberStr("  64 ")   // => 'A'
     }
 webSockets => {
-    //
+    // client socket.io
+    <script src="/socket.io/socket.io.js" />    // get static content from server inside html
+    var socket = io.connect("http://localhost", {"forceNew": true})
+    socket.io("messages", function(data) { console.log(data) })     // listen to events from server
+    socket.emit("anyType", {"payload": "here"})                     // emit events to the server
+
+    // server socket.io
+    var express = require("express"); var app = express()
+    var server = require("http").Server(app)
+    var io = require("socket.io")(server)
+
+    app.use(express.static("app"))  // serve static content for the client
+
+    var box = new Array("One", "Two")
+    io.on("connection", function(socket) {
+        socket.emit("messages", box)                // send data to client ones it first connected
+        socket.on("anyType", function(data) {       // listen to events from client
+            box.push(data)
+            io.sockets.emit("messages", box)        // send data to all connected sockets to the server
+        })
+    })
+
+    server.listen(80)
     }
