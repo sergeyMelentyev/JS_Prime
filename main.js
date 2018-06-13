@@ -95,7 +95,7 @@ symbol => {
     Symbol.keyFor(uid)
     }
 
-coercio => {
+coercion => {
     // from string to number
     function intToNum(str) {
         var val = parseInt(str, 10) // "10px" = 10, stops when not valud val reached
@@ -230,6 +230,7 @@ scope => {
     }
     }
 thisPointer => {
+    // pointer "this" is a pointer to the object, that is a current context
     // function form of invocation
     functionName(args)
     // "this" pointer will be set to global obj, will bind to "underfined" in strict mode
@@ -1152,6 +1153,7 @@ promise => {
 
     }
 asyncAwait => {
+    // subset of Generators, works only with Promises
     let getRepo = async (name) => { ... }
     async function getRepo(name) {
         let response = await fetch(`https://api.github.com/users/${user}`)
@@ -1268,4 +1270,7 @@ composition => {
         .map(s => s + 1)
         .map(s => String.fromCharCode(s))
     const result = nextCharFromNumberStr("  64 ")   // => 'A'
+    }
+webSockets => {
+    //
     }
