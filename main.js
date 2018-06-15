@@ -1178,11 +1178,17 @@ class => {
         set data(name){
             this.name = name
         }
+        static createRandom() {     // attached directly to class, don`t require instance, cannot be called via instance
+            return new Human(`${Math.random()}`)
+        }
     }
     class Men extends Human {
         constructor(name, age, id){
             super(name, age)
             this.id = id
+        }
+        anotherDataFormatter() {
+            reurn super.dataFormatter() + "something"
         }
     }
     var person = new Men("S", 35, 123)
@@ -1283,7 +1289,7 @@ webSockets => {
     var server = require("http").Server(app)
     var io = require("socket.io")(server)
 
-    app.use(express.static("app"))  // serve static content for the client
+    app.use(express.static("app"))                  // serve static content for the client
 
     var box = new Array("One", "Two")
     io.on("connection", function(socket) {
