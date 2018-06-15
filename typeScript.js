@@ -8,21 +8,63 @@ casting => {
 	let input = document.querySelector("name") as HTMLInputElement
 	}
 objShape => {
-	let obj: { name: string, password: string }					// declaration
-	obj = { name: "name", password: "pass", id: 123 }			// assigment with error
+	let obj: { name: string, password: string }				// declaration
+	obj = { name: "name", password: "pass", id: 123 }		// assigment with error
 	obj = {
 		name: "name", password: "pass", id: 123
-	} as { name: string, password: string, id: number }			// assigmeng with type casting
+	} as { name: string, password: string, id: number }		// assigmeng with type casting
 	}
 interface => {
-	interface Obj { name: string; password: string; }			// can`t have implementation, describe shape of obj
-	let myObj: Obj = { name: "name", password: "pass" }			// ok
-	function func(objOne: Obj, objTwo: Obj) { ... }
+	interface Obj { name: string; password: string; }		// can`t have implementation, describe shape of obj
+	interface Obj { id: number }							// extend current interface
+	interface NewObj extends Obj { field: "value" }			// extend current interface
 
-	interface Obj { id: number }								// extend current interface
-	let myObj: Obj = { name: "name", password: "111", id: 12 }	// ok
+	let myObj: Obj = { name: "name", password: "pass" }
+	function func(objOne: Obj, objTwo: Obj) { ... }
+	}
+typeAliase => {
+	// can be exported and consume in other module
+	type Color = [number, number, number]
+	let red: Color = [255, 0, 0]
 	}
 any => {
-	let age = 34; let myAge = age as any; myAge = "35"			// type wild card, can be reassign with another type
+	let age = 34; let myAge = age as any; myAge = "35"		// type wild card, can be reassign with another type
 	function add (a: any, b: any): number { ... }
+	}
+class => {
+	class Car {
+		make: string
+		model: string
+		year: number
+		constructor(make: string, model: string, year: number) {
+			this.make = make; this.model = model; this.year = year
+		}
+		startEngine() { return "VROOM" }
+	}
+	let car = new Car("Mazda", "2", 2008)
+	}
+array => {
+	let nums: number[] = [1,2,3]							// var
+	class ShoppingCart {
+		items: number[] = new Array()						// class props
+		constructor() { this.items.push(5) }
+	}
+	var arr: MyObj[] = new Array()							// array of obj of type Obj
+
+	let dep: [string, number]; dep = ["react", 16]			// arr of tuples
+	let deps: [string, number][] = new Array()
+	}
+tuples => {
+	// arr of fixed length
+	let dep: [string, number]
+	dep = ["react", 16]
+	}
+enums => {
+	enum AcctType {
+		Checking,
+		Saving,
+		MoneyMarket
+	}
+	type Acct = [number, AcctType]
+	let account: Acct = [9000, AcctType.Checking]
 	}
