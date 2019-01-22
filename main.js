@@ -1,4 +1,13 @@
-basics => {
+core => {
+    // callback from promise is being added to the microtask que and has higher priority,
+        // even if it took more time before it was added to the que
+    // callback from setTimeout is being added to the task que and has lower priority,
+        // even if it took less time before it was added to the que
+    // task que is being executed one tast at a time plus then return to main thread
+    // animation request frame will execute all qued tasks at a time, not including new tasks
+    // microtasks is being executed all at once including new tasks,
+        // main thread will resume execution only after microtask que is empty 
+
     // js paradigm
     memory/variable environment; global/local execution context; call stack; callback queue; event looop
     (1 + 1, 2 + 2)          // => 4    
@@ -62,8 +71,6 @@ string => {
         message = `${count} items cost ${(count * price).toFixed(2)}.`
     
     tagFunction`Hello ${firstName} ${lastName}!`
-    // the same as
-    tagFunction(['Hello ', ' ', '!'], firstName, lastName)
 
     // iterate over str
     for (let char of "abc") console.log(char)
@@ -966,6 +973,28 @@ iterator => {
     for (let div of divs) console.log(div.id)
     }
 generator => {
+    // core synchronous consept 
+    function *createFlow() {
+        const num = 10;
+        const newNum = yield num;
+        yield 5 + newNum;
+    }
+    const returnNextElement = createFlow();
+    const elemOne = returnNextElement.next();   // 10
+    const elemTwo = returnNextElement.next(2);  // 7
+
+    // core async consept
+    function doWhenDataReceived(value) {
+        returnNextElement.next(value);
+    }
+    function *createFlow() {
+        const data = yield fetch('url');
+        console.log(data);
+    }
+    const returnNextElement = createFlow();
+    const futureData = returnNextElement.next();
+    futureData.then(doWhenDataReceived);
+
     // suspend execution while retaining context
     function ajax(endPoint) {
         fetch(endPoint)
@@ -1154,13 +1183,33 @@ promise => {
     }
 asyncAwait => {
     // subset of Generators, works only with Promises
-    let getRepo = async (name) => { ... }
-    async function getRepo(name) {
-        let response = await fetch(`https://api.github.com/users/${user}`)
-        let data = await response.json()
-        return data
+
+    // core consept
+
+    async function createFlow() {
+        console.log('Me first');
+        const data = await fetch('url');
+        console.log(`Me third with data: ${data}`);
     }
-    var promise = getRepo().then(...)
+    createFlow();
+    console.log('Me second');
+
+    async function getRepo(name) {
+        let response = await fetch(`https://api.github.com/users/${user}`);
+        let data = await response.json();
+        return data;
+    }
+    var promise = getRepo().then(...);
+
+    // parallel fetch
+    const fetchAll = async (payload: any) => {
+      const [schedules, weekSchedules, holidays] = await Promise.all([
+      fetchSchedules(payload.scheduleService),
+      fetchWeekSchedules(payload.scheduleService),
+      fetchHolidays(payload.scheduleService),
+    ]);
+    return { holidays, schedules, weekSchedules };
+    }
     }
 
 class => {
@@ -1302,3 +1351,4 @@ webSockets => {
 
     server.listen(80)
     }
+
