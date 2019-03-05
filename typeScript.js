@@ -7,12 +7,13 @@ explicitTyping => {
 casting => {
 	let input = document.querySelector("name") as HTMLInputElement
 	}
+functions => {
+	//
+	}
 objShape => {
-	let obj: { name: string, password: string }				// declaration
-	obj = { name: "name", password: "pass", id: 123 }		// assigment with error
-	obj = {
-		name: "name", password: "pass", id: 123
-	} as { name: string, password: string, id: number }		// assigmeng with type casting
+	type ISecuritiesState = {
+	  renewStamps: { [k: number]: number };
+	};
 	}
 interface => {
 	interface Obj { name: string; password: string; }		// can`t have implementation, describe shape of obj
@@ -68,3 +69,23 @@ enums => {
 	type Acct = [number, AcctType]
 	let account: Acct = [9000, AcctType.Checking]
 	}
+set => {
+	uuidsValidatedList: Set<string>;
+	}
+reactProps => {
+	// callback
+	interface Props {
+		onRevokeKeySubmit(event: any): void;
+	}
+	}
+events => {
+    <ListItemText
+      primary={title}
+      onClick={this.handleClick(item)}
+    />
+
+    handleClick = (item: any) => () => {
+    	const { handleRead } = this.props;
+    	handleRead(item);
+  	};
+}
