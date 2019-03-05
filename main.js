@@ -243,7 +243,7 @@ thisPointer => {
     // "this" pointer will be set to global obj, will bind to "underfined" in strict mode
 
     // method form of invocation
-    obj.methodName(args); obj["methodName"](args)
+    obj.methodName(args);
     // "this" pointer will be set to "obj", the obj containing the "methodName"
 
     // constructor form of invocation
@@ -1185,7 +1185,6 @@ asyncAwait => {
     // subset of Generators, works only with Promises
 
     // core consept
-
     async function createFlow() {
         console.log('Me first');
         const data = await fetch('url');
@@ -1351,4 +1350,3 @@ webSockets => {
 
     server.listen(80)
     }
-
