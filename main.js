@@ -743,6 +743,7 @@ arrayObject => {
     var firstElementValue = arr.shift()             // delete first elem
     var removedItem = arr.splice(index, 1)          // remove by index pos, slow operation
     arr.reverse()                                   // reverse an arr in place
+    arr.fill(value[, startIndex[, endIndex]])       // fill with static values or with copied refs of passed obj
     arr.sort(function (a, b) { if (a < b) return -1; if (a > b) return 1; return 0 })
 
     // accessor nonmutator methods
@@ -751,42 +752,26 @@ arrayObject => {
     arr.indexOf(searchElem[, fromIndex])            // returns first index at which elem can be found
     arr.lastIndexOf(searchElem[, fromIndex])
     arr.join([, separator])                         // join all elems of an arr, specify str to separate each pair
-    var arr = oldArr.slice([, begin], [, end])      // return shallow copy of a portion of an arr into new array 
+    var arr = oldArr.slice([, begin], [, end])      // return shallow copy of a portion of an arr into new array
+    var arr = oldArr.flat([depth])                  // flattening nested arrays, 'Infinity' as value can be passed
 
     // iteration nonmutator methods
-    var iter = a.entries()                              // var a = ['a', 'b'] => { value: [ 0, 'a' ], done: false }
-    var iter = a.keys(); iter.next()                    // var a = ['a', 'b'] => { value: 0, done: false }
-    var bool = a.every(function(val,i,arr){}[, this])   // test each elem, if find falsy return false, otherwise true
-    var arr = a.filter(function(val,i,arr){}[, this])   // new arr with elems that pass test with predicate
-    var val = a.find(function(val,i,arr){}[, this])     // return val of first elem that pass test or undefined
-    var i = a.findIndex(function(val,i,arr){}[, this])  // return index of first elem that pass test or -1
-    a.forEach(function(val,i,arr){}[, this])            // return undefined, not chainable, cannot break (only exception)
-    var arr = a.map(function(val, i, arr){}[, this])    // return result of callback func
-    arr.reduce(function(val, i, arr){}[, initialVal])   // accumulates callback return val to reduce it to a single val
-    var bool = a.some(function(val, i, arr){}[, this])  // true if callback return truthy val for any element, otherwise false
+    var a = arr.filter((val, i, arr) => {return 'elems that passed the test with predicate'}, this)
+    var a = arr.find((val, i, arr) => {return 'first elem that passed the test with predicate or undefined'}, this)
+    var i = arr.findIndex((val, i, arr) => {return 'index of first elem that passed the test with predicate or -1'}, this)
+    arr.forEach((val, i, arr) => {return 'not chainable, cannot be broke (only exception)'}, this)
+    var a = arr.map((val, i, arr) => {return 'result of callback func'}, this)
+    var r = arr.reduce((acc, value) => { return value !== null ? acc.push(value) : acc}, [])
+    var r = arr.reduceRight((acc, val, i, arr) => { return 'no init value could be provided' }, [])
+    var b = arr.some((val, i, arr) => {return 'true if callback returns truthy val for any element, or false'}, this)
+    
+    // remove all negative vals and split odds into an even number and 1
+    let a = [5, 4, -3, 20, 17, -33, -4, 18]     // => [4, 1, 4, 20, 16, 1, 18]
+    a.flatMap(n =>
+      (n < 0) ? [] :
+      (n % 2 == 0) ? [n] : [n-1, 1]
+    )
 
-    // arr.reduce() max value example
-    const ages = [21,18,42,40,64,63,34]
-    const max = ages.reduce((max, age) => {
-        if (age > max) return age
-        else return max
-    }, 0)   // 21 > 0 = true; 18 > 21 = false; 42 > 21 = true; 40 > 42 = false; 64 > 42 = true; maxAge 64
-
-    // arr.reduce() from array to object
-    const colors = [
-        { id: '-xekare', title: "rad red", rating: 3 },
-        { id: '-jbwsof', title: "big blue", rating: 2 }
-    ]
-    const hashColors = colors.reduce((hash, {id, title, rating}) => {
-        hash[id] = {title, rating}
-        return hash
-    }, {})
-
-    // arr.reduce() array of unique items
-    const colors = ["red", "red", "green", "blue", "green"]
-    const distinctColors = colors.reduce((distinct, color) =>
-        (distinct.indexOf(color) !== -1) ? distinct : [...distinct, color]
-    , [])   // ["red", "green", "blue"]
 
     // copy and passing as argument
     var shallowCopy = arrName.slice()
@@ -803,11 +788,10 @@ arrayObject => {
 
     // destructuring
     var colors = ["red", "green", "blue"]
-    var [firstColor, secondColor ] = colors        // firstColor = "red"; secondColor = "green"
-    var [,,thirdColor] = colors      // thirdColor = "blue"
-    var [firstColor, secondColor = "white"] = colors    // default value
+    var [firstColor, secondColor ] = colors
+    var [,,thirdColor] = colors
+    var [firstColor, secondColor = "white"] = colors
     var [x,...y] = "abc"    // rest operator x='a'; y=['b', 'c']
-
     const items = [ ["foo", 3], ["bar", 9] ]
     items.forEach(([word, count]) => console.log(word+' '+count))
     const items = [{ word:'foo', count:3 }, { word:'bar', count:9 }]
@@ -957,6 +941,18 @@ iterator => {
     // Symbol.iterator symbol specifies a func that returns an iterator for arrs, sets, and maps
     let values = [1, 2, 3]
     let iterator = values[Symbol.iterator]()   // iterator.next() => "{ value: 1, done: false }"
+    // manual realization
+    const createFlow = array => {
+        let i = 0;
+        return () => {
+            const nextValue = array[i];
+            i += 1;
+            return {
+                value: nextValue,
+                done: array.length <= i ? true : false,
+            };
+        };
+    }
 
     // for-of loop
     let values = [1, 2, 3]     // calls next() on an iterable each time the loop executes
@@ -984,16 +980,13 @@ generator => {
     const elemTwo = returnNextElement.next(2);  // 7
 
     // core async consept
-    function doWhenDataReceived(value) {
-        returnNextElement.next(value);
-    }
     function *createFlow() {
         const data = yield fetch('url');
         console.log(data);
     }
     const returnNextElement = createFlow();
     const futureData = returnNextElement.next();
-    futureData.then(doWhenDataReceived);
+    futureData.then(data => returnNextElement.next(data), err => console.log(err));
 
     // suspend execution while retaining context
     function ajax(endPoint) {
@@ -1065,6 +1058,10 @@ generator => {
     iterator.next()     // { value: true, done: false }
     }
 promise => {
+    // will return object immediately
+        // property "value" will be used for storing respose data
+        // hidden property "onFulfillment" array that all will be triggered as soon as "value" gets updated
+        // returnedPromiseObj.then will push functions onto "onFulfillment" array
     // states: pending, fulfilled, rejected, immutable once resolved
     const getFakeMembers = count => new Promise((resolve, reject) => {
         const api = `https://api.randomuser.me/?nat=US&results=${count}`
@@ -1080,18 +1077,6 @@ promise => {
         members => console.log(members),
         err => console.error(new Error("cannot load members from randomuser.me"))
     )
-
-    // load an image
-    loadImage("name.png")
-        .then(img => document.body.appendChild(img))
-        .catch(e =>  console.log(e))
-    function loadImage(url) {
-        return new Promise(function resolver(resolve, reject) {
-            var img = new Image(); img.src = url
-            img.onload = function() {resolve(img)}
-            img.onerror = function(e) {reject(e)}
-            });
-    }
 
     // error handling, always use "throw Error(val)" error obj
     Promise.reject(Error('bad news'))
@@ -1153,33 +1138,16 @@ promise => {
       return result;
     }
 
-    // conditional logic
-    var user = {
-        authenticated: false,
-        login() { console.log("returns promise for login request, set authenticated to true") }
-    }
-    function showMainMenu() {
-        var p = (!user.authenticated) ? user.login() : Promise.resolve()
-        return p.then(function () { console.log("code to display main menu")})
-    }
-
     // parallel execution
     var accounts = ['Checking Account', 'Travel Rewards Card', 'Big Box Retail Card']
-    accounts.forEach(function (account) {
-        ajax(account.url)
-            .then(function (balance) { console.log(account + ' Balance: ' + balance) })
-    })
+    accounts
+        .forEach(account => fetch(account)
+            .then(balance => console.log(account + ' Balance: ' + balance)))
 
-    var requests = accounts.map(function (account) { return ajax(account.url) })    
+    var requests = accounts.map(account => fetch(account))    
     Promise.all(requests)
-        .then(function (balances) {
-            console.log('All ' + balances.length + ' balances are up to date')
-        })
-        .catch(function (error) {
-            console.log('An error occurred while retrieving balance information')
-            console.log(error);
-        })
-
+        .then(balances => console.log('All ' + balances.length + ' balances are up to date'))
+        .catch(error => console.log(error))
     }
 asyncAwait => {
     // subset of Generators, works only with Promises
