@@ -42,35 +42,11 @@ referenceVal => {
 string => {
     // string => immutable type, represents a single 16-bit unit of UTF-16 text
     var foo = new String("foo"); typeof foo    // "object"; keys = [0,1,2]; vals = ['f','o','o']
-
-    // behind the scenes
-    var a = "Ser"; var c = a.charAt(0); console.log(c)
-    var a = "Ser"; var t = new String(a); var c = t.charAt(0); t = null; console.log(c)
-
-    String.prototype.yourMethodName = function() { return /* logic here */ }    // add custom methods
-    sre.length                                  // str length
-    str.startsWith(searchString[, position])    // boolean
-    str.endsWith(searchString[, length])        // boolean
-    str.includes(searchString[, position])      // boolean
+    str.length                                  // str length
     
-    str.trim()                                  // remove whitespace from both ends
-    str.substr(start, [length])                 // string    
-    str.replace(substr, newSubstr)              // nonmutator, function can be passed
-    str.slice(beginIndex[, endIndex])           // nonmutator, new str containing extracted section of str
-    str.split([separator[, limit]])             // splits str into an array of strs, using separator
-
-    str.charAt(index)                           // string
-    str.indexOf(searchValue[, fromIndex])       // first occurrence of specified val or -1
-    str.lastIndexOf(searchValue[, fromIndex])   // last occurrence of specified val or -1
-
-    // template literal
-    let message = `Multiline
-        string`                 // indentation is counting in 'message.length'
-    let count = 10,             // template literal substitution === string concatenation
-        price = 0.25,
-        message = `${count} items cost ${(count * price).toFixed(2)}.`
-    
-    tagFunction`Hello ${firstName} ${lastName}!`
+    // string interpolation
+    formatCurrency`Hello ${firstName} ${lastName}!`
+    function formatCurrency(stringsArray, ...values) {...}
 
     // iterate over str
     for (let char of "abc") console.log(char)
@@ -349,11 +325,6 @@ func => {
     var x = Person("Sergey")       // [[Call]] method executes the body of func as it is
     var y = new Person("Sergey")   // [[Construct]] methods executes, new object is created,
         // then executing the func body with "this" set to the new target
-
-    // destructuring
-    var regularPerson = { firstname: "Bill" }
-    var lordify = ({firstname}) => { console.log(`${firstname} of Canterbury`) }
-    lordify(regularPerson)
     }
 arrowFunc => {
     // fat arrow (arrow func)
@@ -523,24 +494,6 @@ object => {
     Object.entries(obj)     // => arr of enumerable prop [key, value] pairs, not including proto chain
     Object.keys(obj)        // => arr of keys, unspecified enumeration order, not including proto chain
     Object.values(obj)      // => arr of vals, unspecified enumeration order, not including proto chain
-
-    // destructuring
-    var person = {name: "S", age: 35}
-    var {name, age} = person       // var name = "S"; var age = 35
-    var {name, age, admin = true} = person    // ("S", 35, true) or ("S", 35, underfined) if no default val provided
-    var {name: fullName, age: fullAge } = person    // assign to a different name
-    var {name: fullName, age: fullAge = 36 } = person    // default val
-
-    var person = { admin: { name: "name" } }
-    var { admin: { name }} = person         // nested object
-
-    var name = "Tallac"; var elevation = 9738
-    var print = function() { console.log(`Mt. ${this.name} is ${this.elevation} feet tall`) }
-    var funHike = { name, elevation, print }
-    funHike.print()     // Mt. Tallac is 9738 feet tall
-    // several levels deep
-    const obj = {a: [{ foo: 123, bar: "abc" }, {}], b: true }
-    const { a: [{foo: f}] } = obj       // f = 123
     }
 constructorCall => {
     // func with constructor call use "new" in order to construct an obj
@@ -772,7 +725,6 @@ arrayObject => {
       (n % 2 == 0) ? [n] : [n-1, 1]
     )
 
-
     // copy and passing as argument
     var shallowCopy = arrName.slice()
     var shallowCopy = Array.from(Object.create(arrName))
@@ -785,17 +737,6 @@ arrayObject => {
     for (let i in arr) {}     // iterate over array index, not values
     for (let i of arr) {}     // calls next() on an iterable each time the loop executes
     var iterator = arr[Symbol.iterator]()   // iterator.next() => "{ value: 1, done: false }"
-
-    // destructuring
-    var colors = ["red", "green", "blue"]
-    var [firstColor, secondColor ] = colors
-    var [,,thirdColor] = colors
-    var [firstColor, secondColor = "white"] = colors
-    var [x,...y] = "abc"    // rest operator x='a'; y=['b', 'c']
-    const items = [ ["foo", 3], ["bar", 9] ]
-    items.forEach(([word, count]) => console.log(word+' '+count))
-    const items = [{ word:'foo', count:3 }, { word:'bar', count:9 }]
-    items.forEach(({word, count}) => console.log(word+' '+count))
     }
 arrayBuffer => {
     // typed array, allow storage and manipulation of eight different numeric types
@@ -914,6 +855,42 @@ loops => {
 
     // using iterators’ contents in arrs
     for (const [index, element] of ['a', 'b'].entries()) console.log(index, element)
+    }
+destructuring => {
+    // function parameters
+    var regularPerson = { firstname: "Bill" }
+    var lordify = ({firstname}) => { console.log(`${firstname} of Canterbury`) }
+    lordify(regularPerson)
+
+    // object
+    // there is a pattern on the left handside, describes what values we are expecting to get from func call
+    const [
+        {
+            name: firstName,
+            email: firstEmail = 'name@name.com',
+        },
+        {
+            name: secondName,
+            email: secondEmail = 'name@name.com',
+            ...moreData,                        // separate object with all the rest props copied
+        },
+    ] = getSomeData();
+
+    var person = { admin: { name: "name" } }    // nested object
+    var { admin: { name }} = person
+    const obj = {a: [{ foo: 123, bar: "abc" }, {}], b: true }
+    const { a: [{foo: f}] } = obj       // f = 123
+
+    // array
+    var colors = ["red", "green", "blue"]
+    var [firstColor, secondColor ] = colors
+    var [,,thirdColor] = colors
+    var [firstColor, secondColor = "white"] = colors
+    var [x,...y] = "abc"    // rest operator x='a'; y=['b', 'c']
+    const items = [ ["foo", 3], ["bar", 9] ]
+    items.forEach(([word, count]) => console.log(word+' '+count))
+    const items = [{ word:'foo', count:3 }, { word:'bar', count:9 }]
+    items.forEach(({word, count}) => console.log(word+' '+count))
     }
 restOperator => {
     // use instead of arguments inside function declaration
@@ -1169,7 +1146,7 @@ asyncAwait => {
     var promise = getRepo().then(...);
 
     // parallel fetch
-    const fetchAll = async (payload: any) => {
+    const fetchAll = async (payload) => {
       const [schedules, weekSchedules, holidays] = await Promise.all([
       fetchSchedules(payload.scheduleService),
       fetchWeekSchedules(payload.scheduleService),
@@ -1177,7 +1154,12 @@ asyncAwait => {
     ]);
     return { holidays, schedules, weekSchedules };
     }
+
+    // iterate over async data
+    for await (let data of fetchURL(['url1', 'url2'])) {
+        console.log(data)
     }
+}
 
 class => {
     class Human {
