@@ -532,76 +532,42 @@ constructorCall => {
         else throw new Error("You must use new with Person.")
     }
     }
-prototype => {
-    // nature of prototype chain
-    function userCreator(name, score) {
-        var user = Object.create(userFunctionScore) // inherit methods from "userFunctionScore" obj
-        user.name = name
-        user.score = score
-        return user
-    }
-    var userFunctionScore = { increment: function() {this.score++} }
-    var newUser = userCreator("Sergey", 1)
-    newUser = {
-        name: "Sergey",
-        score: 1,
-        __proto__: userFunctionScore
-    }
-
-    // the same as above
-    function userCreator(name, score) {
-        this.name = name
-        this.score = score
-    }
-    userCreator.prototype.increment = function() {this.score++}
-    userCreator = {
-        prototype: {
-            increment: function() {this.score++}
-        }
-    }
-    var newUser = new userCreator("Sergey", 1)
-    
+prototype => {    
     // func has .prototype prop that is shared among all obj instances
     // func .prototype prop is created with .constructor prop equal to the func itself
     // Object.prototype == top-end of every normal [[Prototype]] chain
     function Person(name) { this.name = name }
-    Person.prototype.method = function() { this.name }  // method will be shared among instances
-    Person.prototype.favs = []              // ref val, all instances will point to the same array
+    Person.prototype.methodName = function() { this.name }  // method will be shared among instances
+    Person.prototype.favs = []                              // ref val, all instances will point to the same array
+    Person = {
+        prototype: {
+            methodName: function() { this.name },
+            favs: [],
+        }
+    }
+    var nextPerson = new Person('Sergey');
+    nextPerson = {                                          // this pointer inside
+        name: "Sergey",
+        __proto__: {
+            methodName: function() { this.name },
+            favs: [],
+        }
+    }
 
-    // the same as above two lines, but .constructor prop will be lost!
-    Person.prototype = { method: function() { this.name }, favs: [] }
-    var me = new Person()
-    me instanceof Person        // true
-    me.constructor === Person   // false
-    me.constructor === Object   // true
-    Person.prototype = { constructor: Person, method: function() { this.name }, favs: [] }
-    me instanceof Person        // true
-    me.constructor === Person   // true
-    me.constructor === Object   // false
-
-    obj.foo = "bar"
     // if data accessor prop named "foo" is found higher on the [[Prototype]] chain,
         // and it's NOT writable:false, new prop "foo" is added directly to "obj", resulting in a shadowed prop
     // "foo" is found on the [[Prototype]] chain, but it IS writable:false, error will be thrown,
         // both setting that existing prop as well as creation of shadowed prop on "obj" are disallowed
     // "foo" is found on the [[Prototype]] chain and it's a setter, then the setter will always be called
         // no "foo" will be added to "obj"
-    // have to use "Object.defineProperty()" for second and third cases in order to add "foo" to "obj"
-
-    // instance obj have prop [[Prototype]], a pointer to the prototype obj that instance is using
-    var me = new Person()
-    var proto = Object.getPrototypeOf(me)
-    proto === Person.prototype                  // true
-    Person.prototype.isPrototypeOf(me)          // true
-    
-    Object.setPrototypeOf(target, supplier)     // change the prototype of any obj
+    Person.prototype.isPrototypeOf(nextPerson)          // true
+    Object.setPrototypeOf(target, supplier)             // change the prototype of any obj
 
     // "super" is a pointer to the current obj prototype
     var person = { getGreeting() { return "Hello" } }
     var man = { getGreeting() { return super.getGreeting() + ", hi!" } }                                    // ES6
     var man = { getGreeting() { return Object.getPrototypeOf(this).getGreeting.call(this) + ", hi!" } }     // ES5
     Object.setPrototypeOf(man, person)
-
 
     var obj = {}
     obj.toString()                  // > "[object Object]" method comes from the proto chain
@@ -616,17 +582,6 @@ prototype => {
     // enumerate via prototype chain
     for (let i in obj)     // any prop of "obj" that can be reached via chain will be enumerated
     let i = ("key" in obj) // check the entire chain of the obj
-
-    // add methods to the obj
-    Object.assign(SomeClass.prototype, {
-        someMethod() { ··· },
-        anotherMethod() { ··· }
-    })
-    // clone obj with same prototype as original
-    function clone(orig) {
-        const origProto = Object.getPrototypeOf(orig)
-        return Object.assign(Object.create(origProto), orig)
-    }
     }
 inheritance => {
     // prototype chaining or prototypal inheritance
@@ -1159,7 +1114,7 @@ asyncAwait => {
     for await (let data of fetchURL(['url1', 'url2'])) {
         console.log(data)
     }
-}
+    }
 
 class => {
     class Human {
